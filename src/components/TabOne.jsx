@@ -58,7 +58,7 @@ const TabOne = () => {
         {!window.location.pathname.endsWith("about/") && <Search />}
       </div>
 
-      <Typography variant="h5" align="center" fontWeight="bold">
+      <Typography variant="h5" align="center" fontWeight="bold" my={5}>
         Nike Air Jordan 5 (2024)
       </Typography>
 

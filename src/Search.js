@@ -183,7 +183,7 @@ export default function Search() {
       {!chosenVersion.product_info_id && (
         <div>
           <div className="buffer"></div>
-          <p>A platform that reveals the profit margins of consumer products</p>
+          {/* <p>A platform that reveals the profit margins of consumer products</p> */}
           <p></p>
         </div>
       )}

@@ -1,0 +1,290 @@
+.header {
+  color: #2caffe;
+  cursor: pointer;
+}
+.search {
+  flex-direction: column;
+  text-align: left;
+  font-size: 17px;
+}
+.flex-container {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+.btn {
+  border: 2px solid #282c34;
+  border-radius: 12px;
+  background-color: #282c34;
+  color: #2caffe;
+  font-size: calc(10px + 1vmin);
+  margin-left: 2vh;
+  margin-right: 2vh;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+.search-phone {
+  width: 90vw;
+}
+
+.outside-search-phone {
+  margin-left: 2.85vw;
+}
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+  position: relative;
+}
+
+.search-beginning {
+  margin-top: 0.5em;
+}
+.active {
+  background: lightgray;
+  text-align: left;
+  margin: 0;
+  margin-left: 0.5em;
+  padding-top: 0;
+}
+
+.not-active {
+  text-align: left;
+  margin: 0;
+  margin-left: 0.5em;
+  padding-top: 0;
+}
+
+.active:focus {
+  background: red;
+}
+
+.hide {
+  display: none;
+}
+
+.form2 {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: auto;
+  margin-right: 20px;
+  margin-left: 20px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.form3 {
+  margin-right: 10%;
+  margin-left: 10%;
+  margin-top: 20px;
+  justify-content: center;
+}
+.picture {
+  max-height: 50vh;
+  max-width: 50vh;
+}
+
+.form {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: auto;
+  margin-right: 20px;
+}
+
+.input-form {
+  width: 100%;
+  padding: 0.5em;
+  border: 0px;
+  background-size: 20px;
+  font-size: min(17px);
+  background-color: rgba(0, 0, 0, 0.05);
+  height: 42px;
+}
+.input-form::placeholder {
+  color: #7d7676;
+  font-weight: 500;
+}
+
+.display-autocomplete {
+  overflow: auto;
+  max-height: 25%;
+  width: 31vw;
+  background-color: white;
+  cursor: pointer;
+}
+
+.display-autocomplete-phone {
+  overflow: auto;
+  max-height: 25%;
+  width: 94vw;
+  background-color: white;
+  cursor: pointer;
+}
+
+.display-autocomplete-modal {
+  overflow: auto;
+  padding-top: 10px;
+  width: 100%;
+  z-index: 500;
+}
+
+.display-autocomplete-modal-meta {
+  overflow: auto;
+  width: calc(50% - 50px);
+  z-index: 500;
+  position: absolute;
+}
+
+.meow {
+  width: 30vw;
+  margin: 25px auto;
+}
+
+.input-button {
+  flex-shrink: 0;
+  width: 30px;
+  border: none;
+  background-color: #4b3efb;
+  color: white;
+  padding: 0px;
+}
+.buffer {
+  height: 5vh;
+}
+
+.about {
+  text-align: left;
+  margin: 2em;
+}
+.footer {
+  background-color: #282c34;
+  padding: 15px 0px;
+  font-size: calc(10px + 1vmin);
+  float: left;
+  width: 100%;
+}
+.search-stuff {
+  max-width: 40em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.normal-button {
+  background-color: #4b3efb;
+  color: white;
+  cursor: pointer;
+}
+
+#search-bar {
+  padding: 5px 25px;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 50%;
+  justify-content: center;
+}
+
+.select-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: "center";
+}
+.select {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2vh;
+  margin-bottom: 1vh;
+}
+
+.finally {
+  overflow: auto;
+  position: absolute;
+  background-color: white;
+  max-height: 30%;
+  z-index: 500;
+}
+.row2 {
+  height: 50%;
+  justify-content: center;
+}
+.column {
+  width: 50%;
+}
+.column2 {
+  text-align: left;
+  margin-left: 10vh;
+  width: 50%;
+}
+
+.autocomplete-headline {
+  font-weight: bold;
+  font-size: large;
+  position: relative;
+  padding: 5px 25px;
+  margin-top: 20px;
+}
+
+.autocomplete-headline2 {
+  text-align: left;
+  font-weight: bold;
+  font-size: large;
+  position: relative;
+}
+
+.icon {
+  margin: 0;
+  position: absolute;
+  -ms-transform: translate(-50%, -40%);
+  transform: translate(-50%, -40%);
+}
+
+.suggestions {
+  list-style: none;
+  text-align: left;
+}
+
+.button-searchpage {
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  margin: 5px 20px 5px 20px;
+}
+
+.button-category {
+  margin-right: 5px;
+  background-color: black;
+  color: white;
+}
+
+.test {
+  margin-top: 20px;
+}
+
+.left {
+  margin-left: 0.5vw;
+}
+
+.right {
+  margin-right: 0.5vw;
+}
+
+.shut-up {
+  margin-bottom: 5vh;
+}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Search from "../Search";
 import { Box, Typography } from "@mui/material";
 
@@ -12,7 +13,21 @@ const cellStyle = {
 };
 
 export const TabTwo = () => {
-  const data = {
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSearchResult = (data) => {
+    if (!data || typeof data !== "object") {
+      setError("No results found.");
+      return;
+    }
+    setApiData(data);
+    setError("");
+  };
+
+  // fallback if apiData is empty
+  const fallbackData = {
     company: "Nike",
     year: 2024,
     ceo: "Elliot Hill",
@@ -20,14 +35,20 @@ export const TabTwo = () => {
     workerSalary: "$35,500.0",
   };
 
+  const data = apiData?.results?.[0] || fallbackData;
+
   return (
     <>
       <div className="search-form">
-        {!window.location.pathname.endsWith("about/") && <Search />}
+        {!window.location.pathname.endsWith("about/") && (
+          <Search apiType="tax" onProductSelect={handleSearchResult} />
+        )}
       </div>
 
+      {loading && <Typography align="center">Loading...</Typography>}
+      {error && <Typography color="error" align="center">{error}</Typography>}
+
       <Box sx={{ p: 2 }}>
-        {/* ✅ Scrollable wrapper */}
         <Box sx={{ overflowX: "auto" }}>
           <Box sx={{ minWidth: "750px" }}>
             {/* Header Row */}

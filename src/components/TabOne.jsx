@@ -1,4 +1,4 @@
-import Search from "../Search";
+import { useEffect, useState } from "react";
 import Productimage from "../assets/image/product-image.png";
 import {
   Box,
@@ -9,106 +9,158 @@ import {
   TableHead,
   TableRow,
   Paper,
+  TextField,
 } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
+import axios from "axios";
 
 export const TabOne = () => {
+  const [data, setData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          "https://api.the-aysa.com/product-semantic-search"
+        );
+        const items = response.data.data || [];
+        setData(items);
+      } catch (err) {
+        console.error("GET request failed:", err);
+        setError("Failed to load product data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllProducts();
+  }, []);
+
+  const parseCurrency = (val) =>
+    parseFloat(val?.replace(/[^0-9.]/g, "") || "0");
+
+  const filteredData = data.filter((item) =>
+    item.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.brand?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const first = filteredData[0] || {};
+
+  const production = parseCurrency(first.profit_made);
+  const market = parseCurrency(first.profit_price);
+  const profit = market - production;
+
   const chartData = {
-    labels: ["Market Price", "Production Cost", "Profit"],
+    labels: [`Market Price: $${market}`],
     datasets: [
       {
-        label: "USD",
-        data: [200, 170, 30],
-        backgroundColor: ["#1976d2", "#64b5f6", "#81c784"],
+        label: `Production Cost: $${production}`,
+        data: [production],
+        backgroundColor: "#5C6BC0",
+      },
+      {
+        label: `Profit: $${profit}`,
+        data: [profit],
+        backgroundColor: "#4FC3F7",
       },
     ],
   };
 
-  const tableRows = [
-    {
-      brand: "Nike",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-      image: "https://cdn.flightclub.com/2600/TEMPLATE/307078/1.jpg",
-      name: "Air Jordan 5",
-      margin: "65%",
+  const chartOptions = {
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+      title: {
+        display: true,
+        text: `Profit Margin: ${first.profit_margin || "N/A"} (*)`,
+        font: { size: 18, weight: "bold" },
+      },
     },
-    {
-      brand: "Asics",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg",
-      image:
-        "https://images.asics.com/is/image/asics/1201A789_102_SR_RT_GLB?$zoom$",
-      name: "GEL-NYC",
-      margin: "52%",
+    responsive: true,
+    scales: {
+      x: {
+        stacked: true,
+        title: {
+          display: true,
+          text: "Market Price",
+        },
+      },
+      y: {
+        stacked: true,
+        beginAtZero: true,
+      },
     },
-    {
-      brand: "Adidas",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg",
-      image:
-        "https://images.asics.com/is/image/asics/1201A789_102_SR_RT_GLB?$zoom$",
-      name: "Adios Pro",
-      margin: "60%",
-    },
-  ];
+  };
 
   return (
     <>
-      <div className="search-form">
-        {!window.location.pathname.endsWith("about/") && <Search />}
-      </div>
+      {loading && <Typography align="center">Loading...</Typography>}
+      {error && <Typography color="error" align="center">{error}</Typography>}
+
+      <Box m={3}>
+        <TextField
+          label="Search Products"
+          variant="outlined"
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
 
       <Typography variant="h5" align="center" fontWeight="bold" my={5}>
-        Nike Air Jordan 5 (2024)
+        {first.product_name || "Product Overview"} ({first.year || ""})
       </Typography>
 
-      <Box
-        display="flex"
-        flexWrap="wrap"
-        justifyContent="space-between"
-        my={4}
-        mb={5}
-      >
+      <Box display="flex" flexWrap="wrap" justifyContent="space-between" my={4}>
         <Box flex={1} maxWidth="45%" mb={2}>
-          <img src={Productimage} alt="Air Jordan 5" style={{ width: "50%" }} />
+          <img
+            src={first.product_url || Productimage}
+            alt={first.product_name || "Product"}
+            style={{ width: "100%", maxWidth: 300 }}
+          />
         </Box>
-
         <Box flex={1} maxWidth="45%">
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-            Profit Margin: 15%(↑)
-          </Typography>
-          <Bar data={chartData} />
+          <Bar data={chartData} options={chartOptions} />
         </Box>
       </Box>
 
       <Typography
         variant="h6"
         align="center"
-        sx={{ backgroundColor: "black", color: "white", py: 1 }}
+        sx={{ backgroundColor: "black", color: "white", py: 1, mt: 4 }}
       >
-        Comparing the Nike profit margin to the below similar products
+        Product Profit Comparisons
       </Typography>
 
       <Paper elevation={3}>
         <Table>
           <TableHead sx={{ backgroundColor: "#b3e5fc" }}>
-            <TableRow className="Table-head">
-              <TableCell>Brand Name</TableCell>
+            <TableRow>
+              <TableCell>Brand</TableCell>
               <TableCell>Product Picture</TableCell>
               <TableCell>Product Name</TableCell>
               <TableCell>Profit Margin</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableRows.map((row, idx) => (
-              <TableRow key={idx} className="Table-row">
+            {filteredData.map((row, idx) => (
+              <TableRow key={idx}>
+                <TableCell>{row.brand}</TableCell>
                 <TableCell>
-                  <img src={row.logo} alt={row.brand} width="60" />
+                  <img
+                    src={row.product_url}
+                    alt={row.product_name}
+                    width={80}
+                  />
                 </TableCell>
-                <TableCell>
-                  <img src={row.image} alt={row.name} width="80" />
-                </TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.margin}</TableCell>
+                <TableCell>{row.product_name}</TableCell>
+                <TableCell>{row.profit_margin}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -117,4 +169,3 @@ export const TabOne = () => {
     </>
   );
 };
-

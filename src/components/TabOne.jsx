@@ -33,7 +33,7 @@ export const TabOne = () => {
         console.log("API Response:", response.data); // ✅ log response
         setApiData(response.data);
       } catch (err) {
-        console.error("CORS/API Error:", err);
+        console.error("CORS/API Error:", err); 
         setError("Failed to fetch data from API.");
       } finally {
         setLoading(false);

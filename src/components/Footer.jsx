@@ -1,7 +1,6 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
-const Footer = () => {
+export const Footer = () => {
   return (
     <footer className="footer">
       <div className="flex-container">
@@ -24,4 +23,3 @@ const Footer = () => {
   );
 };
 
-export default Footer;

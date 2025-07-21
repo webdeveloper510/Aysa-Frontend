@@ -1,4 +1,3 @@
-import React from "react";
 import Search from "../Search";
 import { Box, Typography } from "@mui/material";
 
@@ -12,7 +11,7 @@ const cellStyle = {
   overflowWrap: "break-word",
 };
 
-const TabThree = () => {
+export const TabThree = () => {
   const data = {
     company: "Amazon",
     year: 2024,
@@ -96,4 +95,3 @@ const TabThree = () => {
   );
 };
 
-export default TabThree;

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import TabOne from "./TabOne";
-import TabTwo from "./TabTwo";
-import TabThree from "./TabThree";
+import { useState } from "react";
+import {TabOne} from "./TabOne";
+import {TabTwo} from "./TabTwo";
+import {TabThree} from "./TabThree";
 
 const tabs = [
   {
@@ -18,7 +18,7 @@ const tabs = [
   },
 ];
 
-const Tabs = () => {
+export const Tabs = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -43,5 +43,3 @@ const Tabs = () => {
     </>
   );
 };
-
-export default Tabs;

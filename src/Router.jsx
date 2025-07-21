@@ -1,9 +1,8 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
-import About from "./components/About";
-import Tabs from "./components/Tabs";
+import {About} from "./components/About";
+import {Tabs} from "./components/Tabs";
 
-const Router = () => {
+export const Router = () => {
   return (
     <Routes>
       <Route path="/" element={<Tabs />} />
@@ -11,5 +10,3 @@ const Router = () => {
     </Routes>
   );
 };
-
-export default Router;

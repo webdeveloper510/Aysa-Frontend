@@ -1,7 +1,6 @@
 import "./App.css";
-import React from "react";
-import Footer from "./components/Footer";
-import Router from "./Router";
+import {Footer} from "./components/Footer";
+import {Router} from "./Router";
 
 const test = () => {
   window.location.assign("/");

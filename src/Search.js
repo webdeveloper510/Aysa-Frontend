@@ -6,9 +6,9 @@ import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 
-export default function Search() {
+export default function Search({ onProductSelect }) {
   const [searchInput, setSearchInput] = useState("");
   const [suggestionIndex, setSuggestionIndex] = useState(0);
   const [suggestions, setSuggestions] = useState([]);
@@ -20,6 +20,7 @@ export default function Search() {
   const [versions, setVersions] = useState({});
   const [chosenVersion, setChosenVersion] = useState({});
   const [version, setVersion] = useState("");
+
   useEffect(() => {
     serverCallForAutocomplete("");
   }, []);
@@ -44,7 +45,7 @@ export default function Search() {
   window.addEventListener("resize", changeScreenOrientation);
   useEffect(() => {
     changeScreenOrientation();
-  });
+  }, []);
   useEffect(() => {
     if (prettyPlease) {
       document.addEventListener("click", prettyPlease);
@@ -53,7 +54,7 @@ export default function Search() {
     return () => {
       document.removeEventListener("click", prettyPlease);
     };
-  });
+  }, []);
 
   const handleYearChange = (event) => {
     setChosenYear(event.target.value);
@@ -89,7 +90,7 @@ export default function Search() {
 
   const serverCallForAutocomplete = (userInput) => {
     axios
-      .post("http://localhost:3000/products/name/", {
+      .post("https://api.the-aysa.com/product-semantic-search", {
         names: userInput.split(" "),
       })
       .then((res) => {
@@ -138,35 +139,39 @@ export default function Search() {
   };
 
   const chooseValue = (id, version) => () => {
-    setChosenProduct(suggestions[suggestionIndex]);
+    const selected = suggestions[suggestionIndex];
+    setChosenProduct(selected);
     setSearchInput("");
     setSuggestionIndex(0);
     setSuggestions([]);
     document.activeElement.blur();
     setShowResults(false);
     setVersion(version);
+
     serverCallForItem(id, version);
     serverCallForAutocomplete("");
+
+    // 🔥 Trigger callback to parent (TabOne) for external API call
+    if (onProductSelect) {
+      const selectedName = selected.product;
+      onProductSelect(selectedName);
+    }
   };
+
   const handleChange = (e) => {
     e.preventDefault();
     setSearchInput(e.target.value);
     serverCallForAutocomplete(e.target.value);
   };
+
   const handleKeyDown = (e) => {
-    // UP ARROW
     if (e.keyCode === 38) {
       e.preventDefault();
-      if (suggestionIndex === 0) {
-        return;
-      }
+      if (suggestionIndex === 0) return;
       setSuggestionIndex(suggestionIndex - 1);
     } else if (e.keyCode === 40) {
-      // DOWN ARROW
       e.preventDefault();
-      if (suggestionIndex === suggestions.length) {
-        return;
-      }
+      if (suggestionIndex === suggestions.length) return;
       setSuggestionIndex(suggestionIndex + 1);
     } else if (e.keyCode === 13) {
       if (suggestions[suggestionIndex] !== undefined) {
@@ -183,7 +188,6 @@ export default function Search() {
       {!chosenVersion.product_info_id && (
         <div>
           <div className="buffer"></div>
-          {/* <p>A platform that reveals the profit margins of consumer products</p> */}
           <p></p>
         </div>
       )}
@@ -253,13 +257,11 @@ export default function Search() {
                       label="Version"
                       onChange={handleVersionChange}
                     >
-                      {versions.map((item) => {
-                        return (
-                          <MenuItem value={item.version}>
-                            {item.version}
-                          </MenuItem>
-                        );
-                      })}
+                      {versions.map((item) => (
+                        <MenuItem key={item.version} value={item.version}>
+                          {item.version}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Box>
@@ -275,11 +277,11 @@ export default function Search() {
                       label="Year"
                       onChange={handleYearChange}
                     >
-                      {allTypes.map((item) => {
-                        return (
-                          <MenuItem value={item.year}>{item.year}</MenuItem>
-                        );
-                      })}
+                      {allTypes.map((item) => (
+                        <MenuItem key={item.year} value={item.year}>
+                          {item.year}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Box>
@@ -288,8 +290,9 @@ export default function Search() {
           </div>
         </div>
       )}
+
       {chosenVersion.product_info_id && (
-        <OrientationResults item={chosenVersion}></OrientationResults>
+        <OrientationResults item={chosenVersion} />
       )}
     </div>
   );

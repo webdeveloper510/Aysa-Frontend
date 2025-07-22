@@ -1,6 +1,5 @@
-import { useState } from "react";
-import Search from "../Search";
-import { Box, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Typography, TextField } from "@mui/material";
 
 const cellStyle = {
   padding: "20px",
@@ -13,34 +12,49 @@ const cellStyle = {
 };
 
 export const TabThree = () => {
-  const [apiData, setApiData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearchResult = (data) => {
-    if (!data || typeof data !== "object") {
-      setError("No results found.");
-      return;
-    }
-    setApiData(data);
-    setError("");
-  };
+  useEffect(() => {
+    fetch("https://api.the-aysa.com/tax-semantic-search")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch data");
+        return res.json();
+      })
+      .then((data) => {
+        setApiData(data?.data || []);
+        setError("");
+      })
+      .catch((err) => {
+        setError("Failed to load data.");
+        console.error(err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  const fallbackData = {
-    company: "Amazon",
-    year: 2024,
-    taxpaid: "$2.1 billion",
-    taxavoided: "$5.4 billion",
-  };
-
-  const data = apiData?.results?.[0] || fallbackData;
+  const filteredData = apiData.filter((row) =>
+    row.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.year?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.tax_paid?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.tax_avoid?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
-      <div className="search-form">
-        {!window.location.pathname.endsWith("about/") && (
-          <Search apiType="ceo" onProductSelect={handleSearchResult} />
-        )}
+    <div className="meow">
+      <Box m={3}>
+        <TextField
+          label="Search tax data"
+          variant="outlined"
+          className="input-form"
+          placeholder="Search by company, year, or tax figures"
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
       </div>
 
       {loading && <Typography align="center">Loading...</Typography>}
@@ -49,7 +63,7 @@ export const TabThree = () => {
       <Box sx={{ p: 4, display: "flex", flexDirection: "column" }}>
         <Box className="tab3Table" sx={{ overflowX: "auto" }}>
           <Box sx={{ minWidth: "750px" }}>
-            {/* Header Row */}
+            {/* Header */}
             <Box
               className="tableheader"
               sx={{
@@ -70,40 +84,31 @@ export const TabThree = () => {
               </Box>
             </Box>
 
-            {/* Body Row */}
-            <Box
-              className="tablebody"
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 1,
-              }}
-            >
-              <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
-                <Typography variant="h6">{data.company}</Typography>
-              </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
-                <Typography variant="h6">{data.year}</Typography>
-              </Box>
+            {/* Body */}
+            {filteredData.map((row) => (
               <Box
+                key={row.id}
+                className="tablebody"
                 sx={{
-                  ...cellStyle,
-                  backgroundColor: "#E9E7CA",
-                  color: "#0C7E57",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: 1,
                 }}
               >
-                <Typography variant="h6">{data.taxpaid}</Typography>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
+                  <Typography variant="h6">{row.company_name}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
+                  <Typography variant="h6">{row.year}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA", color: "#0C7E57" }}>
+                  <Typography variant="h6">{row.tax_paid}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7", color: "#EC4137" }}>
+                  <Typography variant="h6">{row.tax_avoid}</Typography>
+                </Box>
               </Box>
-              <Box
-                sx={{
-                  ...cellStyle,
-                  backgroundColor: "#FEC7C7",
-                  color: "#EC4137",
-                }}
-              >
-                <Typography variant="h6">{data.taxavoided}</Typography>
-              </Box>
-            </Box>
+            ))}
           </Box>
         </Box>
       </Box>

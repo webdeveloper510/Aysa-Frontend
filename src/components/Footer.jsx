@@ -1,25 +1,36 @@
 import { Link } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 
 export const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="flex-container">
-        <div className="flex-column">
-          <Link className="btn" to="/about">
-            About
-          </Link>
-        </div>
+    <Box
+    className="footerrow"
+      component="footer"
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "#2C2C2C", // Dark background
+        borderTop: "3px solid white",
+        padding: "12px 24px",
+        fontFamily: "inherit",
+      }}
+    >
+      <Link to="/about" style={{ color: "#00AEEF", textDecoration: "none" }}>
+        About us
+      </Link>
 
-        <div className="flex-column">
-          <button
-            className="btn"
-            onClick={() => (window.location = "mailto:contact@the-aysa.com")}
-          >
-            Contact us
-          </button>
-        </div>
-      </div>
-    </footer>
+      <Typography
+        component="a"
+        href="mailto:contact@the-aysa.com"
+        sx={{
+          color: "#00AEEF",
+          textDecoration: "none",
+          cursor: "pointer",
+        }}
+      >
+        Contact us
+      </Typography>
+    </Box>
   );
 };
-

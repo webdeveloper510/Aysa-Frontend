@@ -1,6 +1,5 @@
-import { useState } from "react";
-import Search from "../Search";
-import { Box, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Typography, TextField } from "@mui/material";
 
 const cellStyle = {
   padding: "20px",
@@ -13,36 +12,50 @@ const cellStyle = {
 };
 
 export const TabTwo = () => {
-  const [apiData, setApiData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearchResult = (data) => {
-    if (!data || typeof data !== "object") {
-      setError("No results found.");
-      return;
-    }
-    setApiData(data);
-    setError("");
-  };
+  useEffect(() => {
+    fetch("https://api.the-aysa.com/ceo-worker-semantic-search")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch data");
+        return res.json();
+      })
+      .then((data) => {
+        setApiData(data?.data || []);
+        setError("");
+      })
+      .catch((err) => {
+        setError("Failed to load data.");
+        console.error(err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  // fallback if apiData is empty
-  const fallbackData = {
-    company: "Nike",
-    year: 2024,
-    ceo: "Elliot Hill",
-    compensation: "32.0 million",
-    workerSalary: "$35,500.0",
-  };
-
-  const data = apiData?.results?.[0] || fallbackData;
+  const filteredData = apiData.filter((row) =>
+    row.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.ceo_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.ceo_total_compensation?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.worker_salary?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    row.year?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
-      <div className="search-form">
-        {!window.location.pathname.endsWith("about/") && (
-          <Search apiType="tax" onProductSelect={handleSearchResult} />
-        )}
+      <div className="meow">
+      <Box m={3}>
+        <TextField
+          label="Search by company, CEO, or year"
+          variant="outlined"
+          className="input-form"
+          placeholder="Type to filter..."
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
       </div>
 
       {loading && <Typography align="center">Loading...</Typography>}
@@ -51,7 +64,7 @@ export const TabTwo = () => {
       <Box sx={{ p: 2 }}>
         <Box sx={{ overflowX: "auto" }}>
           <Box sx={{ minWidth: "750px" }}>
-            {/* Header Row */}
+            {/* Header */}
             <Box
               className="tableheader"
               sx={{
@@ -74,30 +87,33 @@ export const TabTwo = () => {
               </Box>
             </Box>
 
-            {/* Body Row */}
-            <Box
-              className="tablebody"
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-              }}
-            >
-              <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
-                <Typography variant="h6">{data.company}</Typography>
+            {/* Body */}
+            {filteredData.map((row, index) => (
+              <Box
+                key={index}
+                className="tablebody"
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(5, 1fr)",
+                }}
+              >
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
+                  <Typography variant="h6">{row.company_name}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
+                  <Typography variant="h6">{row.year}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA" }}>
+                  <Typography variant="h6">{row.ceo_name}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7" }}>
+                  <Typography variant="h6">{row.ceo_total_compensation}</Typography>
+                </Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#D0F6B4" }}>
+                  <Typography variant="h6">{row.worker_salary}</Typography>
+                </Box>
               </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
-                <Typography variant="h6">{data.year}</Typography>
-              </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA" }}>
-                <Typography variant="h6">{data.ceo}</Typography>
-              </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7" }}>
-                <Typography variant="h6">{data.compensation}</Typography>
-              </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#D0F6B4" }}>
-                <Typography variant="h6">{data.workerSalary}</Typography>
-              </Box>
-            </Box>
+            ))}
           </Box>
         </Box>
       </Box>

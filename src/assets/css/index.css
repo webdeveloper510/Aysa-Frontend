@@ -14,7 +14,11 @@ body {
 code {
   font-family: "Inter", sans-serif !important;
 }
-
+header.App-header p {
+    color: #2CAFFE;
+    font-size: 40px;
+    cursor: pointer;
+}
 /************** tabs css *********************/
 
 .tab-wrapper {
@@ -76,7 +80,7 @@ code {
 .tab-content {
   width: 80%;
   margin: 0 auto;
-  //height: 100vh;
+  /* height: 100vh; */
 }
 .Table-head th {
   font-weight: 700;
@@ -146,9 +150,39 @@ section.about-section {
   border-radius: 0px;
   box-shadow: 0px 4px 4px 0px #00000040;
 }
-footer.footer .btn {
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2C2C2C;
+  border-top: 3px solid white;
+  padding: 12px 24px;
+}
+
+.footerrow a {
+  color: #00AEEF;
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 30px !important;
+}
+
+/* footer.footer .btn {
   text-decoration: none;
   color: #2caffe;
   font-size: 25px;
   font-weight: 400;
+} */
+.input-form .MuiInputBase-input {
+    width: 100%;
+    padding: 0.5em;
+    border: 0px;
+    background-size: 20px;
+    font-size: 17px;
+    background-color: rgba(0, 0, 0, 0.05);
+    height: 42px;
+}
+.meow {
+    width: 50%;
+    margin: 0 auto;
 }

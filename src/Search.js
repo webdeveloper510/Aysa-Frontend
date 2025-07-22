@@ -57,7 +57,7 @@ export default function Search() {
 
   const handleYearChange = (event) => {
     setChosenYear(event.target.value);
-    let element = allTypes.find((el) => el.year == event.target.value);
+    let element = allTypes.find((el) => el.year === event.target.value);
     if (element) {
       setVersions(element.items);
       let newVersion = element.items.find((el) => el.version == version);

@@ -9,7 +9,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
+  TextField
 } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
@@ -46,7 +46,8 @@ export const TabOne = () => {
 
   const filteredData = data.filter((item) =>
     item.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.brand?.toLowerCase().includes(searchQuery.toLowerCase())
+    item.brand?.toLowerCase().includes(searchQuery.toLowerCase())||
+    item.profit_margin?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const first = filteredData[0] || {};
@@ -100,30 +101,44 @@ export const TabOne = () => {
 
   return (
     <>
-      {loading && <Typography align="center">Loading...</Typography>}
-      {error && <Typography color="error" align="center">{error}</Typography>}
+     
 
+<div className="meow">
       <Box m={3}>
-        <TextField
+         <TextField
           label="Search Products"
+          className="input-form"
           variant="outlined"
+          placeholder="Discover the profit margin of any product"
           fullWidth
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </Box>
+      </div>
+       {loading && <Typography align="center">Loading...</Typography>}
+      {error && <Typography color="error" align="center">{error}</Typography>}
 
       <Typography variant="h5" align="center" fontWeight="bold" my={5}>
-        {first.product_name || "Product Overview"} ({first.year || ""})
+        {first.brand} {first.product_name} {first.year}
       </Typography>
 
       <Box display="flex" flexWrap="wrap" justifyContent="space-between" my={4}>
         <Box flex={1} maxWidth="45%" mb={2}>
-          <img
-            src={first.product_url || Productimage}
-            alt={first.product_name || "Product"}
-            style={{ width: "100%", maxWidth: 300 }}
-          />
+        <img
+          src={
+            first && first.product_url && first.product_url.trim().startsWith("http")
+              ? first.product_url
+              : Productimage
+          }
+          alt={first?.product_name || "Product"}
+          onError={(e) => {
+            e.target.onerror = null; 
+            e.target.src = Productimage;
+          }}
+          style={{ width: "100%", maxWidth: 300 }}
+        />
+
         </Box>
         <Box flex={1} maxWidth="45%">
           <Bar data={chartData} options={chartOptions} />
@@ -135,35 +150,35 @@ export const TabOne = () => {
         align="center"
         sx={{ backgroundColor: "black", color: "white", py: 1, mt: 4 }}
       >
-        Product Profit Comparisons
+      Comparing the profit margin to other similar products
       </Typography>
 
       <Paper elevation={3}>
         <Table>
           <TableHead sx={{ backgroundColor: "#b3e5fc" }}>
-            <TableRow>
+            <TableRow className="Table-head">
               <TableCell>Brand</TableCell>
               <TableCell>Product Picture</TableCell>
               <TableCell>Product Name</TableCell>
               <TableCell>Profit Margin</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {filteredData.map((row, idx) => (
-              <TableRow key={idx}>
-                <TableCell>{row.brand}</TableCell>
-                <TableCell>
-                  <img
-                    src={row.product_url}
-                    alt={row.product_name}
-                    width={80}
-                  />
-                </TableCell>
-                <TableCell>{row.product_name}</TableCell>
-                <TableCell>{row.profit_margin}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+       <TableBody>
+  {filteredData.map((row, idx) => (
+    <TableRow key={row.product_name || idx} className="Table-row">
+      <TableCell>{row.brand}</TableCell>
+      <TableCell>
+       <img
+      src={row.product_url || Productimage}
+      alt={row.product_name || "Product"}
+      style={{ width: 100, height: 'auto' }}
+    />
+      </TableCell>
+      <TableCell>{row.product_name}</TableCell>
+      <TableCell>{row.profit_margin}</TableCell>
+    </TableRow>
+  ))}
+</TableBody>
         </Table>
       </Paper>
     </>

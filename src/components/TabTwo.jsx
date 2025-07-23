@@ -47,7 +47,7 @@ export const TabTwo = () => {
       <div className="meow">
       <Box m={3}>
         <TextField
-          label="Search by company, CEO, or year"
+          label="Search by company or CEO name"
           variant="outlined"
           className="input-form"
           placeholder="Type to filter..."
@@ -65,24 +65,24 @@ export const TabTwo = () => {
         <Box sx={{ overflowX: "auto" }}>
           <Box sx={{ minWidth: "750px" }}>
             {/* Header */}
-            <Box
+             <Box
               className="tableheader"
               sx={{
                 display: "grid",
                 gridTemplateColumns: "repeat(5, 1fr)",
               }}
             >
-              <Box sx={{ ...cellStyle, backgroundColor: "#F7C8AA" }}>
+              <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                 Company <br /> Name
               </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#BCD7DC" }}>Year</Box>
+              <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>Year</Box>
               <Box sx={{ ...cellStyle, backgroundColor: "#D3DCAA" }}>
                 CEO <br /> Name
               </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#F69F9F" }}>
+              <Box sx={{ ...cellStyle, backgroundColor: "#EC4137", color: "#fff"  }}>
                 CEO Total Compensation
               </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#A2D37F" }}>
+              <Box sx={{ ...cellStyle, backgroundColor: "#FF0000" , color: "#fff" }}>
                 Frontline Worker Salary
               </Box>
             </Box>

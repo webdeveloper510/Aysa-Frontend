@@ -46,7 +46,7 @@ export const TabThree = () => {
     <div className="meow">
       <Box m={3}>
         <TextField
-          label="Search tax data"
+          label="Search by company name or year"
           variant="outlined"
           className="input-form"
           placeholder="Search by company, year, or tax figures"
@@ -72,10 +72,10 @@ export const TabThree = () => {
                 gap: 1,
               }}
             >
-              <Box sx={{ ...cellStyle, backgroundColor: "#F99B33" }}>
+              <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                 Company <br /> Name
               </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#F99B33" }}>Year</Box>
+              <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>Year</Box>
               <Box sx={{ ...cellStyle, backgroundColor: "#15A271", color: "#fff" }}>
                 Tax Paid
               </Box>

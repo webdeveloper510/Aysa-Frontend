@@ -129,7 +129,7 @@ const suggestions = [...new Set(data.map((item) => item.product_name || ""))];
   renderInput={(params) => (
     <TextField
       {...params}
-      label="Search Products"
+      label="Search by brand or product name"
       className="input-form"
       variant="outlined"
       placeholder="Search by product name, brand, or profit margin"

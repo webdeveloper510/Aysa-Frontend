@@ -12,7 +12,7 @@ function App() {
       <div className="App">
         <header className="App-header">
           <p className="header" onClick={test}>
-            The Aysa
+            Aysa
           </p>
         </header>
 

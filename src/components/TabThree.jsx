@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box, Typography, TextField } from "@mui/material";
 
 const cellStyle = {
@@ -12,34 +12,44 @@ const cellStyle = {
 };
 
 export const TabThree = () => {
-  const [apiData, setApiData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch("https://api.the-aysa.com/tax-semantic-search")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
-      .then((data) => {
-        setApiData(data?.data || []);
-        setError("");
-      })
-      .catch((err) => {
-        setError("Failed to load data.");
-        console.error(err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredData([]);
+      return;
+    }
 
-  const filteredData = apiData.filter((row) =>
-    row.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.year?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.tax_paid?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    row.tax_avoid?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    setLoading(true);
+    try {
+      const res = await fetch("https://api.the-aysa.com/tax-semantic-search");
+      if (!res.ok) throw new Error("Failed to fetch data");
+      const data = await res.json();
+      const rows = data?.data || [];
+
+      setAllData(rows);
+
+      const filtered = rows.filter((row) =>
+        row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
+        row.year?.toLowerCase().includes(query.toLowerCase())
+        //row.tax_paid?.toLowerCase().includes(query.toLowerCase()) ||
+        //row.tax_avoid?.toLowerCase().includes(query.toLowerCase())
+      );
+
+      setFilteredData(filtered);
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load data.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -49,69 +59,84 @@ export const TabThree = () => {
           label="Search by company name or year"
           variant="outlined"
           className="input-form"
-          placeholder="Search by company, year, or tax figures"
+           placeholder="Type to filter..."
           fullWidth
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
       </Box>
       </div>
 
       {loading && <Typography align="center">Loading...</Typography>}
       {error && <Typography color="error" align="center">{error}</Typography>}
+      {!loading && searchQuery && filteredData.length === 0 && (
+        <Typography
+          align="center"
+          color="textSecondary"
+          my={4}
+          dangerouslySetInnerHTML={{
+            __html: `No data found for <strong>${searchQuery
+              .split(" ")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ")}</strong>`,
+          }}
+        />
+      )}
 
-      <Box sx={{ p: 4, display: "flex", flexDirection: "column" }}>
-        <Box className="tab3Table" sx={{ overflowX: "auto" }}>
-          <Box sx={{ minWidth: "750px" }}>
-            {/* Header */}
-            <Box
-              className="tableheader"
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 1,
-              }}
-            >
-              <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                Company <br /> Name
-              </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>Year</Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#15A271", color: "#fff" }}>
-                Tax Paid
-              </Box>
-              <Box sx={{ ...cellStyle, backgroundColor: "#EC4137", color: "#fff" }}>
-                Tax Avoided
-              </Box>
-            </Box>
-
-            {/* Body */}
-            {filteredData.map((row) => (
+      {!!filteredData.length && (
+        <Box sx={{ p: 4, display: "flex", flexDirection: "column" }}>
+          <Box className="tab3Table" sx={{ overflowX: "auto" }}>
+            <Box sx={{ minWidth: "750px" }}>
+              {/* Header */}
               <Box
-                key={row.id}
-                className="tablebody"
+                className="tableheader"
                 sx={{
                   display: "grid",
                   gridTemplateColumns: "repeat(4, 1fr)",
                   gap: 1,
                 }}
               >
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
-                  <Typography variant="h6">{row.company_name}</Typography>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
+                  Company <br /> Name
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
-                  <Typography variant="h6">{row.year}</Typography>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>Year</Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#15A271", color: "#fff" }}>
+                  Tax Paid
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA", color: "#0C7E57" }}>
-                  <Typography variant="h6">{row.tax_paid}</Typography>
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7", color: "#EC4137" }}>
-                  <Typography variant="h6">{row.tax_avoid}</Typography>
+                <Box sx={{ ...cellStyle, backgroundColor: "#EC4137", color: "#fff" }}>
+                  Tax Avoided
                 </Box>
               </Box>
-            ))}
+
+              {/* Body */}
+              {filteredData.map((row) => (
+                <Box
+                  key={row.id}
+                  className="tablebody"
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, 1fr)",
+                    gap: 1,
+                  }}
+                >
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
+                    <Typography variant="h6">{row.company_name}</Typography>
+                  </Box>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
+                    <Typography variant="h6">{row.year}</Typography>
+                  </Box>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA", color: "#0C7E57" }}>
+                    <Typography variant="h6">{row.tax_paid}</Typography>
+                  </Box>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7", color: "#EC4137" }}>
+                    <Typography variant="h6">{row.tax_avoid}</Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      )}
     </>
   );
 };

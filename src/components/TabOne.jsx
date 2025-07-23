@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Productimage from "../assets/image/product-image.png";
 import {
   Box,
@@ -22,39 +22,36 @@ export const TabOne = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  
-  useEffect(() => {
-    const fetchAllProducts = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          "https://api.the-aysa.com/product-semantic-search"
-        );
-        const items = response.data.data || [];
-        setData(items);
-      } catch (err) {
-        console.error("GET request failed:", err);
-        setError("Failed to load product data.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (!query) {
+      setData([]);
+      return;
+    }
 
-    fetchAllProducts();
-  }, []);
+    setLoading(true);
+    try {
+      const response = await axios.get("https://api.the-aysa.com/product-semantic-search");
+      const allItems = response.data.data || [];
 
+      const filtered = allItems.filter(
+        (item) =>
+          item.product_name?.toLowerCase().includes(query.toLowerCase()) ||
+          item.brand?.toLowerCase().includes(query.toLowerCase()) ||
+          item.profit_margin?.toLowerCase().includes(query.toLowerCase())
+      );
 
-  const filteredData = data.filter(
-    (item) =>
-      item.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.profit_margin?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      setData(filtered);
+    } catch (err) {
+      console.error("GET request failed:", err);
+      setError("Failed to load product data.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const first = filteredData[0] || {};
-
-  const parseCurrency = (val) =>
-    parseFloat(val?.replace(/[^0-9.]/g, "") || "0");
+  const first = data[0] || {};
+  const parseCurrency = (val) => parseFloat(val?.replace(/[^0-9.]/g, "") || "0");
 
   const production = parseCurrency(first.profit_made);
   const market = parseCurrency(first.profit_price);
@@ -78,9 +75,7 @@ export const TabOne = () => {
 
   const chartOptions = {
     plugins: {
-      legend: {
-        position: "bottom",
-      },
+      legend: { position: "bottom" },
       title: {
         display: true,
         text: `Profit Margin: ${first.profit_margin || "N/A"} (*)`,
@@ -91,10 +86,7 @@ export const TabOne = () => {
     scales: {
       x: {
         stacked: true,
-        title: {
-          display: true,
-          text: "Market Price",
-        },
+        title: { display: true, text: "Market Price" },
       },
       y: {
         stacked: true,
@@ -103,42 +95,34 @@ export const TabOne = () => {
     },
   };
 
- 
-// const suggestions = data
-//   .filter((item) =>
-//     item.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//     item.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//     item.profit_margin?.toLowerCase().includes(searchQuery.toLowerCase())
-//   )
-//   .map((item) => `${item.brand} - ${item.product_name} - ${item.profit_margin}`)
-//   .slice(0, 10); // optional: limit to top 10 suggestions
-
-
-const suggestions = [...new Set(data.map((item) => item.product_name || ""))];
-
-
   return (
     <>
-      <div className="meow">
-        <Box m={3}>
-          <Autocomplete
-  freeSolo
-  options={suggestions}
-  inputValue={searchQuery}
-  onInputChange={(e, newInput) => setSearchQuery(newInput)}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Search by brand or product name"
-      className="input-form"
-      variant="outlined"
-      placeholder="Search by product name, brand, or profit margin"
-      fullWidth
-    />
-  )}
-/>
-        </Box>
+    <div className="meow">
+      <Box m={3}>
+        <Autocomplete
+          freeSolo
+          options={[]} // No suggestions initially
+          inputValue={searchQuery}
+          onInputChange={(e, newInput) => handleSearch(newInput)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search by brand or product name"
+              className="input-form"
+              variant="outlined"
+              placeholder="Search by product name, brand, or profit margin"
+              fullWidth
+            />
+          )}
+        />
+      </Box>
       </div>
+
+      {!loading && searchQuery && data.length === 0 && (
+  <Typography align="center" color="textSecondary" my={4}>
+    No data found for "<strong>{searchQuery}</strong>"
+  </Typography>
+)}
 
       {loading && <Typography align="center">Loading...</Typography>}
       {error && (
@@ -147,69 +131,73 @@ const suggestions = [...new Set(data.map((item) => item.product_name || ""))];
         </Typography>
       )}
 
-      <Typography variant="h5" align="center" fontWeight="bold" my={5}>
-        {first.brand} {first.product_name} {first.year}
-      </Typography>
+      {!!data.length && (
+        <>
+          <Typography variant="h5" align="center" fontWeight="bold" my={5}>
+            {first.brand} {first.product_name} {first.year}
+          </Typography>
 
-      <Box display="flex" flexWrap="wrap" justifyContent="space-between" my={4}>
-        <Box flex={1} maxWidth="45%" mb={2}>
-          <img
-            src={
-              first &&
-              first.product_url &&
-              first.product_url.trim().startsWith("http")
-                ? first.product_url
-                : Productimage
-            }
-            alt={first?.product_name || "Product"}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = Productimage;
-            }}
-            style={{ width: "100%", maxWidth: 300 }}
-          />
-        </Box>
-        <Box flex={1} maxWidth="45%">
-          <Bar data={chartData} options={chartOptions} />
-        </Box>
-      </Box>
+          <Box display="flex" flexWrap="wrap" justifyContent="space-between" my={4}>
+            <Box flex={1} maxWidth="45%" mb={2}>
+              <img
+                src={
+                  first &&
+                  first.product_url &&
+                  first.product_url.trim().startsWith("http")
+                    ? first.product_url
+                    : Productimage
+                }
+                alt={first?.product_name || "Product"}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = Productimage;
+                }}
+                style={{ width: "100%", maxWidth: 300 }}
+              />
+            </Box>
+            <Box flex={1} maxWidth="45%">
+              <Bar data={chartData} options={chartOptions} />
+            </Box>
+          </Box>
 
-      <Typography
-        variant="h6"
-        align="center"
-        sx={{ backgroundColor: "black", color: "white", py: 1, mt: 4 }}
-      >
-        Comparing the profit margin to other similar products
-      </Typography>
+          <Typography
+            variant="h6"
+            align="center"
+            sx={{ backgroundColor: "black", color: "white", py: 1, mt: 4 }}
+          >
+            Comparing the profit margin to other similar products
+          </Typography>
 
-      <Paper elevation={3}>
-        <Table>
-          <TableHead sx={{ backgroundColor: "#b3e5fc" }}>
-            <TableRow className="Table-head">
-              <TableCell>Brand</TableCell>
-              <TableCell>Product Picture</TableCell>
-              <TableCell>Product Name</TableCell>
-              <TableCell>Profit Margin</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData.map((row, idx) => (
-              <TableRow key={row.product_name || idx} className="Table-row">
-                <TableCell>{row.brand}</TableCell>
-                <TableCell>
-                  <img
-                    src={row.product_url || Productimage}
-                    alt={row.product_name || "Product"}
-                    style={{ width: 100, height: "auto" }}
-                  />
-                </TableCell>
-                <TableCell>{row.product_name}</TableCell>
-                <TableCell>{row.profit_margin}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+          <Paper elevation={3}>
+            <Table>
+              <TableHead sx={{ backgroundColor: "#b3e5fc" }}>
+                <TableRow className="Table-head">
+                  <TableCell>Brand</TableCell>
+                  <TableCell>Product Picture</TableCell>
+                  <TableCell>Product Name</TableCell>
+                  <TableCell>Profit Margin</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((row, idx) => (
+                  <TableRow key={row.product_name || idx} className="Table-row">
+                    <TableCell>{row.brand}</TableCell>
+                    <TableCell>
+                      <img
+                        src={row.product_url || Productimage}
+                        alt={row.product_name || "Product"}
+                        style={{ width: 100, height: "auto" }}
+                      />
+                    </TableCell>
+                    <TableCell>{row.product_name}</TableCell>
+                    <TableCell>{row.profit_margin}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+        </>
+      )}
     </>
   );
 };

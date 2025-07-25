@@ -21,15 +21,19 @@ export const TabOne = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [searching, setSearching] = useState(false);
 
-  const handleSearch = async (query) => {
+  const handleSearch = async (query, isSelection = false) => {
     setSearchQuery(query);
     if (!query) {
+      setSuggestions([]);
       setData([]);
       return;
     }
 
-    setLoading(true);
+    setSearching(true); // prevent "No data found" flicker
+
     try {
       const response = await axios.get(
         "https://api.the-aysa.com/product-semantic-search"
@@ -43,19 +47,31 @@ export const TabOne = () => {
         ),
       }));
 
-      // ✅ STEP 1: Match product by partial name
-      const matchedProduct = withParsed.find((item) =>
-        item.product_name?.toLowerCase().includes(query.toLowerCase())
+      // 🔍 Autocomplete suggestions while typing
+      if (!isSelection) {
+        const matches = withParsed.filter((item) =>
+          item.product_name?.toLowerCase().includes(query.toLowerCase())
+        );
+
+        setSuggestions(matches.slice(0, 10)); // limit suggestions
+        setSearching(false);
+        return;
+      }
+
+      // ✅ ON USER SELECT FROM SUGGESTIONS
+      const matchedProduct = withParsed.find(
+        (item) =>
+          item.product_name?.toLowerCase().trim() === query.toLowerCase().trim()
       );
 
       if (!matchedProduct) {
         setData([]);
+        setSearching(false);
         return;
       }
 
       const matchedMargin = matchedProduct.parsedMargin;
 
-      // ✅ STEP 2: Find lowest margin excluding same margin as matched
       const lowest = withParsed
         .filter(
           (item) =>
@@ -68,7 +84,6 @@ export const TabOne = () => {
             matchedProduct
         );
 
-      // ✅ STEP 3: Find highest margin excluding same margin as matched
       const highest = withParsed
         .filter(
           (item) =>
@@ -81,42 +96,25 @@ export const TabOne = () => {
             matchedProduct
         );
 
-      // ✅ STEP 4: Build final list (no duplicates)
       const finalData = [matchedProduct];
-
-      if (
-        lowest &&
-        lowest.product_name !== matchedProduct.product_name &&
-        !finalData.find((i) => i.product_name === lowest.product_name)
-      ) {
+      if (lowest && lowest.product_name !== matchedProduct.product_name) {
         finalData.push(lowest);
       }
-
       if (
         highest &&
         highest.product_name !== matchedProduct.product_name &&
-        !finalData.find((i) => i.product_name === highest.product_name)
+        highest.product_name !== lowest.product_name
       ) {
         finalData.push(highest);
       }
 
-      console.log("Matched:", matchedProduct);
-      console.log("Lowest margin product (excluding matched margin):", lowest);
-      console.log(
-        "Highest margin product (excluding matched margin):",
-        highest
-      );
-      console.log(
-        "Final Data:",
-        finalData.map((x) => x.product_name)
-      );
-
+      setSuggestions([]);
       setData(finalData);
     } catch (err) {
       console.error("GET request failed:", err);
       setError("Failed to load product data.");
     } finally {
-      setLoading(false);
+      setSearching(false); // always stop searching
     }
   };
 
@@ -188,16 +186,37 @@ export const TabOne = () => {
         <Box m={3}>
           <Autocomplete
             freeSolo
-            options={[]} // no suggestions yet
+            options={suggestions}
+            getOptionLabel={(option) =>
+              typeof option === "string"
+                ? option
+                : `${option.product_name} (Profit: ${option.profit_margin})`
+            }
             inputValue={searchQuery}
             onInputChange={(e, newInput) => handleSearch(newInput)}
+            onChange={(e, selectedOption) => {
+              if (selectedOption?.product_name) {
+                handleSearch(selectedOption.product_name, true); // true = selected
+              }
+            }}
+            renderOption={(props, option) => (
+              <li {...props} key={option.product_name}>
+                <Box display="flex" flexDirection="column">
+                  <Typography fontWeight="bold">
+                    {option.product_name}
+                  </Typography>
+                  <Typography fontSize={12} color="gray">
+                    Profit Margin: {option.profit_margin}
+                  </Typography>
+                </Box>
+              </li>
+            )}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="See what brands don’t want you to know…"
-                className="input-form"
                 variant="outlined"
-                placeholder="Search by product name, brand, or profit margin"
+                placeholder="Type product name..."
                 fullWidth
               />
             )}
@@ -205,7 +224,7 @@ export const TabOne = () => {
         </Box>
       </div>
 
-      {!loading && searchQuery && data.length === 0 && (
+      {!loading && !searching && searchQuery && data.length === 0 && (
         <Typography align="center" color="textSecondary" my={4}>
           No data found for "<strong>{searchQuery}</strong>"
         </Typography>

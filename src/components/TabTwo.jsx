@@ -27,19 +27,24 @@ export const TabTwo = () => {
 
     setLoading(true);
     try {
-      const res = await fetch("https://api.the-aysa.com/ceo-worker-semantic-search");
+      const res = await fetch(
+        "https://api.the-aysa.com/ceo-worker-semantic-search"
+      );
       if (!res.ok) throw new Error("Failed to fetch data");
       const result = await res.json();
       const data = result?.data || [];
 
       setAllData(data);
 
-      const filtered = data.filter((row) =>
-        row.company_name?.toLowerCase().includes(value.toLowerCase()) ||
-        row.ceo_name?.toLowerCase().includes(value.toLowerCase()) ||
-        row.ceo_total_compensation?.toLowerCase().includes(value.toLowerCase()) ||
-        row.worker_salary?.toLowerCase().includes(value.toLowerCase()) ||
-        row.year?.toLowerCase().includes(value.toLowerCase())
+      const filtered = data.filter(
+        (row) =>
+          row.company_name?.toLowerCase().includes(value.toLowerCase()) ||
+          row.ceo_name?.toLowerCase().includes(value.toLowerCase())
+        // row.ceo_total_compensation
+        //   ?.toLowerCase()
+        //   .includes(value.toLowerCase()) ||
+        // row.worker_salary?.toLowerCase().includes(value.toLowerCase()) ||
+        // row.year?.toLowerCase().includes(value.toLowerCase())
       );
 
       setFilteredData(filtered);
@@ -53,22 +58,26 @@ export const TabTwo = () => {
 
   return (
     <>
-    <div className="meow">
-      <Box m={3}>
-        <TextField
-          label="Search by company or CEO name"
-          variant="outlined"
-          className="input-form"
-          placeholder="Type to filter..."
-          fullWidth
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-      </Box>
+      <div className="meow">
+        <Box m={3}>
+          <TextField
+            label="Search by company or CEO name"
+            variant="outlined"
+            className="input-form"
+            placeholder="Type to filter..."
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </Box>
       </div>
 
       {loading && <Typography align="center">Loading...</Typography>}
-      {error && <Typography color="error" align="center">{error}</Typography>}
+      {error && (
+        <Typography color="error" align="center">
+          {error}
+        </Typography>
+      )}
       {!loading && searchQuery && filteredData.length === 0 && (
         <Typography align="center" color="textSecondary" my={4}>
           No data found for "<strong>{searchQuery}</strong>"
@@ -90,14 +99,28 @@ export const TabTwo = () => {
                 <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                   Company <br /> Name
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>Year</Box>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
+                  Year
+                </Box>
                 <Box sx={{ ...cellStyle, backgroundColor: "#D3DCAA" }}>
                   CEO <br /> Name
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#EC4137", color: "#fff" }}>
+                <Box
+                  sx={{
+                    ...cellStyle,
+                    backgroundColor: "#EC4137",
+                    color: "#fff",
+                  }}
+                >
                   CEO Total Compensation
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FF0000", color: "#fff" }}>
+                <Box
+                  sx={{
+                    ...cellStyle,
+                    backgroundColor: "#FF0000",
+                    color: "#fff",
+                  }}
+                >
                   Frontline Worker Salary
                 </Box>
               </Box>
@@ -112,19 +135,33 @@ export const TabTwo = () => {
                     gridTemplateColumns: "repeat(5, 1fr)",
                   }}
                 >
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.company_name}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.year}</Typography>
                   </Box>
                   <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA" }}>
                     <Typography variant="h6">{row.ceo_name}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7" }}>
-                    <Typography variant="h6">{row.ceo_total_compensation}</Typography>
+                  <Box
+                    sx={{
+                      ...cellStyle,
+                      backgroundColor: "#EC4137",
+                      color: "#fff",
+                    }}
+                  >
+                    <Typography variant="h6">
+                      {row.ceo_total_compensation}
+                    </Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#D0F6B4" }}>
+                  <Box
+                    sx={{
+                      ...cellStyle,
+                      backgroundColor: "#FF0000",
+                      color: "#fff",
+                    }}
+                  >
                     <Typography variant="h6">{row.worker_salary}</Typography>
                   </Box>
                 </Box>

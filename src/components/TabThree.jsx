@@ -34,9 +34,10 @@ export const TabThree = () => {
 
       setAllData(rows);
 
-      const filtered = rows.filter((row) =>
-        row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
-        row.year?.toLowerCase().includes(query.toLowerCase())
+      const filtered = rows.filter(
+        (row) =>
+          row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
+          row.year?.toLowerCase().includes(query.toLowerCase())
         //row.tax_paid?.toLowerCase().includes(query.toLowerCase()) ||
         //row.tax_avoid?.toLowerCase().includes(query.toLowerCase())
       );
@@ -53,22 +54,26 @@ export const TabThree = () => {
 
   return (
     <>
-    <div className="meow">
-      <Box m={3}>
-        <TextField
-          label="Search by company name or year"
-          variant="outlined"
-          className="input-form"
-           placeholder="Type to filter..."
-          fullWidth
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-      </Box>
+      <div className="meow">
+        <Box m={3}>
+          <TextField
+            label="Search by company name or year"
+            variant="outlined"
+            className="input-form"
+            placeholder="Type to filter..."
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </Box>
       </div>
 
       {loading && <Typography align="center">Loading...</Typography>}
-      {error && <Typography color="error" align="center">{error}</Typography>}
+      {error && (
+        <Typography color="error" align="center">
+          {error}
+        </Typography>
+      )}
       {!loading && searchQuery && filteredData.length === 0 && (
         <Typography
           align="center"
@@ -99,11 +104,25 @@ export const TabThree = () => {
                 <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                   Company <br /> Name
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>Year</Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#15A271", color: "#fff" }}>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
+                  Year
+                </Box>
+                <Box
+                  sx={{
+                    ...cellStyle,
+                    backgroundColor: "#15A271",
+                    color: "#fff",
+                  }}
+                >
                   Tax Paid
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#EC4137", color: "#fff" }}>
+                <Box
+                  sx={{
+                    ...cellStyle,
+                    backgroundColor: "#EC4137",
+                    color: "#fff",
+                  }}
+                >
                   Tax Avoided
                 </Box>
               </Box>
@@ -119,16 +138,28 @@ export const TabThree = () => {
                     gap: 1,
                   }}
                 >
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCD7BF" }}>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.company_name}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#E0ECE7" }}>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.year}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA", color: "#0C7E57" }}>
+                  <Box
+                    sx={{
+                      ...cellStyle,
+                      backgroundColor: "#E9E7CA",
+                      color: "#0C7E57",
+                    }}
+                  >
                     <Typography variant="h6">{row.tax_paid}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7", color: "#EC4137" }}>
+                  <Box
+                    sx={{
+                      ...cellStyle,
+                      backgroundColor: "#FEC7C7",
+                      color: "#EC4137",
+                    }}
+                  >
                     <Typography variant="h6">{row.tax_avoid}</Typography>
                   </Box>
                 </Box>

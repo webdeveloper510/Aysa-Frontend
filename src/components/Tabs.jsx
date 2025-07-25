@@ -1,7 +1,7 @@
 import { useState } from "react";
-import {TabOne} from "./TabOne";
-import {TabTwo} from "./TabTwo";
-import {TabThree} from "./TabThree";
+import { TabOne } from "./TabOne";
+import { TabTwo } from "./TabTwo";
+import { TabThree } from "./TabThree";
 
 const tabs = [
   {
@@ -19,7 +19,7 @@ const tabs = [
 ];
 
 export const Tabs = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(null);
 
   return (
     <>
@@ -38,7 +38,9 @@ export const Tabs = () => {
           ))}
         </div>
 
-        <div className="tab-content">{tabs[activeTab].content}</div>
+        <div className="tab-content">
+          {(activeTab !== null ? tabs[activeTab] : tabs[0]).content}
+        </div>
       </div>
     </>
   );

@@ -31,17 +31,87 @@ export const TabOne = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get("https://api.the-aysa.com/product-semantic-search");
+      const response = await axios.get(
+        "https://api.the-aysa.com/product-semantic-search"
+      );
       const allItems = response.data.data || [];
 
-      const filtered = allItems.filter(
-        (item) =>
-          item.product_name?.toLowerCase().includes(query.toLowerCase()) ||
-          item.brand?.toLowerCase().includes(query.toLowerCase()) ||
-          item.profit_margin?.toLowerCase().includes(query.toLowerCase())
+      const withParsed = allItems.map((item) => ({
+        ...item,
+        parsedMargin: parseFloat(
+          item.profit_margin?.replace(/[^0-9.]/g, "") || "0"
+        ),
+      }));
+
+      // ✅ STEP 1: Match product by partial name
+      const matchedProduct = withParsed.find((item) =>
+        item.product_name?.toLowerCase().includes(query.toLowerCase())
       );
 
-      setData(filtered);
+      if (!matchedProduct) {
+        setData([]);
+        return;
+      }
+
+      const matchedMargin = matchedProduct.parsedMargin;
+
+      // ✅ STEP 2: Find lowest margin excluding same margin as matched
+      const lowest = withParsed
+        .filter(
+          (item) =>
+            item.product_name !== matchedProduct.product_name &&
+            item.parsedMargin < matchedMargin
+        )
+        .reduce(
+          (min, item) => (item.parsedMargin < min.parsedMargin ? item : min),
+          withParsed.find((x) => x.parsedMargin < matchedMargin) ||
+            matchedProduct
+        );
+
+      // ✅ STEP 3: Find highest margin excluding same margin as matched
+      const highest = withParsed
+        .filter(
+          (item) =>
+            item.product_name !== matchedProduct.product_name &&
+            item.parsedMargin > matchedMargin
+        )
+        .reduce(
+          (max, item) => (item.parsedMargin > max.parsedMargin ? item : max),
+          withParsed.find((x) => x.parsedMargin > matchedMargin) ||
+            matchedProduct
+        );
+
+      // ✅ STEP 4: Build final list (no duplicates)
+      const finalData = [matchedProduct];
+
+      if (
+        lowest &&
+        lowest.product_name !== matchedProduct.product_name &&
+        !finalData.find((i) => i.product_name === lowest.product_name)
+      ) {
+        finalData.push(lowest);
+      }
+
+      if (
+        highest &&
+        highest.product_name !== matchedProduct.product_name &&
+        !finalData.find((i) => i.product_name === highest.product_name)
+      ) {
+        finalData.push(highest);
+      }
+
+      console.log("Matched:", matchedProduct);
+      console.log("Lowest margin product (excluding matched margin):", lowest);
+      console.log(
+        "Highest margin product (excluding matched margin):",
+        highest
+      );
+      console.log(
+        "Final Data:",
+        finalData.map((x) => x.product_name)
+      );
+
+      setData(finalData);
     } catch (err) {
       console.error("GET request failed:", err);
       setError("Failed to load product data.");
@@ -50,8 +120,25 @@ export const TabOne = () => {
     }
   };
 
-  const first = data[0] || {};
-  const parseCurrency = (val) => parseFloat(val?.replace(/[^0-9.]/g, "") || "0");
+  let first = data[0] || {};
+
+  if (!isNaN(searchQuery)) {
+    const targetMargin = parseFloat(searchQuery);
+    const exactMatch = data.find(
+      (item) =>
+        parseFloat(item.profit_margin?.replace(/[^0-9.]/g, "") || "0") ===
+        targetMargin
+    );
+    if (exactMatch) first = exactMatch;
+  } else {
+    const partialMatch = data.find((item) =>
+      item.product_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    if (partialMatch) first = partialMatch;
+  }
+
+  const parseCurrency = (val) =>
+    parseFloat(val?.replace(/[^0-9.]/g, "") || "0");
 
   const production = parseCurrency(first.profit_made);
   const market = parseCurrency(first.profit_price);
@@ -97,32 +184,32 @@ export const TabOne = () => {
 
   return (
     <>
-    <div className="meow">
-      <Box m={3}>
-        <Autocomplete
-          freeSolo
-          options={[]} // No suggestions initially
-          inputValue={searchQuery}
-          onInputChange={(e, newInput) => handleSearch(newInput)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Search by brand or product name"
-              className="input-form"
-              variant="outlined"
-              placeholder="Search by product name, brand, or profit margin"
-              fullWidth
-            />
-          )}
-        />
-      </Box>
+      <div className="meow">
+        <Box m={3}>
+          <Autocomplete
+            freeSolo
+            options={[]} // no suggestions yet
+            inputValue={searchQuery}
+            onInputChange={(e, newInput) => handleSearch(newInput)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="See what brands don’t want you to know…"
+                className="input-form"
+                variant="outlined"
+                placeholder="Search by product name, brand, or profit margin"
+                fullWidth
+              />
+            )}
+          />
+        </Box>
       </div>
 
       {!loading && searchQuery && data.length === 0 && (
-  <Typography align="center" color="textSecondary" my={4}>
-    No data found for "<strong>{searchQuery}</strong>"
-  </Typography>
-)}
+        <Typography align="center" color="textSecondary" my={4}>
+          No data found for "<strong>{searchQuery}</strong>"
+        </Typography>
+      )}
 
       {loading && <Typography align="center">Loading...</Typography>}
       {error && (
@@ -137,7 +224,12 @@ export const TabOne = () => {
             {first.brand} {first.product_name} {first.year}
           </Typography>
 
-          <Box display="flex" flexWrap="wrap" justifyContent="space-between" my={4}>
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            justifyContent="space-between"
+            my={4}
+          >
             <Box flex={1} maxWidth="45%" mb={2}>
               <img
                 src={
@@ -179,20 +271,41 @@ export const TabOne = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.map((row, idx) => (
-                  <TableRow key={row.product_name || idx} className="Table-row">
-                    <TableCell>{row.brand}</TableCell>
-                    <TableCell>
-                      <img
-                        src={row.product_url || Productimage}
-                        alt={row.product_name || "Product"}
-                        style={{ width: 100, height: "auto" }}
-                      />
-                    </TableCell>
-                    <TableCell>{row.product_name}</TableCell>
-                    <TableCell>{row.profit_margin}</TableCell>
-                  </TableRow>
-                ))}
+                {data.map((row, idx) => {
+                  const allMargins = data.map((d) =>
+                    parseFloat(d.profit_margin?.replace(/[^0-9.]/g, "") || "0")
+                  );
+                  const currentMargin = parseFloat(
+                    row.profit_margin?.replace(/[^0-9.]/g, "") || "0"
+                  );
+                  const isMax = currentMargin === Math.max(...allMargins);
+                  const isMin = currentMargin === Math.min(...allMargins);
+
+                  return (
+                    <TableRow
+                      key={row.product_name || idx}
+                      className="Table-row"
+                      sx={{
+                        backgroundColor: isMax
+                          ? "#dcedc8"
+                          : isMin
+                          ? "#ffcdd2"
+                          : "inherit",
+                      }}
+                    >
+                      <TableCell>{row.brand}</TableCell>
+                      <TableCell>
+                        <img
+                          src={row.product_url || Productimage}
+                          alt={row.product_name || "Product"}
+                          style={{ width: 100, height: "auto" }}
+                        />
+                      </TableCell>
+                      <TableCell>{row.product_name}</TableCell>
+                      <TableCell>{row.profit_margin}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </Paper>

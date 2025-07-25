@@ -1,6 +1,6 @@
 import "./App.css";
-import {Footer} from "./components/Footer";
-import {Router} from "./Router";
+import { Footer } from "./components/Footer";
+import { Router } from "./Router";
 
 const test = () => {
   window.location.assign("/");
@@ -17,8 +17,9 @@ function App() {
         </header>
 
         <Router />
+
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 }

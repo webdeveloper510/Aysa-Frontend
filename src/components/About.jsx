@@ -1,62 +1,80 @@
+import { Container, Box, Typography, Grid } from "@mui/material";
+
 export const About = () => {
   return (
     <div className="about-page">
-      <div className="title">
-        <h1>About Us</h1>
-      </div>
+      {/* Page Title */}
+      <Box textAlign="center" py={3} className="about-row">
+        <Typography variant="h3" component="h1" fontWeight="bold">
+          About Us
+        </Typography>
+      </Box>
 
-      <section className="about-section">
-        <h2>Our Mission</h2>
-        <p>
-          Democratize access to profit margin information for every product on
-          the market.
-        </p>
-      </section>
+      <Container maxWidth="md" sx={{ mt: 3 }}>
+        {/* Mission */}
+        <Box my={5}>
+          <Typography variant="h4" gutterBottom>
+            Our Mission
+          </Typography>
+          <Typography variant="body1">
+            Democratize access to profit margin information for every product on
+            the market.
+          </Typography>
+        </Box>
 
-      <section className="about-section">
-        <h2>Who We Are</h2>
-        <p>
-          Aysa is a platform that empowers consumers by providing insight into
-          the profit margin of each product they purchase...
-        </p>
-      </section>
+        {/* Who We Are */}
+        <Box my={5}>
+          <Typography variant="h4" gutterBottom>
+            Who We Are
+          </Typography>
+          <Typography variant="body1">
+            Aysa is a platform that empowers consumers to know exactly what they
+            are paying for by learning about the profit margin of the product
+            they purchase. Not only that, but Aysa also reveals the amount of
+            taxes companies avoid paying every year. Aysa is all about
+            transparency.
+          </Typography>
+        </Box>
 
-      <section className="about-section">
-        <h2>The Team</h2>
+        {/* The Team */}
+        <Box mt={5} mb={0}>
+          <Typography variant="h4" gutterBottom>
+            The Team
+          </Typography>
 
-        <div className="team-member">
-          <h4>Mohy Omer – Co-Founder</h4>
-          <p>
-            After nearly a decade of experience working with the U.S.
-            government...
-          </p>
-        </div>
+          <Grid item xs={12} mb={4}>
+            <Typography variant="h6">Mohy Omer – Co-Founder</Typography>
+            <Typography variant="body2">
+              After nearly a decade of experience working with the U.S.
+              government...
+            </Typography>
+          </Grid>
 
-        <div className="team-member">
-          <h4>Andreas Decker – Co-Founder</h4>
-          <p>
-            Andreas Decker is a seasoned Software Engineer with over a decade of
-            experience...
-          </p>
-        </div>
+          <Grid item xs={12} mb={4}>
+            <Typography variant="h6">Andreas Decker – Co-Founder</Typography>
+            <Typography variant="body2">
+              Andreas Decker is a seasoned Software Engineer with over a decade
+              of experience...
+            </Typography>
+          </Grid>
 
-        <div className="team-member">
-          <h4>Corey Whitby – Researcher</h4>
-          <p>
-            Corey Whitby brings nearly a decade of international experience in
-            talent acquisition...
-          </p>
-        </div>
+          <Grid item xs={12} mb={4}>
+            <Typography variant="h6">Corey Whitby – Researcher</Typography>
+            <Typography variant="body2">
+              Corey Whitby brings nearly a decade of international experience in
+              talent acquisition...
+            </Typography>
+          </Grid>
 
-        <div className="team-member">
-          <h4>Qi (Alice) Wang – Data Analyst</h4>
-          <p>
-            Qi Wang is a highly skilled statistician and data scientist with a
-            Master’s degree in Applied Statistics...
-          </p>
-        </div>
-      </section>
+          <Grid item xs={12}>
+            <Typography variant="h6">Qi (Alice) Wang – Data Analyst</Typography>
+            <Typography variant="body2">
+              Qi Wang is a highly skilled statistician and data scientist with a
+              Master’s degree in Applied Statistics...
+            </Typography>
+          </Grid>
+        </Box>
+      </Container>
     </div>
   );
 };
-

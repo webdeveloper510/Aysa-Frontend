@@ -16,8 +16,10 @@ code {
 }
 header.App-header p {
   color: #2caffe;
-  font-size: 40px;
+  font-size: 25px;
   cursor: pointer;
+  margin: 0;
+  padding: 15px 20px;
 }
 /************** tabs css *********************/
 .App {
@@ -104,6 +106,9 @@ header.App-header p {
 .about-page {
   float: left;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 .title {
   float: left;
@@ -175,15 +180,9 @@ section.about-section {
   color: #00aeef;
   text-decoration: none;
   font-weight: 400;
-  font-size: 30px !important;
+  font-size: 22px !important;
 }
 
-/* footer.footer .btn {
-  text-decoration: none;
-  color: #2caffe;
-  font-size: 25px;
-  font-weight: 400;
-} */
 .input-form .MuiInputBase-input {
   width: 100%;
   padding: 0.5em;
@@ -196,4 +195,10 @@ section.about-section {
 .meow {
   width: 50%;
   margin: 0 auto;
+}
+.chart-heading {
+  color: #333 !important;
+}
+.about-row {
+  background: #cbebff;
 }

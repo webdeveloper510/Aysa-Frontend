@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 export const Footer = () => {
   return (
     <Box
-    className="footerrow"
+      className="footerrow"
       component="footer"
       sx={{
         display: "flex",
@@ -12,7 +12,7 @@ export const Footer = () => {
         alignItems: "center",
         backgroundColor: "#2C2C2C", // Dark background
         borderTop: "3px solid white",
-        padding: "12px 24px",
+        padding: "9px 24px",
         fontFamily: "inherit",
       }}
     >

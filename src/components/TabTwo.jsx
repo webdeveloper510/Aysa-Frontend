@@ -40,14 +40,16 @@ export const TabTwo = () => {
         (row) =>
           row.company_name?.toLowerCase().includes(value.toLowerCase()) ||
           row.ceo_name?.toLowerCase().includes(value.toLowerCase())
-        // row.ceo_total_compensation
-        //   ?.toLowerCase()
-        //   .includes(value.toLowerCase()) ||
-        // row.worker_salary?.toLowerCase().includes(value.toLowerCase()) ||
-        // row.year?.toLowerCase().includes(value.toLowerCase())
       );
 
-      setFilteredData(filtered);
+      // ✅ Sort by year (desc) and get latest 4
+      const sorted = [...filtered]
+        .filter((row) => row.year)
+        .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+
+      const topFourYears = sorted.slice(0, 4);
+
+      setFilteredData(topFourYears);
     } catch (err) {
       console.error(err);
       setError("Failed to load data.");
@@ -102,14 +104,13 @@ export const TabTwo = () => {
                 <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                   Year
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#D3DCAA" }}>
+                <Box sx={{ ...cellStyle, backgroundColor: "#ff7f7f" }}>
                   CEO <br /> Name
                 </Box>
                 <Box
                   sx={{
                     ...cellStyle,
-                    backgroundColor: "#EC4137",
-                    color: "#fff",
+                    backgroundColor: "#FCFAF6",
                   }}
                 >
                   CEO Total Compensation
@@ -117,8 +118,7 @@ export const TabTwo = () => {
                 <Box
                   sx={{
                     ...cellStyle,
-                    backgroundColor: "#FF0000",
-                    color: "#fff",
+                    backgroundColor: "#FCFAF6",
                   }}
                 >
                   Frontline Worker Salary
@@ -141,14 +141,13 @@ export const TabTwo = () => {
                   <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.year}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#E9E7CA" }}>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7" }}>
                     <Typography variant="h6">{row.ceo_name}</Typography>
                   </Box>
                   <Box
                     sx={{
                       ...cellStyle,
-                      backgroundColor: "#EC4137",
-                      color: "#fff",
+                      backgroundColor: "#FCFAF6",
                     }}
                   >
                     <Typography variant="h6">
@@ -158,8 +157,7 @@ export const TabTwo = () => {
                   <Box
                     sx={{
                       ...cellStyle,
-                      backgroundColor: "#FF0000",
-                      color: "#fff",
+                      backgroundColor: "#FCFAF6",
                     }}
                   >
                     <Typography variant="h6">{row.worker_salary}</Typography>

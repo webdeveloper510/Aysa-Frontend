@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Productimage from "../assets/image/product-image.png";
+import Tooltip from "@mui/material/Tooltip";
 import {
   Box,
   Typography,
@@ -146,14 +147,14 @@ export const TabOne = () => {
     labels: [`Market Price: $${market}`],
     datasets: [
       {
-        label: `Production Cost: $${production}`,
-        data: [production],
-        backgroundColor: "#5C6BC0",
-      },
-      {
         label: `Profit: $${profit}`,
         data: [profit],
         backgroundColor: "#4FC3F7",
+      },
+      {
+        label: `Production Cost: $${production}`,
+        data: [production],
+        backgroundColor: "#5C6BC0",
       },
     ],
   };
@@ -161,21 +162,44 @@ export const TabOne = () => {
   const chartOptions = {
     plugins: {
       legend: { position: "bottom" },
-      title: {
-        display: true,
-        text: `Profit Margin: ${first.profit_margin || "N/A"} (*)`,
-        font: { size: 18, weight: "bold" },
-      },
     },
     responsive: true,
     scales: {
       x: {
         stacked: true,
-        title: { display: true, text: "Market Price" },
+        title: {
+          display: true,
+          text: `Market Price: $${market || "N/A"}`,
+          font: {
+            size: 14,
+          },
+          padding: {
+            top: 10,
+          },
+        },
+        ticks: {
+          display: false,
+        },
+        grid: {
+          display: false,
+          drawTicks: false,
+        },
       },
       y: {
         stacked: true,
         beginAtZero: true,
+        min: 0,
+        max: 250,
+        ticks: {
+          stepSize: 50,
+          callback: function (value) {
+            return value;
+          },
+        },
+        grid: {
+          drawBorder: false,
+          color: "#e0e0e0",
+        },
       },
     },
   };
@@ -267,8 +291,29 @@ export const TabOne = () => {
               />
             </Box>
             <Box flex={1} maxWidth="45%">
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                textAlign="center"
+                className="chart-heading"
+              >
+                Profit Margin: {first.profit_margin || "N/A"}{" "}
+                <Tooltip title="An estimate">
+                  <span
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    (*)
+                  </span>
+                </Tooltip>
+              </Typography>
+
               <Bar data={chartData} options={chartOptions} />
             </Box>
+            {/* <Box flex={1} maxWidth="45%">
+              <Bar data={chartData} options={chartOptions} />
+            </Box> */}
           </Box>
 
           <Typography

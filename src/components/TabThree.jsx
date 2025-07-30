@@ -38,11 +38,16 @@ export const TabThree = () => {
         (row) =>
           row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
           row.year?.toLowerCase().includes(query.toLowerCase())
-        //row.tax_paid?.toLowerCase().includes(query.toLowerCase()) ||
-        //row.tax_avoid?.toLowerCase().includes(query.toLowerCase())
       );
 
-      setFilteredData(filtered);
+      // ✅ Sort by year (desc) and get latest 4
+      const sorted = [...filtered]
+        .filter((row) => row.year)
+        .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+
+      const topFourYears = sorted.slice(0, 4);
+
+      setFilteredData(topFourYears);
       setError("");
     } catch (err) {
       console.error(err);

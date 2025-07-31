@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Typography, TextField } from "@mui/material";
-
+import axios from "axios";
 const cellStyle = {
   padding: "20px",
   textAlign: "center",
@@ -18,44 +18,55 @@ export const TabThree = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSearch = async (query) => {
-    setSearchQuery(query);
-    if (!query.trim()) {
-      setFilteredData([]);
-      return;
-    }
+const handleSearch = async (query) => {
+  setSearchQuery(query);
 
-    setLoading(true);
-    try {
-      const res = await fetch("https://api.the-aysa.com/tax-semantic-search");
-      if (!res.ok) throw new Error("Failed to fetch data");
-      const data = await res.json();
-      const rows = data?.data || [];
+  if (!query.trim()) {
+    setFilteredData([]);
+    return;
+  }
 
-      setAllData(rows);
+  setLoading(true);
+  setError("");
 
-      const filtered = rows.filter(
-        (row) =>
-          row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
-          row.year?.toLowerCase().includes(query.toLowerCase())
-      );
+  try {
+    const res = await axios.post("https://api.the-aysa.com/tax-semantic-search", {
+      query: query,
+    });
 
-      // ✅ Sort by year (desc) and get latest 4
-      const sorted = [...filtered]
-        .filter((row) => row.year)
-        .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+    const rawRows = res.data?.result || [];
 
-      const topFourYears = sorted.slice(0, 4);
+    const rows = rawRows.map((row) => ({
+      company_name: row["Company Name"]?.trim(),
+      year: row["Year"]?.trim(),
+      tax_paid: row["Tax Paid"]?.trim(),
+      tax_avoid: row["Tax Avoided"]?.trim(),
+    }));
 
-      setFilteredData(topFourYears);
-      setError("");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setAllData(rows);
+
+    const filtered = rows.filter(
+      (row) =>
+        row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
+        row.year?.toString().includes(query)
+    );
+
+    const sorted = [...filtered]
+      .filter((row) => row.year)
+      .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+
+    const topFourYears = sorted.slice(0, 4);
+
+    setFilteredData(topFourYears);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to load data.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <>
@@ -85,7 +96,7 @@ export const TabThree = () => {
           color="textSecondary"
           my={4}
           dangerouslySetInnerHTML={{
-            __html: `No data found for <strong>${searchQuery
+            __html: `No Match found for <strong>${searchQuery
               .split(" ")
               .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
               .join(" ")}</strong>`,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Typography, TextField } from "@mui/material";
-
+import axios from "axios";
 const cellStyle = {
   padding: "20px",
   textAlign: "center",
@@ -18,45 +18,56 @@ export const TabTwo = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSearch = async (value) => {
-    setSearchQuery(value);
-    if (!value.trim()) {
-      setFilteredData([]);
-      return;
-    }
+const handleSearch = async (value) => {
+  setSearchQuery(value);
 
-    setLoading(true);
-    try {
-      const res = await fetch(
-        "https://api.the-aysa.com/ceo-worker-semantic-search"
-      );
-      if (!res.ok) throw new Error("Failed to fetch data");
-      const result = await res.json();
-      const data = result?.data || [];
+  if (!value.trim()) {
+    setFilteredData([]);
+    return;
+  }
 
-      setAllData(data);
+  setLoading(true);
+  setError("");
 
-      const filtered = data.filter(
-        (row) =>
-          row.company_name?.toLowerCase().includes(value.toLowerCase()) ||
-          row.ceo_name?.toLowerCase().includes(value.toLowerCase())
-      );
+  try {
+    const res = await axios.post(
+      "https://api.the-aysa.com/ceo-worker-semantic-search",
+      { query: value }
+    );
 
-      // ✅ Sort by year (desc) and get latest 4
-      const sorted = [...filtered]
-        .filter((row) => row.year)
-        .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+    const rawData = res.data?.result || [];
 
-      const topFourYears = sorted.slice(0, 4);
+    // Normalize keys to camelCase without spaces
+    const data = rawData.map((row) => ({
+      company_name: row["Company Name"]?.trim(),
+      year: row["Year"]?.trim(),
+      ceo_name: row["CEO Name"]?.trim(),
+      ceo_total_compensation: row["CEO Total Compensation"]?.trim(),
+      worker_salary: row["Frontline Worker Salary"]?.trim(),
+    }));
 
-      setFilteredData(topFourYears);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setAllData(data);
+
+    const filtered = data.filter(
+      (row) =>
+        row.company_name?.toLowerCase().includes(value.toLowerCase()) ||
+        row.ceo_name?.toLowerCase().includes(value.toLowerCase())
+    );
+
+    const sorted = [...filtered]
+      .filter((row) => row.year)
+      .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+
+    const topFourYears = sorted.slice(0, 4);
+
+    setFilteredData(topFourYears);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to load data.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
@@ -82,7 +93,7 @@ export const TabTwo = () => {
       )}
       {!loading && searchQuery && filteredData.length === 0 && (
         <Typography align="center" color="textSecondary" my={4}>
-          No data found for "<strong>{searchQuery}</strong>"
+          No Match found for "<strong>{searchQuery}</strong>"
         </Typography>
       )}
 

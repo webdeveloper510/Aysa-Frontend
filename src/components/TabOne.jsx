@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Productimage from "../assets/image/product-image.png";
 import Tooltip from "@mui/material/Tooltip";
 import {
   Box,
@@ -18,91 +17,78 @@ import "chart.js/auto";
 import axios from "axios";
 
 export const TabOne = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  //const [suggestions, setSuggestions] = useState([]);
   const [searching, setSearching] = useState(false);
 
-const handleSearch = async (query) => {
-  setSearchQuery(query);
-  if (!query) {
-    setData([]);
-    return;
-  }
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (!query) {
+      setData({ matched: [], compared: [] });
+      return;
+    }
 
-  setSearching(true);
-  setError("");
+    setSearching(true);
+    setError("");
 
-  try {
-    const response = await axios.post(
-      "https://api.the-aysa.com/product-semantic-search",
-      { query },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    try {
+      const response = await axios.post(
+        "https://api.the-aysa.com/product-semantic-search",
+        { query },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    const rawResults = response.data.result || [];
+      const matched = response.data.matched_data || [];
+      const compared = response.data.compare_data || [];
 
-    const formatted = rawResults.map((item) => ({
-      brand: item["Brand"] || "",
-      product_name: item["Product Name"] || "",
-      product_type: item["Type"] || "",
-      production_year: item["Production Year"] || 0,
-      profit_margin: item["Profit Margin"] || "0%",
-      product_url: item["Link to Product Pictures"] || "",
-      profit_made: item["Profit Made"] || "",
-      release_price: item["Release Price"] || "",
-      combinedText: `${item["Brand"] || ""} ${item["Product Name"] || ""} ${item["Profit Margin"] || ""}`
-        .toLowerCase(),
-    }));
+      const formatItems = (items) =>
+        items.map((item) => ({
+          brand: item["Brand"] || "",
+          product_name: item["Product Name"] || "",
+          product_type: item["Type"] || "",
+          production_year: item["Production Year"] || 0,
+          profit_margin: item["Profit Margin"] || "0%",
+          product_url: item["Link to Product Pictures"] || "",
+          profit_made: item["Profit Made"] || "",
+          release_price: item["Release Price"] || "",
+          combinedText: `${item["Brand"] || ""} ${item["Product Name"] || ""} ${item["Profit Margin"] || ""}`.toLowerCase(),
+        }));
 
-    const searchWords = query.toLowerCase().split(/\s+/);
+      const searchWords = query.toLowerCase().split(/\s+/);
+      const matchedFormatted = formatItems(matched);
+      const comparedFormatted = formatItems(compared);
 
-    const filtered = formatted.filter((item) =>
-      searchWords.every((word) => item.combinedText.includes(word))
-    );
+      const filteredMatched = matchedFormatted.filter((item) =>
+        searchWords.every((word) => item.combinedText.includes(word))
+      );
 
-   const sorted = filtered.sort((a, b) => b.production_year - a.production_year);
-setData(sorted);
+      const sortedMatched = filteredMatched.sort((a, b) => b.production_year - a.production_year);
 
-  } catch (err) {
-    console.error("POST request failed:", err);
-    setError("Failed to load product data.");
-  } finally {
-    setSearching(false);
-  }
-};
+      setData({
+        matched: sortedMatched,
+        compared: comparedFormatted,
+      });
+    } catch (err) {
+      console.error("POST request failed:", err);
+      setError("Failed to load product data.");
+    } finally {
+      setSearching(false);
+    }
+  };
 
-
-
-
-  let first = data[0] || {};
-
-  if (!isNaN(searchQuery)) {
-    const targetMargin = parseFloat(searchQuery);
-    const exactMatch = data.find(
-      (item) =>
-        parseFloat(item.profit_margin?.replace(/[^0-9.]/g, "") || "0") ===
-        targetMargin
-    );
-    if (exactMatch) first = exactMatch;
-  } else {
-   const partialMatch = data.find((item) =>
-  item.norm_name?.includes(searchQuery.toLowerCase().replace(/\s+/g, ""))
-);
-    if (partialMatch) first = partialMatch;
-  }
+  let first = data.matched?.[0] || {};
 
   const parseCurrency = (val) =>
     parseFloat(val?.replace(/[^0-9.]/g, "") || "0");
 
   const production = parseCurrency(first.profit_made);
- const market = parseCurrency(first.release_price);
+  const market = parseCurrency(first.release_price);
   const profit = market - production;
 
   const chartData = {
@@ -154,9 +140,6 @@ setData(sorted);
         max: 250,
         ticks: {
           stepSize: 50,
-          callback: function (value) {
-            return value;
-          },
         },
         grid: {
           drawBorder: false,
@@ -166,37 +149,36 @@ setData(sorted);
     },
   };
 
+
+
   return (
     <>
-      <div className="meow">
-        <Box m={3}>
-
+      <Box m={3}>
         <Autocomplete
-  freeSolo
-  options={[]} // No suggestions
-  inputValue={searchQuery}
-  onInputChange={(event, newInputValue) => setSearchQuery(newInputValue)}
-  onKeyDown={(event) => {
-    if (event.key === 'Enter') {
-      handleSearch(searchQuery);
-    }
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="See what brands don’t want you to know…"
-      variant="outlined"
-      placeholder="Type product name..."
-      fullWidth
-    />
-  )}
-/>
-        </Box>
-      </div>
+          freeSolo
+          options={[]} // No suggestions
+          inputValue={searchQuery}
+          onInputChange={(event, newInputValue) => setSearchQuery(newInputValue)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              handleSearch(searchQuery);
+            }
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="See what brands don't want you to know…"
+              variant="outlined"
+              placeholder="Type product name..."
+              fullWidth
+            />
+          )}
+        />
+      </Box>
 
-      {!loading && !searching && searchQuery && data.length === 0 && (
+      {!loading && !searching && searchQuery && !data.matched.length && !data.compared.length && (
         <Typography align="center" color="textSecondary" my={4}>
-          No Match found for "<strong>{searchQuery}</strong>"
+          No match found for "<strong>{searchQuery}</strong>"
         </Typography>
       )}
 
@@ -207,27 +189,21 @@ setData(sorted);
         </Typography>
       )}
 
-
-
-
-      {!!data.length && (
+      {!!data.matched.length && (
         <>
           <Typography variant="h5" align="center" fontWeight="bold" my={5}>
-            {first.brand} {first.product_name} {first.year}
+            {first.brand} {first.product_name} {first.production_year}
           </Typography>
 
-          <Box
-            display="flex"
-            flexWrap="wrap"
-            justifyContent="space-between"
-            my={4}
-          >
+          <Box display="flex" flexWrap="wrap" justifyContent="space-between" my={4}>
             <Box flex={1} maxWidth="45%" mb={2}>
-               <img
-                          src={first.product_url || Productimage}
-                          alt={first.product_name || "Product"}
-                          style={{ width: 100, height: "auto" }}
-                        />
+              {first.product_url && (
+                <img
+                  src={first.product_url}
+                  alt={first.product_name || "Product"}
+                  style={{ width: 200, height: "auto", borderRadius: "8px" }}
+                />
+              )}
             </Box>
             <Box flex={1} maxWidth="45%">
               <Typography
@@ -238,21 +214,12 @@ setData(sorted);
               >
                 Profit Margin: {first.profit_margin || "N/A"}{" "}
                 <Tooltip title="An estimate">
-                  <span
-                    style={{
-                      cursor: "pointer",
-                    }}
-                  >
-                    (*)
-                  </span>
+                  <span style={{ cursor: "pointer" }}>(*)</span>
                 </Tooltip>
               </Typography>
 
               <Bar data={chartData} options={chartOptions} />
             </Box>
-            {/* <Box flex={1} maxWidth="45%">
-              <Bar data={chartData} options={chartOptions} />
-            </Box> */}
           </Box>
 
           <Typography
@@ -260,22 +227,27 @@ setData(sorted);
             align="center"
             sx={{ backgroundColor: "black", color: "white", py: 1, mt: 4 }}
           >
-            Comparing the profit margin to other similar products
+            {data.compared.length > 0 
+              ? "Comparing the profit margin to other similar products" 
+              : "Product Details"}
           </Typography>
 
           <Paper elevation={3}>
             <Table>
               <TableHead sx={{ backgroundColor: "#b3e5fc" }}>
-                <TableRow className="Table-head">
+                <TableRow>
                   <TableCell>Brand</TableCell>
                   <TableCell>Product Picture</TableCell>
                   <TableCell>Product Name</TableCell>
                   <TableCell>Profit Margin</TableCell>
+                  <TableCell>Product Type</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.map((row, idx) => {
-                  const allMargins = data.map((d) =>
+                {/* First show matched products */}
+                {data.matched.map((row, idx) => {
+                  const allData = [...data.matched, ...data.compared];
+                  const allMargins = allData.map((d) =>
                     parseFloat(d.profit_margin?.replace(/[^0-9.]/g, "") || "0")
                   );
                   const currentMargin = parseFloat(
@@ -286,8 +258,7 @@ setData(sorted);
 
                   return (
                     <TableRow
-                      key={row.product_name || idx}
-                      className="Table-row"
+                      key={`matched-${row.product_name || idx}`}
                       sx={{
                         backgroundColor: isMax
                           ? "#dcedc8"
@@ -298,14 +269,57 @@ setData(sorted);
                     >
                       <TableCell>{row.brand}</TableCell>
                       <TableCell>
-                        <img
-                          src={row.product_url || Productimage}
-                          alt={row.product_name || "Product"}
-                          style={{ width: 100, height: "auto" }}
-                        />
+                        {row.product_url && (
+                          <img
+                            src={row.product_url}
+                            alt={row.product_name || "Product"}
+                            style={{ width: 80, height: "auto", borderRadius: "4px" }}
+                          />
+                        )}
                       </TableCell>
                       <TableCell>{row.product_name}</TableCell>
                       <TableCell>{row.profit_margin}</TableCell>
+                      <TableCell>{row.product_type}</TableCell>
+                    </TableRow>
+                  );
+                })}
+                
+                {/* Then show compared products if they exist */}
+                {data.compared.map((row, idx) => {
+                  const allData = [...data.matched, ...data.compared];
+                  const allMargins = allData.map((d) =>
+                    parseFloat(d.profit_margin?.replace(/[^0-9.]/g, "") || "0")
+                  );
+                  const currentMargin = parseFloat(
+                    row.profit_margin?.replace(/[^0-9.]/g, "") || "0"
+                  );
+                  const isMax = currentMargin === Math.max(...allMargins);
+                  const isMin = currentMargin === Math.min(...allMargins);
+
+                  return (
+                    <TableRow
+                      key={`compared-${row.product_name || idx}`}
+                      sx={{
+                        backgroundColor: isMax
+                          ? "#dcedc8"
+                          : isMin
+                          ? "#ffcdd2"
+                          : "inherit",
+                      }}
+                    >
+                      <TableCell>{row.brand}</TableCell>
+                      <TableCell>
+                        {row.product_url && (
+                          <img
+                            src={row.product_url}
+                            alt={row.product_name || "Product"}
+                            style={{ width: 80, height: "auto", borderRadius: "4px" }}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>{row.product_name}</TableCell>
+                      <TableCell>{row.profit_margin}</TableCell>
+                      <TableCell>{row.product_type}</TableCell>
                     </TableRow>
                   );
                 })}

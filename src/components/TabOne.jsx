@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Tooltip } from "@mui/material";
 import {
   Box,
   Typography,
@@ -15,11 +16,17 @@ import {
   CardContent,
 } from "@mui/material";
 
+import { Bar } from "react-chartjs-2";
+import "chart.js/auto";
+
+
 export const TabOne = () => {
   const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+
 
   const handleSearch = async (query) => {
     if (!query.trim()) {
@@ -51,16 +58,18 @@ export const TabOne = () => {
       const matched = result.matched_data || [];
       const compared = result.compare_data || [];
 
-      const formatItems = (items) =>
-        items.map((item, index) => ({
-          id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
-          brand: (item["Brand"] || "").trim(),
-          product_name: (item["Product Name"] || "").trim(),
-          product_type: (item["Type"] || "").trim(),
-          production_year: parseInt(item["Production Year"]) || 0,
-          profit_margin: item["Profit Margin"] || "0%",
-          product_url: item["Link to Product Pictures"] || "",
-        }));
+     const formatItems = (items) =>
+  items.map((item, index) => ({
+    id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
+    brand: (item["Brand"] || "").trim(),
+    product_name: (item["Product Name"] || "").trim(),
+    product_type: (item["Type"] || "").trim(),
+    production_year: parseInt(item["Production Year"]) || 0,
+    profit_margin: item["Profit Margin"] || "0%",
+    product_url: item["Link to Product Pictures"] || "",
+    market_price: parseFloat(item["Release Price"]?.replace(/[^0-9.]/g, "") || "0"),
+    profit_made: parseFloat(item["Profit Made"]?.replace(/[^0-9.]/g, "") || "0"),
+  }));
 
       const matchedFormatted = formatItems(matched);
       const comparedFormatted = formatItems(compared);
@@ -82,6 +91,9 @@ export const TabOne = () => {
     }
   };
 
+
+
+  
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -109,37 +121,88 @@ export const TabOne = () => {
     </Box>
   );
 
-  const ProfitMarginCard = ({ product }) => {
-    const profitMarginValue = parseFloat(product.profit_margin?.replace(/[^0-9.]/g, "") || "0");
+  // const ProfitMarginCard = ({ product }) => {
+  //   const profitMarginValue = parseFloat(product.profit_margin?.replace(/[^0-9.]/g, "") || "0");
     
-    return (
-      <Card elevation={3} sx={{ height: "100%" }}>
-        <CardContent sx={{ textAlign: "center", py: 3 }}>
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Profit Margin Analysis
-          </Typography>
-          <Box 
-            sx={{ 
-              fontSize: "3rem", 
-              fontWeight: "bold", 
-              color: profitMarginValue > 50 ? "#f44336" : profitMarginValue > 30 ? "#ff9800" : "#4caf50",
-              my: 2 
-            }}
-          >
-            {product.profit_margin || "N/A"}
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            * Estimated profit margin
-          </Typography>
-          {profitMarginValue > 50 && (
-            <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
-              High profit margin detected
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
-    );
-  };
+  //   return (
+  //     <Card elevation={3} sx={{ height: "100%" }}>
+  //       <CardContent sx={{ textAlign: "center", py: 3 }}>
+  //         <Typography variant="h6" fontWeight="bold" gutterBottom>
+  //           Profit Margin Analysis
+  //         </Typography>
+  //         <Box 
+  //           sx={{ 
+  //             fontSize: "3rem", 
+  //             fontWeight: "bold", 
+  //             color: profitMarginValue > 50 ? "#f44336" : profitMarginValue > 30 ? "#ff9800" : "#4caf50",
+  //             my: 2 
+  //           }}
+  //         >
+  //           {product.profit_margin || "N/A"}
+  //         </Box>
+  //         <Typography variant="body2" color="text.secondary">
+  //           * Estimated profit margin
+  //         </Typography>
+  //         {profitMarginValue > 50 && (
+  //           <Typography variant="caption" color="error" sx={{ mt: 1, display: "block" }}>
+  //             High profit margin detected
+  //           </Typography>
+  //         )}
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // };
+
+const profitMarginValue = parseFloat(firstProduct.profit_margin?.replace('%', '') || '0');
+const marketPriceValue = firstProduct.market_price || 0;
+
+const chartData = {
+  labels: ['Profit Margin (%)', 'Market Price ($)'],
+  datasets: [
+    {
+      label: 'Product Metrics',
+      data: [profitMarginValue, marketPriceValue],
+      backgroundColor: ['#4FC3F7', '#5C6BC0'],
+      borderRadius: 6,
+      barThickness: 40,
+    },
+  ],
+};
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: function (context) {
+          const label = context.dataset.label || '';
+          const val = context.raw;
+          return context.label.includes('Margin') ? `${val}%` : `$${val}`;
+        },
+      },
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Metrics',
+        font: { weight: 'bold' },
+      },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        callback: function (value, index) {
+          return value < 101 ? `${value}%` : `$${value}`;
+        },
+      },
+    },
+  },
+};
+
 
   return (
     <>
@@ -191,12 +254,13 @@ export const TabOne = () => {
       {!loading && data.matched.length > 0 && (
         <>
           <Typography variant="h4" align="center" fontWeight="bold" my={4}>
-            {firstProduct.brand} {firstProduct.product_name} {firstProduct.product_type}
+            {firstProduct.brand} {firstProduct.product_name} {firstProduct.product_type} ({firstProduct.production_year})
           </Typography>
-          
-          <Typography variant="subtitle1" align="center" color="text.secondary" mb={4}>
+
+           
+          {/* <Typography variant="subtitle1" align="center" color="text.secondary" mb={4}>
             Production Year: {firstProduct.production_year}
-          </Typography>
+          </Typography> */}
 
           <Box display="flex" flexWrap="wrap" gap={3} justifyContent="center" my={4}>
             <Box flex={1} maxWidth="400px" minWidth="300px">
@@ -234,9 +298,27 @@ export const TabOne = () => {
               )}
             </Box>
             
-            <Box flex={1} maxWidth="400px" minWidth="300px">
+            {/* <Box flex={1} maxWidth="400px" minWidth="300px">
               <ProfitMarginCard product={firstProduct} />
-            </Box>
+            </Box> */}
+            
+            <Box flex={1} maxWidth="45%" height={300}>
+              <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
+  <Typography variant="subtitle1" fontWeight="bold" mr={0.5}>
+    Profit Margin: {firstProduct.profit_margin || "N/A"}
+  </Typography>
+  <Tooltip title="An estimate" arrow>
+    <Typography
+      component="span"
+      sx={{fontWeight: "bold", fontSize: "1.1rem" , Color: "#000"}}
+    >
+     (*) 
+    </Typography>
+  </Tooltip>
+</Box>
+  {chartData && <Bar data={chartData} options={chartOptions} />}
+</Box>
+          
           </Box>
 
           <Typography

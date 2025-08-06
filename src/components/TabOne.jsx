@@ -500,7 +500,7 @@ const chartOptions = {
                           }}
                         >
                           {row.profit_margin}
-                          {isMax && (
+                          {/* {isMax && (
                             <Typography
                               variant="caption"
                               color="error"
@@ -517,7 +517,7 @@ const chartOptions = {
                             >
                               LOWEST
                             </Typography>
-                          )}
+                          )} */}
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -601,7 +601,7 @@ const chartOptions = {
                           }}
                         >
                           {row.profit_margin}
-                          {isMax && (
+                          {/* {isMax && (
                             <Typography
                               variant="caption"
                               color="error"
@@ -618,7 +618,7 @@ const chartOptions = {
                             >
                               LOWEST
                             </Typography>
-                          )}
+                          )} */}
                         </Box>
                       </TableCell>
                     </TableRow>

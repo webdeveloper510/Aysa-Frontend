@@ -206,6 +206,7 @@ const chartOptions = {
 
   return (
     <>
+    <div class="meow">
       <Box m={3}>
         <Autocomplete
           freeSolo
@@ -229,6 +230,7 @@ const chartOptions = {
           )}
         />
       </Box>
+      </div>
 
       {loading && <LoadingComponent />}
 

@@ -54,7 +54,6 @@ export const TabOne = () => {
       }
 
       const result = await response.json();
-
       const matched = result.matched_data || [];
       const compared = result.compare_data || [];
 
@@ -76,7 +75,7 @@ export const TabOne = () => {
         }));
 
       const matchedFormatted = formatItems(matched);
-      const comparedFormatted = formatItems(compared);
+      const comparedFormatted = formatItems(compared.length > 0 ?compared: [] );
 
       // Sort by production year (newest first)
       const sortedMatched = matchedFormatted.sort(

@@ -720,8 +720,8 @@ export const TabOne = () => {
                       <TableCell>
                         <Box sx={{ fontWeight: "bold", color: currentMargin > 50 ? "#f44336" : "inherit" }}>
                           {row.profit_margin}
-                          {isMax && <Typography variant="caption" color="error" sx={{ ml: 1 }}>HIGHEST</Typography>}
-                          {isMin && <Typography variant="caption" color="success.main" sx={{ ml: 1 }}>LOWEST</Typography>}
+                          {isMax && <Typography variant="caption" color="error" sx={{ ml: 1 }}></Typography>}
+                          {isMin && <Typography variant="caption" color="success.main" sx={{ ml: 1 }}></Typography>}
                         </Box>
                       </TableCell>
                       <TableCell sx={{ fontWeight: "500" }}>{row.profit_made || "N/A"}</TableCell>

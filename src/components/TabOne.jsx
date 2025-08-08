@@ -43,6 +43,7 @@ export const TabOne = () => {
         }
 
         const result = await response.json();
+        console.log("Initial data fetch result:", result); // Debug log
         const apiData = result.data || [];
         
         // Format the data for suggestions - Enhanced to include more comprehensive search
@@ -53,8 +54,8 @@ export const TabOne = () => {
           brand: item.Brand || '',
           productName: item["Product Name"] || '',
           type: item.Type || '',
-          profitMargin: item["Profit Margin "] || "N/A",
-          productionYear: item["Production Year "] || "N/A",
+          profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
+          productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           // Enhanced search text with multiple variations for better matching
           searchText: [
@@ -157,6 +158,8 @@ export const TabOne = () => {
     setError("");
 
     try {
+      console.log("Making search request for:", query); // Debug log
+      
       const response = await fetch("https://api.the-aysa.com/product-semantic-search", {
         method: "POST",
         headers: {
@@ -170,31 +173,56 @@ export const TabOne = () => {
       }
 
       const result = await response.json();
+      console.log("Search API response:", result); // Debug log
 
+      // Handle both array and object responses for compare_data
       const matched = result.matched_data || [];
-      const compared = result.compare_data || [];
+      let compared = result.compare_data || [];
+      
+      // If compare_data is an object (like {}), convert it to an empty array
+      if (!Array.isArray(compared)) {
+        compared = Object.values(compared).filter(Boolean); // Convert object values to array, filter out falsy values
+      }
 
-      // Format items function
-      const formatItems = (items) =>
-        items.map((item, index) => ({
-          id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
-          brand: (item["Brand"] || "").trim(),
-          product_name: (item["Product Name"] || "").trim(),
-          product_type: (item["Type"] || "").trim(),
-          production_year: parseInt(item["Production Year"]) || 0,
-          profit_margin: item["Profit Margin"] || "0%",
-          profit_made: item["Profit Made"] || "$0",
-          release_price: item["Release Price"] || "$0",
-          product_url: item["Link to Product Pictures"] || "",
-          similarity: item["similarity"] || 0,
-          cluster: item["cluster"] || 0,
-          // Add market price and profit made as numbers for chart
-          market_price: parseFloat(item["Release Price"]?.replace(/[^0-9.]/g, "") || "0"),
-          profit_made_value: parseFloat(item["Profit Made"]?.replace(/[^0-9.]/g, "") || "0"),
-        }));
+      console.log("Processed data - matched:", matched, "compared:", compared); // Debug log
+
+      // Format items function with better error handling
+      const formatItems = (items) => {
+        if (!Array.isArray(items)) {
+          console.warn("formatItems received non-array:", items);
+          return [];
+        }
+        
+        return items.map((item, index) => {
+          // Handle both "Profit Margin" and "Profit Margin " (with space)
+          const profitMargin = item["Profit Margin"] || item["Profit Margin "] || "0%";
+          const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
+          const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
+          const productionYear = item["Production Year"] || item["Production Year "] || 0;
+          
+          return {
+            id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
+            brand: (item["Brand"] || "").trim(),
+            product_name: (item["Product Name"] || "").trim(),
+            product_type: (item["Type"] || "").trim(),
+            production_year: parseInt(productionYear) || 0,
+            profit_margin: profitMargin,
+            profit_made: profitMade,
+            release_price: releasePrice,
+            product_url: item["Link to Product Pictures"] || "",
+            similarity: item["similarity"] || 0,
+            cluster: item["cluster"] || 0,
+            // Add market price and profit made as numbers for chart
+            market_price: parseFloat(releasePrice?.replace(/[^0-9.]/g, "") || "0"),
+            profit_made_value: parseFloat(profitMade?.replace(/[^0-9.]/g, "") || "0"),
+          };
+        });
+      };
 
       const matchedFormatted = formatItems(matched);
       const comparedFormatted = formatItems(compared);
+
+      console.log("Formatted data - matched:", matchedFormatted, "compared:", comparedFormatted); // Debug log
 
       // Sort by production year (newest first)
       const sortedMatched = matchedFormatted.sort((a, b) => b.production_year - a.production_year);
@@ -206,7 +234,7 @@ export const TabOne = () => {
 
     } catch (err) {
       console.error("Search failed:", err);
-      setError("Failed to load product data. Please try again.");
+      setError(`Failed to load product data: ${err.message}. Please try again.`);
       setData({ matched: [], compared: [] });
     } finally {
       setLoading(false);

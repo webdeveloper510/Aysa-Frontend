@@ -218,23 +218,10 @@ export const TabOne = () => {
 
       console.log("Formatted search data:", formattedData); // Debug log
 
-      // Sort by production year (newest first) and then by profit margin
-      const sortedData = formattedData.sort((a, b) => {
-        // First sort by production year (newest first)
-        if (b.production_year !== a.production_year) {
-          return b.production_year - a.production_year;
-        }
-        // Then by profit margin (highest first)
-        const aProfitMargin = parseFloat(a.profit_margin?.replace(/[^0-9.]/g, "") || "0");
-        const bProfitMargin = parseFloat(b.profit_margin?.replace(/[^0-9.]/g, "") || "0");
-        return bProfitMargin - aProfitMargin;
-      });
-
-      // For the new structure, we'll treat all results as "matched"
-      // If you want to distinguish between exact matches and similar products,
-      // you could implement logic based on similarity scores or other criteria
+      // Keep the data in the order returned by the API (no sorting)
+      // The API returns results in order of relevance/similarity
       setData({
-        matched: sortedData,
+        matched: formattedData,
         compared: [], // Empty for now since the new API doesn't distinguish
       });
 
@@ -609,26 +596,14 @@ export const TabOne = () => {
               </TableHead>
               <TableBody>
                 {data.matched.map((row, index) => {
-                  const allMargins = data.matched.map((d) =>
-                    parseFloat(d.profit_margin?.replace(/[^0-9.]/g, "") || "0")
-                  );
-                  const currentMargin = parseFloat(
-                    row.profit_margin?.replace(/[^0-9.]/g, "") || "0"
-                  );
-                  const isMax = currentMargin === Math.max(...allMargins);
-                  const isMin = allMargins.length > 1 && currentMargin === Math.min(...allMargins);
-                  const isFirstResult = index === 0;
+                  const isFirstResult = index === 0; // First result (index 0) is the primary match
 
                   return (
                     <TableRow
                       key={row.id}
                       sx={{
                         backgroundColor: isFirstResult
-                          ? "#e3f2fd" // Highlight first result
-                          : isMax
-                          ? "#ffebee"
-                          : isMin
-                          ? "#e8f5e8"
+                          ? "#e3f2fd" // Highlight first result (API's top match)
                           : "inherit",
                         borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
                         "&:hover": {
@@ -640,7 +615,6 @@ export const TabOne = () => {
                         {row.brand}
                         {isFirstResult && (
                           <Typography variant="caption" color="primary" sx={{ ml: 1, display: "block" }}>
-                            Primary Match
                           </Typography>
                         )}
                       </TableCell>
@@ -695,10 +669,8 @@ export const TabOne = () => {
                       </TableCell>
                       <TableCell>{row.production_year}</TableCell>
                       <TableCell>
-                        <Box sx={{ fontWeight: "bold", color: currentMargin > 50 ? "#f44336" : "inherit" }}>
+                        <Box sx={{ fontWeight: "bold" }}>
                           {row.profit_margin}
-                          {isMax && <Typography variant="caption" color="error" sx={{ ml: 1 }}>📈</Typography>}
-                          {isMin && <Typography variant="caption" color="success.main" sx={{ ml: 1 }}>📉</Typography>}
                         </Box>
                       </TableCell>
                       <TableCell sx={{ fontWeight: "500" }}>{row.profit_made || "N/A"}</TableCell>

@@ -175,16 +175,10 @@ export const TabOne = () => {
       const result = await response.json();
       console.log("Search API response:", result); // Debug log
 
-      // Handle both array and object responses for compare_data
-      const matched = result.matched_data || [];
-      let compared = result.compare_data || [];
-      
-      // If compare_data is an object (like {}), convert it to an empty array
-      if (!Array.isArray(compared)) {
-        compared = Object.values(compared).filter(Boolean); // Convert object values to array, filter out falsy values
-      }
+      // Handle the new simplified response structure
+      const searchData = result.data || [];
 
-      console.log("Processed data - matched:", matched, "compared:", compared); // Debug log
+      console.log("Processed search data:", searchData); // Debug log
 
       // Format items function with better error handling
       const formatItems = (items) => {
@@ -210,6 +204,7 @@ export const TabOne = () => {
             profit_made: profitMade,
             release_price: releasePrice,
             product_url: item["Link to Product Pictures"] || "",
+            category: item["Category"] || "",
             similarity: item["similarity"] || 0,
             cluster: item["cluster"] || 0,
             // Add market price and profit made as numbers for chart
@@ -219,17 +214,28 @@ export const TabOne = () => {
         });
       };
 
-      const matchedFormatted = formatItems(matched);
-      const comparedFormatted = formatItems(compared);
+      const formattedData = formatItems(searchData);
 
-      console.log("Formatted data - matched:", matchedFormatted, "compared:", comparedFormatted); // Debug log
+      console.log("Formatted search data:", formattedData); // Debug log
 
-      // Sort by production year (newest first)
-      const sortedMatched = matchedFormatted.sort((a, b) => b.production_year - a.production_year);
+      // Sort by production year (newest first) and then by profit margin
+      const sortedData = formattedData.sort((a, b) => {
+        // First sort by production year (newest first)
+        if (b.production_year !== a.production_year) {
+          return b.production_year - a.production_year;
+        }
+        // Then by profit margin (highest first)
+        const aProfitMargin = parseFloat(a.profit_margin?.replace(/[^0-9.]/g, "") || "0");
+        const bProfitMargin = parseFloat(b.profit_margin?.replace(/[^0-9.]/g, "") || "0");
+        return bProfitMargin - aProfitMargin;
+      });
 
+      // For the new structure, we'll treat all results as "matched"
+      // If you want to distinguish between exact matches and similar products,
+      // you could implement logic based on similarity scores or other criteria
       setData({
-        matched: sortedMatched,
-        compared: comparedFormatted,
+        matched: sortedData,
+        compared: [], // Empty for now since the new API doesn't distinguish
       });
 
     } catch (err) {
@@ -583,11 +589,7 @@ export const TabOne = () => {
               fontWeight: "bold",
             }}
           >
-            {data.compared.length > 0
-              ? `Product Comparison (${
-                  data.matched.length + data.compared.length
-                } products found)`
-              : `Product Details (${data.matched.length} products found)`}
+            Search Results ({data.matched.length} products found)
           </Typography>
 
           <Paper elevation={3}>
@@ -598,6 +600,7 @@ export const TabOne = () => {
                   <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
+                  <TableCell sx={{ fontWeight: "bold" }}>Category</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Year</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
                   <TableCell sx={{ fontWeight: "bold" }}>Profit Made</TableCell>
@@ -605,10 +608,8 @@ export const TabOne = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* Matched products */}
-                {data.matched.map((row) => {
-                  const allData = [...data.matched, ...data.compared];
-                  const allMargins = allData.map((d) =>
+                {data.matched.map((row, index) => {
+                  const allMargins = data.matched.map((d) =>
                     parseFloat(d.profit_margin?.replace(/[^0-9.]/g, "") || "0")
                   );
                   const currentMargin = parseFloat(
@@ -616,22 +617,33 @@ export const TabOne = () => {
                   );
                   const isMax = currentMargin === Math.max(...allMargins);
                   const isMin = allMargins.length > 1 && currentMargin === Math.min(...allMargins);
+                  const isFirstResult = index === 0;
 
                   return (
                     <TableRow
                       key={row.id}
                       sx={{
-                        backgroundColor: isMax
+                        backgroundColor: isFirstResult
+                          ? "#e3f2fd" // Highlight first result
+                          : isMax
                           ? "#ffebee"
                           : isMin
                           ? "#e8f5e8"
                           : "inherit",
+                        borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
                         "&:hover": {
                           backgroundColor: "#f5f5f5"
                         }
                       }}
                     >
-                      <TableCell sx={{ fontWeight: "500" }}>{row.brand}</TableCell>
+                      <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "500" }}>
+                        {row.brand}
+                        {isFirstResult && (
+                          <Typography variant="caption" color="primary" sx={{ ml: 1, display: "block" }}>
+                            Primary Match
+                          </Typography>
+                        )}
+                      </TableCell>
                       <TableCell>
                         {row.product_url ? (
                           <img
@@ -665,91 +677,28 @@ export const TabOne = () => {
                           </Box>
                         )}
                       </TableCell>
-                      <TableCell>{row.product_name}</TableCell>
+                      <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
+                        {row.product_name}
+                      </TableCell>
                       <TableCell>{row.product_type}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ 
+                          backgroundColor: "#f0f0f0", 
+                          px: 1, 
+                          py: 0.5, 
+                          borderRadius: 1,
+                          display: "inline-block",
+                          fontSize: "0.75rem"
+                        }}>
+                          {row.category || "N/A"}
+                        </Typography>
+                      </TableCell>
                       <TableCell>{row.production_year}</TableCell>
                       <TableCell>
                         <Box sx={{ fontWeight: "bold", color: currentMargin > 50 ? "#f44336" : "inherit" }}>
                           {row.profit_margin}
-                          {isMax && <Typography variant="caption" color="error" sx={{ ml: 1 }}></Typography>}
-                          {isMin && <Typography variant="caption" color="success.main" sx={{ ml: 1 }}></Typography>}
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: "500" }}>{row.profit_made || "N/A"}</TableCell>
-                      <TableCell sx={{ fontWeight: "500" }}>{row.release_price || "N/A"}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                
-                {/* Compared products */}
-                {data.compared.map((row) => {
-                  const allData = [...data.matched, ...data.compared];
-                  const allMargins = allData.map((d) =>
-                    parseFloat(d.profit_margin?.replace(/[^0-9.]/g, "") || "0")
-                  );
-                  const currentMargin = parseFloat(
-                    row.profit_margin?.replace(/[^0-9.]/g, "") || "0"
-                  );
-                  const isMax = currentMargin === Math.max(...allMargins);
-                  const isMin = allMargins.length > 1 && currentMargin === Math.min(...allMargins);
-
-                  return (
-                    <TableRow
-                      key={`compared-${row.brand}-${row.product_name}`}
-                      sx={{
-                        backgroundColor: isMax
-                          ? "#ffebee"
-                          : isMin
-                          ? "#e8f5e8"
-                          : "#f9f9f9",
-                        borderLeft: "4px solid #2196f3",
-                        "&:hover": {
-                          backgroundColor: "#f0f0f0"
-                        }
-                      }}
-                    >
-                      <TableCell sx={{ fontWeight: "500" }}>{row.brand}</TableCell>
-                      <TableCell>
-                        {row.product_url ? (
-                          <img
-                            src={row.product_url}
-                            alt={`${row.brand} ${row.product_name}`}
-                            style={{ 
-                              width: 60, 
-                              height: 60, 
-                              objectFit: "cover",
-                              borderRadius: "6px" 
-                            }}
-                            onError={(e) => {
-                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiNEREREREQiLz4KPC9zdmc+';
-                            }}
-                          />
-                        ) : (
-                          <Box 
-                            sx={{ 
-                              width: 60, 
-                              height: 60, 
-                              backgroundColor: "#f0f0f0", 
-                              borderRadius: "6px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center"
-                            }}
-                          >
-                            <Typography variant="caption" color="text.disabled">
-                              No img
-                            </Typography>
-                          </Box>
-                        )}
-                      </TableCell>
-                      <TableCell>{row.product_name}</TableCell>
-                      <TableCell>{row.product_type}</TableCell>
-                      <TableCell>{row.production_year}</TableCell>
-                      <TableCell>
-                        <Box sx={{ fontWeight: "bold", color: currentMargin > 50 ? "#f44336" : "inherit" }}>
-                          {row.profit_margin}
-                          {isMax && <Typography variant="caption" color="error" sx={{ ml: 1 }}></Typography>}
-                          {isMin && <Typography variant="caption" color="success.main" sx={{ ml: 1 }}></Typography>}
+                          {isMax && <Typography variant="caption" color="error" sx={{ ml: 1 }}>📈</Typography>}
+                          {isMin && <Typography variant="caption" color="success.main" sx={{ ml: 1 }}>📉</Typography>}
                         </Box>
                       </TableCell>
                       <TableCell sx={{ fontWeight: "500" }}>{row.profit_made || "N/A"}</TableCell>

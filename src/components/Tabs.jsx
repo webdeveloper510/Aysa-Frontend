@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TabOne } from "./TabOne";
 import { TabTwo } from "./TabTwo";
 import { TabThree } from "./TabThree";
+import React from "react"
 
 const tabs = [
   {
@@ -20,6 +21,22 @@ const tabs = [
 
 export const Tabs = () => {
   const [activeTab, setActiveTab] = useState(null);
+  
+  const getSearchLabel = () => {
+    if (activeTab === null) {
+      return "See what brands don't want you to know";
+    }
+    switch (activeTab) {
+      case 0:
+        return "Search by brands, products or type";
+      case 1:
+        return tabs[activeTab].label; 
+      case 2:
+        return tabs[activeTab].label;
+      default:
+        return tabs[activeTab].label;
+    }
+  };
 
   return (
     <>
@@ -39,7 +56,11 @@ export const Tabs = () => {
         </div>
 
         <div className="tab-content">
-          {(activeTab !== null ? tabs[activeTab] : tabs[0]).content}
+          {activeTab !== null ? (
+            React.cloneElement(tabs[activeTab].content, { searchLabel: getSearchLabel() })
+          ) : (
+            <TabOne searchLabel={getSearchLabel()} />
+          )}
         </div>
       </div>
     </>

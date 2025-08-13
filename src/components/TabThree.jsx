@@ -1,6 +1,13 @@
-import { useState } from "react";
-import { Box, Typography, TextField } from "@mui/material";
+import { useState, useEffect, useMemo } from "react";
+import { 
+  Box, 
+  Typography, 
+  TextField, 
+  Autocomplete, 
+  CircularProgress 
+} from "@mui/material";
 import axios from "axios";
+
 const cellStyle = {
   padding: "20px",
   textAlign: "center",
@@ -17,80 +24,289 @@ export const TabThree = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [allTaxData, setAllTaxData] = useState([]);
+  const [initialDataLoading, setInitialDataLoading] = useState(true);
 
-const handleSearch = async (query) => {
-  setSearchQuery(query);
+  useEffect(() => {
+    const fetchAllTaxData = async () => {
+      setInitialDataLoading(true);
+      try {
+        const response = await fetch("https://api.the-aysa.com/get-tax-data", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-  if (!query.trim()) {
-    setFilteredData([]);
-    return;
-  }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-  setLoading(true);
-  setError("");
+        const result = await response.json();
+        console.log("Initial tax data fetch result:", result);
+        const apiData = result.data || [];
+        const formattedData = apiData.map((item, index) => ({
+          id: index,
+          label: `${item["Company Name"] || ''} (${item.Year || ''})`.trim(),
+          value: item["Company Name"] || '',
+          companyName: item["Company Name"] || '',
+          year: item.Year || '',
+          taxesPaid: item["Taxes Paid"] || item["Tax Paid"] || "N/A",
+          taxesAvoided: item["Taxes Avoided"] || item["Tax Avoided"] || "N/A",
+          searchText: [
+            (item["Company Name"] || '').toLowerCase(),
+            (item.Year || '').toString().toLowerCase(),
+            `${item["Company Name"] || ''} ${item.Year || ''}`.toLowerCase(),
+          ].filter(text => text.trim() !== '') 
+        }));
 
-  try {
-    const res = await axios.post("https://api.the-aysa.com/tax-semantic-search", {
-      query: query,
+        setAllTaxData(formattedData);
+      } catch (err) {
+        console.error("Failed to fetch initial tax data:", err);
+        setError("Failed to load tax data. Please refresh the page.");
+      } finally {
+        setInitialDataLoading(false);
+      }
+    };
+
+    fetchAllTaxData();
+  }, []);
+
+  const suggestions = useMemo(() => {
+    if (!searchQuery || searchQuery.length < 1 || allTaxData.length === 0) {
+      return [];
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+    
+    const filteredSuggestions = allTaxData.filter(item => {
+      const matchesFullQuery = item.searchText.some(text => text.includes(query));
+      const matchesAllWords = queryWords.every(word => 
+        item.searchText.some(text => text.includes(word))
+      );
+      const companyName = item.companyName.toLowerCase();
+      const year = item.year.toString().toLowerCase();
+      
+      const matchesIndividualFields = 
+        companyName.includes(query) || 
+        year.includes(query) ||
+        queryWords.some(word => 
+          companyName.includes(word) || 
+          year.includes(word)
+        );
+      
+      return matchesFullQuery || matchesAllWords || matchesIndividualFields;
+    });
+    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
+      const aExactCompany = a.companyName.toLowerCase() === query;
+      const bExactCompany = b.companyName.toLowerCase() === query;
+      if (aExactCompany !== bExactCompany) return bExactCompany - aExactCompany;
+      const aCompanyStarts = a.companyName.toLowerCase().startsWith(query);
+      const bCompanyStarts = b.companyName.toLowerCase().startsWith(query);
+      if (aCompanyStarts !== bCompanyStarts) return bCompanyStarts - aCompanyStarts;
+      const aYearMatch = a.year.toString() === query;
+      const bYearMatch = b.year.toString() === query;
+      if (aYearMatch !== bYearMatch) return bYearMatch - aYearMatch;
+      const companyCompare = a.companyName.localeCompare(b.companyName);
+      if (companyCompare !== 0) return companyCompare;
+      
+      return parseInt(b.year) - parseInt(a.year);
     });
 
-    const rawRows = res.data?.result || [];
+    return sortedSuggestions.slice(0, 15);
+  }, [searchQuery, allTaxData]);
 
-    const rows = rawRows.map((row) => ({
-      company_name: row["Company Name"]?.trim(),
-      year: row["Year"]?.trim(),
-      tax_paid: row["Tax Paid"]?.trim(),
-      tax_avoid: row["Tax Avoided"]?.trim(),
-    }));
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
 
-    setAllData(rows);
+    if (!query.trim()) {
+      setFilteredData([]);
+      return;
+    }
 
-    const filtered = rows.filter(
-      (row) =>
-        row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
-        row.year?.toString().includes(query)
-    );
+    setLoading(true);
+    setError("");
 
-    const sorted = [...filtered]
-      .filter((row) => row.year)
-      .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+    try {
+      console.log("Making search request for:", query); 
+      
+      const res = await axios.post("https://api.the-aysa.com/tax-semantic-search", {
+        query: query,
+      });
 
-    const topFourYears = sorted.slice(0, 4);
+      console.log("Tax search API response:", res.data)
+      const rawRows = res.data?.data || [];
 
-    setFilteredData(topFourYears);
-  } catch (err) {
-    console.error(err);
-    setError("Failed to load data.");
-  } finally {
-    setLoading(false);
+      console.log("Raw rows from API:", rawRows); 
+
+      const rows = rawRows.map((row, index) => ({
+        id: `${row["Company Name"]}-${row["Year"]}-${index}`,
+        company_name: row["Company Name"]?.trim(),
+        year: row["Year"]?.toString().trim(),
+        tax_paid: row["Taxes Paid"]?.trim(), 
+        tax_avoid: row["Taxes Avoided"]?.trim(), 
+      }));
+
+      console.log("Processed rows:", rows); 
+
+      setAllData(rows);
+      const filtered = rows.filter(
+        (row) =>
+          row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
+          row.year?.toString().includes(query)
+      );
+
+      const sorted = [...filtered]
+        .filter((row) => row.year)
+        .sort((a, b) => parseInt(b.year) - parseInt(a.year));
+
+      const topFourYears = sorted.slice(0, 4);
+
+      console.log("Final filtered data:", topFourYears); 
+      setFilteredData(topFourYears);
+    } catch (err) {
+      console.error("Tax search failed:", err);
+      setError(`Failed to load data: ${err.message}. Please try again.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSearch(searchQuery);
+    }
+  };
+
+  const handleSuggestionSelect = (event, value) => {
+    if (value && typeof value === 'object') {
+      const selectedQuery = value.value;
+      setSearchQuery(selectedQuery);
+      handleSearch(selectedQuery);
+    } else if (typeof value === 'string') {
+      setSearchQuery(value)
+      handleSearch(value);
+    }
+  };
+
+  const LoadingComponent = () => (
+    <Box 
+      display="flex" 
+      flexDirection="column" 
+      alignItems="center" 
+      justifyContent="center" 
+      py={8}
+    >
+      <CircularProgress size={60} thickness={4} />
+      <Typography variant="h6" sx={{ mt: 2, color: "text.secondary" }}>
+        Searching tax data...
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 1, color: "text.disabled" }}>
+        Analyzing company tax information
+      </Typography>
+    </Box>
+  );
+
+  const InitialLoadingComponent = () => (
+    <Box 
+      display="flex" 
+      flexDirection="column" 
+      alignItems="center" 
+      justifyContent="center" 
+      py={8}
+    >
+      <CircularProgress size={60} thickness={4} />
+      <Typography variant="h6" sx={{ mt: 2, color: "text.secondary" }}>
+        Loading tax data
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 1, color: "text.disabled" }}>
+        This may take a moment 
+      </Typography>
+    </Box>
+  );
+  if (initialDataLoading) {
+    return <InitialLoadingComponent />;
   }
-};
-
-
 
   return (
     <>
       <div className="meow">
         <Box m={3}>
-          <TextField
-            label="Search by company name or year"
-            variant="outlined"
-            className="input-form"
-            placeholder="Type to filter..."
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+          <Autocomplete
+            freeSolo
+            options={suggestions}
+            getOptionLabel={(option) => {
+              if (typeof option === 'string') return option;
+              return option.label || '';
+            }}
+            inputValue={searchQuery}
+            onInputChange={(event, newInputValue) => {
+              if (!newInputValue) { 
+                setSearchQuery("");
+                setFilteredData([]);
+                return;
+              }
+              setSearchQuery(newInputValue);
+            }}
+            onChange={handleSuggestionSelect}
+            onKeyDown={handleKeyPress}
+            noOptionsText={
+              searchQuery.length < 1 
+                ? "Start typing to search for companies or years..." 
+                : "No matching tax data found"
+            }
+            disabled={loading}
+            filterOptions={(options) => options} 
+            renderOption={(props, option) => (
+              <Box component="li" {...props} key={option.id}>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="body2" fontWeight="bold">
+                      <span style={{ color: '#1976d2' }}>{option.companyName}</span>
+                      <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.year}</span>
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Paid: {option.taxesPaid} • Avoided: {option.taxesAvoided}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search by company name or year"
+                variant="outlined"
+                className="input-form"
+                placeholder="Type to filter..."
+                fullWidth
+                disabled={loading || initialDataLoading}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loading && <CircularProgress size={20} />}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
           />
         </Box>
       </div>
 
-      {loading && <Typography align="center">Loading...</Typography>}
+      {loading && <LoadingComponent />}
+      
       {error && (
         <Typography color="error" align="center">
           {error}
         </Typography>
       )}
-      {!loading && searchQuery && filteredData.length === 0 && (
+      
+      {!loading && searchQuery && filteredData.length === 0 && !error && (
         <Typography
           align="center"
           color="textSecondary"
@@ -144,9 +360,9 @@ const handleSearch = async (query) => {
               </Box>
 
               {/* Body */}
-              {filteredData.map((row) => (
+              {filteredData.map((row, index) => (
                 <Box
-                  key={row.id}
+                  key={`${row.company_name}-${row.year}-${index}`}
                   className="tablebody"
                   sx={{
                     display: "grid",

@@ -18,7 +18,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
-export const TabOne = () => {
+export const TabOne = ({ searchLabel = "Search by brands, products or types" }) => {
   const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -189,7 +189,7 @@ export const TabOne = () => {
         
         return items.map((item, index) => {
           // Handle both "Profit Margin" and "Profit Margin " (with space)
-const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
+          const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
           const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
           const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
           const productionYear = item["Production Year"] || item["Production Year "] || 0;
@@ -257,9 +257,9 @@ const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "
   const firstProduct = data.matched?.[0] || {};
 
   // Chart data preparation
-const profitMarginValue = parseFloat(
-  String(firstProduct.profit_margin || "0").replace("%", "")
-);
+  const profitMarginValue = parseFloat(
+    String(firstProduct.profit_margin || "0").replace("%", "")
+  );
 
   const marketPriceValue = firstProduct.market_price || 0;
   const profitValueMade = firstProduct.profit_made_value || 0;
@@ -398,17 +398,15 @@ const profitMarginValue = parseFloat(
               return option.label || '';
             }}
             inputValue={searchQuery}
-    onInputChange={(event, newInputValue) => {
-  if (!newInputValue) { 
-    // Empty string (either cleared with X or backspace)
-    setSearchQuery("");
-    setData({ matched: [], compared: [] });
-    return;
-  }
-  setSearchQuery(newInputValue);
-}}
-
-
+            onInputChange={(event, newInputValue) => {
+              if (!newInputValue) { 
+                // Empty string (either cleared with X or backspace)
+                setSearchQuery("");
+                setData({ matched: [], compared: [] });
+                return;
+              }
+              setSearchQuery(newInputValue);
+            }}
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={
@@ -453,7 +451,7 @@ const profitMarginValue = parseFloat(
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="See what brands don’t want you to know"
+                label={searchLabel} // Use the dynamic search label here
                 variant="outlined"
                 className="input-form"
                 placeholder="Type to filter..."

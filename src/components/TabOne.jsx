@@ -189,7 +189,7 @@ export const TabOne = () => {
         
         return items.map((item, index) => {
           // Handle both "Profit Margin" and "Profit Margin " (with space)
-          const profitMargin = item["Profit Margin"] || item["Profit Margin "] || "0%";
+const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
           const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
           const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
           const productionYear = item["Production Year"] || item["Production Year "] || 0;
@@ -257,9 +257,10 @@ export const TabOne = () => {
   const firstProduct = data.matched?.[0] || {};
 
   // Chart data preparation
-  const profitMarginValue = parseFloat(
-    firstProduct.profit_margin?.replace("%", "") || "0"
-  );
+const profitMarginValue = parseFloat(
+  String(firstProduct.profit_margin || "0").replace("%", "")
+);
+
   const marketPriceValue = firstProduct.market_price || 0;
   const profitValueMade = firstProduct.profit_made_value || 0;
 
@@ -397,11 +398,17 @@ export const TabOne = () => {
               return option.label || '';
             }}
             inputValue={searchQuery}
-            onInputChange={(event, newInputValue) => {
-              if (event && event.type === 'change') {
-                setSearchQuery(newInputValue || "");
-              }
-            }}
+    onInputChange={(event, newInputValue) => {
+  if (!newInputValue) { 
+    // Empty string (either cleared with X or backspace)
+    setSearchQuery("");
+    setData({ matched: [], compared: [] });
+    return;
+  }
+  setSearchQuery(newInputValue);
+}}
+
+
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={

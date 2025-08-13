@@ -115,7 +115,7 @@ const handleSearch = async (value) => {
                 <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                   Year
                 </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#ff7f7f" }}>
+                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                   CEO <br /> Name
                 </Box>
                 <Box
@@ -152,13 +152,13 @@ const handleSearch = async (value) => {
                   <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.year}</Typography>
                   </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FEC7C7" }}>
+                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.ceo_name}</Typography>
                   </Box>
                   <Box
                     sx={{
                       ...cellStyle,
-                      backgroundColor: "#FCFAF6",
+                      backgroundColor: "#FEC7C7",
                     }}
                   >
                     <Typography variant="h6">

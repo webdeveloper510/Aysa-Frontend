@@ -26,6 +26,7 @@ export const TabTwo = () => {
   const [error, setError] = useState("");
   const [allCeoWorkerData, setAllCeoWorkerData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
+  
   useEffect(() => {
     const fetchAllCeoWorkerData = async () => {
       setInitialDataLoading(true);
@@ -105,6 +106,7 @@ export const TabTwo = () => {
       
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
     });
+    
     const sortedSuggestions = filteredSuggestions.sort((a, b) => {
       const aExactCompany = a.companyName.toLowerCase() === query;
       const bExactCompany = b.companyName.toLowerCase() === query;
@@ -162,11 +164,22 @@ export const TabTwo = () => {
       console.log("Processed data:", data); 
 
       setAllData(data);
-      const filtered = data.filter(
-        (row) =>
-          row.company_name?.toLowerCase().includes(value.toLowerCase()) ||
-          row.ceo_name?.toLowerCase().includes(value.toLowerCase())
-      );
+      
+      // FIXED: Include year in the filtering logic
+      const searchTerms = value.toLowerCase().trim().split(/\s+/);
+      
+      const filtered = data.filter((row) => {
+        const companyName = (row.company_name || '').toLowerCase();
+        const ceoName = (row.ceo_name || '').toLowerCase();
+        const year = (row.year || '').toString().toLowerCase();
+        
+        // Check if any search term matches company name, CEO name, or year
+        return searchTerms.some(term => 
+          companyName.includes(term) || 
+          ceoName.includes(term) || 
+          year.includes(term)
+        );
+      });
 
       const sorted = [...filtered]
         .filter((row) => row.year)
@@ -238,6 +251,7 @@ export const TabTwo = () => {
       </Typography>
     </Box>
   );
+  
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }

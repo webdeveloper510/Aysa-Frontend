@@ -98,6 +98,7 @@ export const TabThree = () => {
       
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
     });
+    
     const sortedSuggestions = filteredSuggestions.sort((a, b) => {
       const aExactCompany = a.companyName.toLowerCase() === query;
       const bExactCompany = b.companyName.toLowerCase() === query;
@@ -141,21 +142,35 @@ export const TabThree = () => {
       console.log("Raw rows from API:", rawRows); 
 
       const rows = rawRows.map((row, index) => ({
-        id: `${row["Company Name"]}-${row["Year"]}-${index}`,
-        company_name: row["Company Name"]?.trim(),
-        year: row["Year"]?.toString().trim(),
-        tax_paid: row["Taxes Paid"]?.trim(), 
-        tax_avoid: row["Taxes Avoided"]?.trim(), 
+        id: `${(row["Company Name"] || '').trim()}-${(row["Year"] || '').toString().trim()}-${index}`,
+        company_name: (row["Company Name"] || '').trim(),
+        year: (row["Year"] || '').toString().trim(),
+        tax_paid: (row["Taxes Paid"] || '').trim(), 
+        tax_avoid: (row["Taxes Avoided"] || '').trim(), 
       }));
 
       console.log("Processed rows:", rows); 
 
       setAllData(rows);
-      const filtered = rows.filter(
-        (row) =>
-          row.company_name?.toLowerCase().includes(query.toLowerCase()) ||
-          row.year?.toString().includes(query)
-      );
+      
+      // FIXED: Improved filtering logic with better search term matching
+      const searchTerms = query.toLowerCase().trim().split(/\s+/);
+      
+      const filtered = rows.filter((row) => {
+        const companyName = (row.company_name || '').toLowerCase();
+        const year = (row.year || '').toString().toLowerCase();
+        
+        // Check if any search term matches company name or year
+        return searchTerms.some(term => 
+          companyName.includes(term) || 
+          year.includes(term)
+        ) || 
+        // Also check if the full query matches (for cases like partial company names)
+        companyName.includes(query.toLowerCase()) ||
+        year.includes(query.toLowerCase());
+      });
+
+      console.log("Filtered data before sorting:", filtered);
 
       const sorted = [...filtered]
         .filter((row) => row.year)
@@ -226,6 +241,7 @@ export const TabThree = () => {
       </Typography>
     </Box>
   );
+  
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }

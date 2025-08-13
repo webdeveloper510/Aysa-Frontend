@@ -121,7 +121,7 @@ const handleSearch = async (value) => {
                 <Box
                   sx={{
                     ...cellStyle,
-                    backgroundColor: "#FCFAF6",
+                    backgroundColor: "#ff7f7f",
                   }}
                 >
                   CEO Total Compensation

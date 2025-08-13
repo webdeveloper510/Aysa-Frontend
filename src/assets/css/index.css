@@ -202,3 +202,8 @@ section.about-section {
 .about-row {
   background: #cbebff;
 }
+header.App-header label {
+    color: #fff;
+    margin-bottom: 10px;
+        font-size: 18px;
+}

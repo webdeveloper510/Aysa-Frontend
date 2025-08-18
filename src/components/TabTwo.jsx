@@ -403,6 +403,7 @@ export const TabTwo = () => {
                   <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.ceo_name}</Typography>
                   </Box>
+                  
                   <Box sx={{ ...cellStyle, backgroundColor: "rgb(254, 199, 199)" }}>
                     <Typography variant="h6">{row.ceo_total_compensation}</Typography>
                   </Box>

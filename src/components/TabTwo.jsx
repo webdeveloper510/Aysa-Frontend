@@ -39,7 +39,7 @@ export const TabTwo = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return new Error(`HTTP error! status: ${response.status}`);
         }
 
         const result = await response.json();
@@ -164,17 +164,13 @@ export const TabTwo = () => {
       console.log("Processed data:", data); 
 
       setAllData(data);
-      
-      // FIXED: Include year in the filtering logic
-      const searchTerms = value.toLowerCase().trim().split(/\s+/);
+            const searchTerms = value.toLowerCase().trim().split(/\s+/);
       
       const filtered = data.filter((row) => {
         const companyName = (row.company_name || '').toLowerCase();
         const ceoName = (row.ceo_name || '').toLowerCase();
         const year = (row.year || '').toString().toLowerCase();
-        
-        // Check if any search term matches company name, CEO name, or year
-        return searchTerms.some(term => 
+                return searchTerms.some(term => 
           companyName.includes(term) || 
           ceoName.includes(term) || 
           year.includes(term)
@@ -341,84 +337,106 @@ export const TabTwo = () => {
 
       {!!filteredData.length && (
         <Box sx={{ p: 2 }}>
-          <Box sx={{ overflowX: "auto" }}>
-            <Box sx={{ minWidth: "750px" }}>
-              {/* Header */}
-              <Box
-                className="tableheader"
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(5, 1fr)",
-                }}
-              >
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                  Company <br /> Name
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                  Year
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                  CEO <br /> Name
-                </Box>
-                <Box
-                  sx={{
-                    ...cellStyle,
-                    backgroundColor: "#ff7f7f",
-                  }}
-                >
-                  CEO Total Compensation
-                </Box>
-                <Box
-                  sx={{
-                    ...cellStyle,
-                    backgroundColor: "#FCFAF6",
-                  }}
-                >
-                  Frontline Worker Salary
-                </Box>
-              </Box>
-
-              {/* Body */}
-              {filteredData.map((row) => (
-                <Box
-                  key={row.id}
-                  className="tablebody"
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(5, 1fr)",
-                  }}
-                >
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.company_name}</Typography>
-                  </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.year}</Typography>
-                  </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.ceo_name}</Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      ...cellStyle,
-                      backgroundColor: "#FEC7C7",
-                    }}
-                  >
-                    <Typography variant="h6">
-                      {row.ceo_total_compensation}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      ...cellStyle,
-                      backgroundColor: "#FCFAF6",
-                    }}
-                  >
-                    <Typography variant="h6">{row.worker_salary}</Typography>
-                  </Box>
-                </Box>
-              ))}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5, 1fr)",
+              backgroundColor: "#E3F2FD", 
+              borderRadius: "8px",
+              mb: 3, 
+              border: "1px solid #BBDEFB",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            }}
+          >
+            <Box sx={{ ...cellStyle, backgroundColor: "transparent" }}>
+              Company <br /> Name
+            </Box>
+            <Box sx={{ ...cellStyle, backgroundColor: "transparent" }}>
+              Year
+            </Box>
+            <Box sx={{ ...cellStyle, backgroundColor: "transparent" }}>
+              CEO <br /> Name
+            </Box>
+            <Box
+              sx={{
+                ...cellStyle,
+                backgroundColor: "#FFCDD2",
+                borderRadius: "0 0 0 0"
+              }}
+            >
+              CEO Total Compensation
+            </Box>
+            <Box sx={{ ...cellStyle, backgroundColor: "transparent" }}>
+              Frontline Worker Salary
             </Box>
           </Box>
+
+          {filteredData.map((row, index) => (
+            <Box
+              key={row.id}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                backgroundColor: "#FAFAFA",
+                borderRadius: "8px",
+                mb: 2, 
+                border: "1px solid #E0E0E0",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                  transform: "translateY(-1px)"
+                }
+              }}
+            >
+              <Box sx={{ 
+                ...cellStyle, 
+                backgroundColor: "transparent",
+                borderRight: "1px solid #E0E0E0"
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {row.company_name}
+                </Typography>
+              </Box>
+              <Box sx={{ 
+                ...cellStyle, 
+                backgroundColor: "transparent",
+                borderRight: "1px solid #E0E0E0"
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {row.year}
+                </Typography>
+              </Box>
+              <Box sx={{ 
+                ...cellStyle, 
+                backgroundColor: "transparent",
+                borderRight: "1px solid #E0E0E0"
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {row.ceo_name}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  ...cellStyle,
+                  backgroundColor: "#FFEBEE",
+                  borderRight: "1px solid #E0E0E0"
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 600, color: "#D32F2F" }}>
+                  {row.ceo_total_compensation}
+                </Typography>
+              </Box>
+              <Box sx={{ 
+                ...cellStyle, 
+                backgroundColor: "transparent"
+              }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {row.worker_salary}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
         </Box>
       )}
     </>

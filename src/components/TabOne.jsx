@@ -26,7 +26,6 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   const [allProductsData, setAllProductsData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
 
-  // Load all products data once when component mounts
   useEffect(() => {
     const fetchAllProductsData = async () => {
       setInitialDataLoading(true);
@@ -43,11 +42,9 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         }
 
         const result = await response.json();
-        console.log("Initial data fetch result:", result); // Debug log
+        console.log("Initial data fetch result:", result); 
         const apiData = result.data || [];
-        
-        // Format the data for suggestions - Enhanced to include more comprehensive search
-        const formattedData = apiData.map((item, index) => ({
+                const formattedData = apiData.map((item, index) => ({
           id: index,
           label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
           value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
@@ -57,7 +54,6 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
           profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
           productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
-          // Enhanced search text with multiple variations for better matching
           searchText: [
             (item.Brand || '').toLowerCase(),
             (item["Product Name"] || '').toLowerCase(), 
@@ -66,7 +62,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             `${item.Brand || ''} ${item.Type || ''}`.toLowerCase(),
             `${item["Product Name"] || ''} ${item.Type || ''}`.toLowerCase(),
             `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.toLowerCase()
-          ].filter(text => text.trim() !== '') // Remove empty strings
+          ].filter(text => text.trim() !== '') 
         }));
 
         setAllProductsData(formattedData);
@@ -81,7 +77,6 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     fetchAllProductsData();
   }, []);
 
-  // Enhanced suggestion generation with better matching logic
   const suggestions = useMemo(() => {
     if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
       return [];
@@ -91,15 +86,11 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     const queryWords = query.split(/\s+/).filter(word => word.length > 0);
     
     const filteredSuggestions = allProductsData.filter(item => {
-      // Check if any of the search text variations contain the query
       const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      
-      // Also check if all query words are found in any combination
       const matchesAllWords = queryWords.every(word => 
         item.searchText.some(text => text.includes(word))
       );
       
-      // Check individual fields for partial matches
       const brand = item.brand.toLowerCase();
       const productName = item.productName.toLowerCase();
       const type = item.type.toLowerCase();
@@ -117,33 +108,25 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
     });
 
-    // Sort suggestions by relevance
     const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-      // Exact brand match gets highest priority
       const aExactBrand = a.brand.toLowerCase() === query;
       const bExactBrand = b.brand.toLowerCase() === query;
       if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
       
-      // Brand starts with query gets second priority
       const aBrandStarts = a.brand.toLowerCase().startsWith(query);
       const bBrandStarts = b.brand.toLowerCase().startsWith(query);
       if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
       
-      // Product name starts with query gets third priority
       const aProductStarts = a.productName.toLowerCase().startsWith(query);
       const bProductStarts = b.productName.toLowerCase().startsWith(query);
       if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
-      
-      // Type starts with query gets fourth priority
-      const aTypeStarts = a.type.toLowerCase().startsWith(query);
+            const aTypeStarts = a.type.toLowerCase().startsWith(query);
       const bTypeStarts = b.type.toLowerCase().startsWith(query);
       if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-      
-      // Finally sort alphabetically by brand
-      return a.brand.localeCompare(b.brand);
+            return a.brand.localeCompare(b.brand);
     });
 
-    return sortedSuggestions.slice(0, 15); // Increased limit to 15 suggestions
+    return sortedSuggestions.slice(0, 15);
   }, [searchQuery, allProductsData]);
 
   const handleSearch = async (query) => {
@@ -158,7 +141,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     setError("");
 
     try {
-      console.log("Making search request for:", query); // Debug log
+      console.log("Making search request for:", query); 
       
       const response = await fetch("https://api.the-aysa.com/product-semantic-search", {
         method: "POST",
@@ -173,22 +156,15 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       }
 
       const result = await response.json();
-      console.log("Search API response:", result); // Debug log
-
-      // Handle the new simplified response structure
       const searchData = result.data || [];
 
-      console.log("Processed search data:", searchData); // Debug log
-
-      // Format items function with better error handling
-      const formatItems = (items) => {
+        const formatItems = (items) => {
         if (!Array.isArray(items)) {
           console.warn("formatItems received non-array:", items);
           return [];
         }
         
         return items.map((item, index) => {
-          // Handle both "Profit Margin" and "Profit Margin " (with space)
           const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
           const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
           const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
@@ -207,7 +183,6 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             category: item["Category"] || "",
             similarity: item["similarity"] || 0,
             cluster: item["cluster"] || 0,
-            // Add market price and profit made as numbers for chart
             market_price: parseFloat(releasePrice?.replace(/[^0-9.]/g, "") || "0"),
             profit_made_value: parseFloat(profitMade?.replace(/[^0-9.]/g, "") || "0"),
           };
@@ -215,14 +190,9 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       };
 
       const formattedData = formatItems(searchData);
-
-      console.log("Formatted search data:", formattedData); // Debug log
-
-      // Keep the data in the order returned by the API (no sorting)
-      // The API returns results in order of relevance/similarity
       setData({
         matched: formattedData,
-        compared: [], // Empty for now since the new API doesn't distinguish
+        compared: [],
       });
 
     } catch (err) {
@@ -245,18 +215,14 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     if (value && typeof value === 'object') {
       const selectedQuery = value.value;
       setSearchQuery(selectedQuery);
-      // Automatically trigger semantic search when product is selected from suggestions
       handleSearch(selectedQuery);
     } else if (typeof value === 'string') {
       setSearchQuery(value);
-      // Also trigger search for manual text input
       handleSearch(value);
     }
   };
 
   const firstProduct = data.matched?.[0] || {};
-
-  // Chart data preparation
  const profitMarginValue = parseFloat(
   String(firstProduct.profit_margin || "0").replace("%", "")
 );
@@ -376,7 +342,6 @@ const chartOptions = {
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) { 
-                // Empty string (either cleared with X or backspace)
                 setSearchQuery("");
                 setData({ matched: [], compared: [] });
                 return;
@@ -391,7 +356,7 @@ const chartOptions = {
                 : "No matching products found"
             }
             disabled={loading}
-            filterOptions={(options) => options} // Disable built-in filtering since we handle it ourselves
+            filterOptions={(options) => options} 
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -427,7 +392,7 @@ const chartOptions = {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={searchLabel} // Use the dynamic search label here
+                label={searchLabel}
                 variant="outlined"
                 className="input-form"
                 placeholder="Type to filter..."
@@ -605,7 +570,7 @@ const chartOptions = {
                     e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiNEREREREQiLz4KPC9zdmc+';
                   }}
                 />
-                
+
               ) : (
                 <Box 
                   sx={{ 

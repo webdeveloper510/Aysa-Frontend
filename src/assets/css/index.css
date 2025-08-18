@@ -162,7 +162,9 @@ section.about-section {
 }
 
 .tab3Table .tablebody .MuiBox-root,
-.tab3Table .tableheader .MuiBox-root {
+.tab3Table .tableheader .MuiBox-root,
+.tab2Table .tablebody .MuiBox-root,
+.tab2Table .tableheader .MuiBox-root {
   border-radius: 0px;
   box-shadow: 0px 4px 4px 0px #00000040;
 }

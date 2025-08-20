@@ -210,16 +210,33 @@ export const TabTwo = () => {
     }
   };
 
-  const handleSuggestionSelect = (event, value) => {
-    if (value && typeof value === 'object') {
-      const selectedQuery = value.value;
-      setSearchQuery(selectedQuery);
-      handleSearch(selectedQuery);
-    } else if (typeof value === 'string') {
-      setSearchQuery(value);
-      handleSearch(value);
-    }
-  };
+const handleSuggestionSelect = (event, value) => {
+  if (value && typeof value === 'object') {
+    // Create a payload with CEO name, company name, and year
+    const payload = {
+      ceoName: value.ceoName,
+      companyName: value.companyName,
+      year: value.year,
+      ceoCompensation: value.ceoCompensation,
+      workerSalary: value.workerSalary
+    };
+    
+    console.log("Selected suggestion payload:", payload);
+    
+    // Instead of using the formatted label, use just the company name
+    // This avoids the double slash issue in the API call
+    const searchTerm = value.companyName; // or value.ceoName if you prefer
+    
+    setSearchQuery(value.label); // This shows the full formatted text in the input
+    handleSearch(searchTerm); // This sends a clean search term to the API
+    
+  } else if (typeof value === 'string') {
+    // Clean the string to remove any extra formatting
+    const cleanValue = value.replace(/\\/g, '').trim();
+    setSearchQuery(cleanValue);
+    handleSearch(cleanValue);
+  }
+};
 
   const LoadingComponent = () => (
     <Box 

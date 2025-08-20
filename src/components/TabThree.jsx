@@ -26,6 +26,7 @@ export const TabThree = () => {
   const [error, setError] = useState("");
   const [allTaxData, setAllTaxData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState(null); 
 
   useEffect(() => {
     const fetchAllTaxData = async () => {
@@ -153,19 +154,16 @@ export const TabThree = () => {
 
       setAllData(rows);
       
-      // FIXED: Improved filtering logic with better search term matching
       const searchTerms = query.toLowerCase().trim().split(/\s+/);
       
       const filtered = rows.filter((row) => {
         const companyName = (row.company_name || '').toLowerCase();
         const year = (row.year || '').toString().toLowerCase();
         
-        // Check if any search term matches company name or year
         return searchTerms.some(term => 
           companyName.includes(term) || 
           year.includes(term)
         ) || 
-        // Also check if the full query matches (for cases like partial company names)
         companyName.includes(query.toLowerCase()) ||
         year.includes(query.toLowerCase());
       });
@@ -197,15 +195,26 @@ export const TabThree = () => {
 
   const handleSuggestionSelect = (event, value) => {
     if (value && typeof value === 'object') {
-      const selectedQuery = value.value;
-      setSearchQuery(selectedQuery);
-      handleSearch(selectedQuery);
+      const payload = {
+        companyName: value.companyName,
+        year: value.year,
+        taxesPaid: value.taxesPaid,
+        taxesAvoided: value.taxesAvoided
+      };
+      setSelectedItem(payload);
+      setSearchQuery(value.label); 
+     const searchTerm = `${value.companyName} ${value.year}`;
+      handleSearch(searchTerm);
+      
     } else if (typeof value === 'string') {
-      setSearchQuery(value)
-      handleSearch(value);
+
+      const cleanValue = value.replace(/\\/g, '').trim();
+      setSearchQuery(cleanValue);
+      handleSearch(cleanValue);
     }
   };
 
+ 
   const LoadingComponent = () => (
     <Box 
       display="flex" 
@@ -281,7 +290,7 @@ export const TabThree = () => {
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body2" fontWeight="bold">
                       <span style={{ color: '#1976d2' }}>{option.companyName}</span>
-                      <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.year}</span>
+                      <span style={{ color: '#999', fontWeight: 'normal' }}> ({option.year})</span>
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Paid: {option.taxesPaid} • Avoided: {option.taxesAvoided}

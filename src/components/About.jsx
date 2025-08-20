@@ -43,7 +43,7 @@ export const About = () => {
           </Typography>
 
           <Grid item xs={12} mb={4}>
-            <Typography variant="h6">Mohy Omer – Co-Founder</Typography>
+            <Typography variant="h6">Mohy Omer – Founder and CEO</Typography>
             <Typography variant="body2">
               After nearly a decade of experience working with the U.S.
               government...
@@ -58,19 +58,11 @@ export const About = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} mb={4}>
-            <Typography variant="h6">Corey Whitby – Researcher</Typography>
-            <Typography variant="body2">
-              Corey Whitby brings nearly a decade of international experience in
-              talent acquisition...
-            </Typography>
-          </Grid>
-
           <Grid item xs={12}>
             <Typography variant="h6">Qi (Alice) Wang – Data Analyst</Typography>
             <Typography variant="body2">
               Qi Wang is a highly skilled statistician and data scientist with a
-              Master’s degree in Applied Statistics...
+              Master's degree in Applied Statistics...
             </Typography>
           </Grid>
         </Box>

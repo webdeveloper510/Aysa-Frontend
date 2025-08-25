@@ -522,7 +522,7 @@ const chartOptions = {
               fontWeight: "bold",
             }}
           >
-            Search Results ({data.matched.length} products found)
+            Comparing the Profit Margin to Similar Products ({data.matched.length} products found)
           </Typography>
 
          <Paper elevation={3}>

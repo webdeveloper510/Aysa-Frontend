@@ -223,11 +223,12 @@ const handleSuggestionSelect = (event, value) => {
     
     console.log("Selected suggestion payload:", payload);
     
-    // Use the complete information for search - combine company name, CEO name, and year
-    const searchTerm = `${value.companyName} ${value.ceoName} ${value.year}`.trim();
+    // Instead of using the formatted label, use just the company name
+    // This avoids the double slash issue in the API call
+    const searchTerm = value.companyName; // or value.ceoName if you prefer
     
     setSearchQuery(value.label); // This shows the full formatted text in the input
-    handleSearch(searchTerm); // This sends the complete search term to the API
+    handleSearch(searchTerm); // This sends a clean search term to the API
     
   } else if (typeof value === 'string') {
     // Clean the string to remove any extra formatting

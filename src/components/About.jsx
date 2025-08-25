@@ -10,9 +10,9 @@ export const About = () => {
         </Typography>
       </Box>
 
-      <Container maxWidth="md" sx={{ mt: 3 }}>
+      <Container maxWidth="md" sx={{ mt: 3 , mb: 4}}>
         {/* Mission */}
-        <Box my={5}>
+        <Box my={4}>
           <Typography variant="h4" gutterBottom>
             Our Mission
           </Typography>

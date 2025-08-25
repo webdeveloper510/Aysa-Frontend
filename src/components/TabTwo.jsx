@@ -281,7 +281,7 @@ const handleSuggestionSelect = (event, value) => {
   return (
     <>
       <div className="meow">
-        <Box m={3}>
+        <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
             options={suggestions}
@@ -370,7 +370,7 @@ const handleSuggestionSelect = (event, value) => {
       )}
 
       {!!filteredData.length && (
-        <Box sx={{ p: 4, display: "flex", flexDirection: "column" }}>
+        <Box sx={{ p:2, display: "flex", flexDirection: "column" }} className="nopadding">
           <Box className="tab2Table" sx={{ overflowX: "auto" }}>
             <Box sx={{ minWidth: "750px" }}>
               {/* Header */}

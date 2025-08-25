@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Card,
   CardContent,
+  TableContainer,
   Tooltip,
 } from "@mui/material";
 import { Bar } from "react-chartjs-2";
@@ -331,7 +332,7 @@ const chartOptions = {
   return (
     <>
       <div className="meow">
-        <Box m={3}>
+        <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
             options={suggestions}
@@ -483,7 +484,7 @@ const chartOptions = {
             </Box>
 
             {/* Chart Section */}
-            <Box flex={1} maxWidth="45%" height={300}>
+            <Box flex={1} maxWidth="45%" height={300} className="profit-graph">
               <Box
                 display="flex"
                 justifyContent="center"
@@ -511,6 +512,7 @@ const chartOptions = {
           </Box>
 
           <Typography
+          className="table-heading"
             variant="h5"
             align="center"
             sx={{
@@ -520,12 +522,14 @@ const chartOptions = {
               mt: 6,
               mb: 0,
               fontWeight: "bold",
+               fontSize: "1.4rem",
             }}
           >
             Comparing the Profit Margin to Similar Products ({data.matched.length} products found)
           </Typography>
 
          <Paper elevation={3}>
+<TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
   <Table>
     <TableHead sx={{ backgroundColor: "#bbdefb" }}>
       <TableRow>
@@ -537,22 +541,18 @@ const chartOptions = {
     </TableHead>
     <TableBody>
       {data.matched.map((row, index) => {
-        const isFirstResult = index === 0; 
+        const isFirstResult = index === 0;
 
         return (
           <TableRow
             key={row.id}
             sx={{
-              backgroundColor: isFirstResult
-                ? "#e3f2fd" 
-                : "inherit",
+              backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
               borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
-              "&:hover": {
-                backgroundColor: "#f5f5f5"
-              }
+              "&:hover": { backgroundColor: "#f5f5f5" }
             }}
           >
-            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "500" }}>
+            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
               {row.brand}
             </TableCell>
             <TableCell>
@@ -560,23 +560,23 @@ const chartOptions = {
                 <img
                   src={row.product_url}
                   alt={`${row.brand} ${row.product_name}`}
-                  style={{ 
-                    width: 60, 
-                    height: 60, 
+                  style={{
+                    width: 60,
+                    height: 60,
                     objectFit: "cover",
-                    borderRadius: "6px" 
+                    borderRadius: "6px"
                   }}
                   onError={(e) => {
-                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiNEREREREQiLz4KPC9zdmc+';
+                    e.currentTarget.src =
+                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBW MjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
                   }}
                 />
-
               ) : (
-                <Box 
-                  sx={{ 
-                    width: 60, 
-                    height: 60, 
-                    backgroundColor: "#f0f0f0", 
+                <Box
+                  sx={{
+                    width: 60,
+                    height: 60,
+                    backgroundColor: "#f0f0f0",
                     borderRadius: "6px",
                     display: "flex",
                     alignItems: "center",
@@ -602,6 +602,7 @@ const chartOptions = {
       })}
     </TableBody>
   </Table>
+</TableContainer>
 </Paper>
         </>
       )}

@@ -51,7 +51,7 @@ export const About = () => {
           </Grid>
 
           <Grid item xs={12} mb={4}>
-            <Typography variant="h6">Andreas Decker – Co-Founder</Typography>
+            <Typography variant="h6">Andreas Decker</Typography>
             <Typography variant="body2">
               Andreas Decker is a seasoned Software Engineer with over a decade
               of experience...

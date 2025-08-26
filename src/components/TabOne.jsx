@@ -47,22 +47,22 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         const apiData = result.data || [];
                 const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
-          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
+          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`.trim(),
+          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`.trim(),
           brand: item.Brand || '',
           productName: item["Product Name"] || '',
-          type: item.Type || '',
+          type: item["Product Type"] || '',
           profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
           productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           searchText: [
-            (item.Brand || '').toLowerCase(),
-            (item["Product Name"] || '').toLowerCase(), 
-            (item.Type || '').toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''}`.toLowerCase(),
-            `${item.Brand || ''} ${item.Type || ''}`.toLowerCase(),
-            `${item["Product Name"] || ''} ${item.Type || ''}`.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.toLowerCase()
+            (item.Brand || '')?.toLowerCase(),
+            (item["Product Name"] || '')?.toLowerCase(), 
+            (item["Product Type"] || '')?.toLowerCase(),
+            `${item.Brand || ''} ${item["Product Name"] || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item["Product Type"] || ''}`?.toLowerCase(),
+            `${item["Product Name"] || ''} ${item["Product Type"] || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`?.toLowerCase()
           ].filter(text => text.trim() !== '') 
         }));
 
@@ -83,7 +83,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       return [];
     }
 
-    const query = searchQuery.toLowerCase().trim();
+    const query = searchQuery?.toLowerCase().trim();
     const queryWords = query.split(/\s+/).filter(word => word.length > 0);
     
     const filteredSuggestions = allProductsData.filter(item => {
@@ -91,19 +91,19 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const matchesAllWords = queryWords.every(word => 
         item.searchText.some(text => text.includes(word))
       );
-      
-      const brand = item.brand.toLowerCase();
-      const productName = item.productName.toLowerCase();
-      const type = item.type.toLowerCase();
-      
+
+      const brand = item.brand?.toLowerCase();
+      const productName = item.productName?.toLowerCase();
+      const productType = item.productType?.toLowerCase();
+
       const matchesIndividualFields = 
-        brand.includes(query) || 
-        productName.includes(query) || 
-        type.includes(query) ||
+        brand?.includes(query) || 
+        productName?.includes(query) || 
+        productType?.includes(query) ||
         queryWords.some(word => 
-          brand.includes(word) || 
-          productName.includes(word) || 
-          type.includes(word)
+          brand?.includes(word) || 
+          productName?.includes(word) || 
+          productType?.includes(word)
         );
       
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
@@ -175,7 +175,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
             brand: (item["Brand"] || "").trim(),
             product_name: (item["Product Name"] || "").trim(),
-            product_type: (item["Type"] || "").trim(),
+            product_type: (item["Product Type"] || "").trim(),
             production_year: parseInt(productionYear) || 0,
             profit_margin: profitMargin,
             profit_made: profitMade,

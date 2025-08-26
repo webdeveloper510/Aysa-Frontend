@@ -525,7 +525,7 @@ const chartOptions = {
                fontSize: "1.4rem",
             }}
           >
-            Comparing the Profit Margin to Similar Products ({data.matched.length} products found)
+            Comparing the Profit Margin to two Similar Products.
           </Typography>
 
          <Paper elevation={3}>

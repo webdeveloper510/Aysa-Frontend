@@ -20,7 +20,7 @@ const tabs = [
 ];
 
 // ✅ Small custom hook for media queries
-function useMediaQuery(query: string) {
+function useMediaQuery(query) {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
@@ -37,8 +37,8 @@ function useMediaQuery(query: string) {
 }
 
 export const Tabs = () => {
- const [activeTab, setActiveTab] = useState(null);
-  const isMobile = useMediaQuery("(max-width: 768px)"); // breakpoint
+  const [activeTab, setActiveTab] = useState(0); // ✅ first tab open by default
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const getSearchLabel = () => {
     if (activeTab === null) {
@@ -55,25 +55,31 @@ export const Tabs = () => {
   return (
     <div className="tab-wrapper">
       {isMobile ? (
-        // ✅ Mobile: Accordion View
+        // ✅ Mobile: Accordion with Arrow
         <div className="accordion-wrapper">
-          {tabs.map((tab, index) => (
-            <div key={index} className="accordion-item">
-              <div
-                className={`accordion-header ${activeTab === index ? "open" : ""}`}
-                onClick={() =>
-                  setActiveTab(activeTab === index ? null : index)
-                }
-              >
-                <span>{tab.label}</span>
-              </div>
-              {activeTab === index && (
-                <div className="accordion-content">
-                  {React.cloneElement(tab.content, { searchLabel: getSearchLabel() })}
+          {tabs.map((tab, index) => {
+            const isOpen = activeTab === index;
+            return (
+              <div key={index} className="accordion-item">
+                <div
+                  className={`accordion-header ${isOpen ? "open" : ""}`}
+                  onClick={() =>
+                    setActiveTab(isOpen ? null : index)
+                  }
+                >
+                  <span>{tab.label}</span>
+                  <span className={`arrow ${isOpen ? "down" : "right"}`}>
+                    ▶
+                  </span>
                 </div>
-              )}
-            </div>
-          ))}
+                {isOpen && (
+                  <div className="accordion-content">
+                    {React.cloneElement(tab.content, { searchLabel: getSearchLabel() })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       ) : (
         // ✅ Desktop: Tab View

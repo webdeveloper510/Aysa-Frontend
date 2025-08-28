@@ -220,20 +220,39 @@ header.App-header label {
 }
 
 .accordion-header {
-  padding: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  background: #f5f5f5;
+    padding: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #cbebff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 5px solid #1674da;
+        color: #7d7676;
 }
 
 .accordion-header.open {
-  background: #e3f2fd;
+    background: #67AFEF;
+    color: #fff;
 }
-
 .accordion-content {
   padding: 12px;
   background: #fff;
 }
+
+/* Arrow styles */
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.arrow.right {
+  transform: rotate(0deg);
+}
+
+.arrow.down {
+  transform: rotate(90deg);
+}
+
 
 
 /**************** responsive css ************/

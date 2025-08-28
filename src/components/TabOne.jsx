@@ -45,24 +45,25 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         const result = await response.json();
         console.log("Initial data fetch result:", result); 
         const apiData = result.data || [];
-                const formattedData = apiData.map((item, index) => ({
+        
+        const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`.trim(),
-          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`.trim(),
+          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
+          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
           brand: item.Brand || '',
           productName: item["Product Name"] || '',
-          type: item["Product Type"] || '',
+          type: item.Type || '', // Fixed: Use 'Type' instead of 'Product Type'
           profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
           productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           searchText: [
             (item.Brand || '')?.toLowerCase(),
             (item["Product Name"] || '')?.toLowerCase(), 
-            (item["Product Type"] || '')?.toLowerCase(),
+            (item.Type || '')?.toLowerCase(), // Fixed: Use 'Type' instead of 'Product Type'
             `${item.Brand || ''} ${item["Product Name"] || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Type"] || ''}`?.toLowerCase(),
-            `${item["Product Name"] || ''} ${item["Product Type"] || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`?.toLowerCase()
+            `${item.Brand || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
+            `${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
+            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase() // Fixed: Use 'Type'
           ].filter(text => text.trim() !== '') 
         }));
 
@@ -94,7 +95,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
       const brand = item.brand?.toLowerCase();
       const productName = item.productName?.toLowerCase();
-      const productType = item.productType?.toLowerCase();
+      const productType = item.type?.toLowerCase(); // This is now correctly using 'type' field
 
       const matchesIndividualFields = 
         brand?.includes(query) || 
@@ -121,10 +122,12 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const aProductStarts = a.productName.toLowerCase().startsWith(query);
       const bProductStarts = b.productName.toLowerCase().startsWith(query);
       if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
-            const aTypeStarts = a.type.toLowerCase().startsWith(query);
+      
+      const aTypeStarts = a.type.toLowerCase().startsWith(query);
       const bTypeStarts = b.type.toLowerCase().startsWith(query);
       if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-            return a.brand.localeCompare(b.brand);
+      
+      return a.brand.localeCompare(b.brand);
     });
 
     return sortedSuggestions.slice(0, 15);
@@ -159,7 +162,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const result = await response.json();
       const searchData = result.data || [];
 
-        const formatItems = (items) => {
+      const formatItems = (items) => {
         if (!Array.isArray(items)) {
           console.warn("formatItems received non-array:", items);
           return [];
@@ -175,7 +178,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
             brand: (item["Brand"] || "").trim(),
             product_name: (item["Product Name"] || "").trim(),
-            product_type: (item["Product Type"] || "").trim(),
+            product_type: (item["Product Type"] || "").trim(), // Use 'Product Type' for search API
             production_year: parseInt(productionYear) || 0,
             profit_margin: profitMargin,
             profit_made: profitMade,
@@ -224,70 +227,71 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   };
 
   const firstProduct = data.matched?.[0] || {};
- const profitMarginValue = parseFloat(
-  String(firstProduct.profit_margin || "0").replace("%", "")
-);
+  const profitMarginValue = parseFloat(
+    String(firstProduct.profit_margin || "0").replace("%", "")
+  );
 
   const marketPriceValue = firstProduct.market_price || 0;
   const profitValueMade = firstProduct.profit_made_value || 0;
 
-const chartData = {
-  labels: [`Market Price: $${marketPriceValue}`], 
-  datasets: [
-    {
-      label: "Profit Margin",
-      data: [profitMarginValue], 
-      backgroundColor: "#4FC3F7", 
-      categoryPercentage: 0.6,
-      barThickness: 80,
-    },
-  ],
-};
+  const chartData = {
+    labels: [`Market Price: $${marketPriceValue}`], 
+    datasets: [
+      {
+        label: "Profit Margin",
+        data: [profitMarginValue], 
+        backgroundColor: "#4FC3F7", 
+        categoryPercentage: 0.6,
+        barThickness: 80,
+      },
+    ],
+  };
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: function (context) {
-          return `Profit Margin: ${context.raw}%`;
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            return `Profit Margin: ${context.raw}%`;
+          },
         },
       },
     },
-  },
-  scales: {
-    x: {
-      title: {
-        display: true,
-        text: "Product",
-        font: { weight: "bold" },
-      },
-      grid: {
-        display: false,
-      },
-    },
-    y: {
-      beginAtZero: true,
-      max: 100,
-      ticks: {
-        stepSize: 25, 
-        callback: function (value) {
-          return `${value}%`;
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Product",
+          font: { weight: "bold" },
+        },
+        grid: {
+          display: false,
         },
       },
-      title: {
-        display: true,
-        text: "Profit Margin (%)",
-        font: { weight: "bold" },
-      },
-      grid: {
-        color: "#e0e0e0",
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 25, 
+          callback: function (value) {
+            return `${value}%`;
+          },
+        },
+        title: {
+          display: true,
+          text: "Profit Margin (%)",
+          font: { weight: "bold" },
+        },
+        grid: {
+          color: "#e0e0e0",
+        },
       },
     },
-  },
-};
+  };
+
   const LoadingComponent = () => (
     <Box 
       display="flex" 
@@ -512,7 +516,7 @@ const chartOptions = {
           </Box>
 
           <Typography
-          className="table-heading"
+            className="table-heading"
             variant="h5"
             align="center"
             sx={{
@@ -522,88 +526,88 @@ const chartOptions = {
               mt: 6,
               mb: 0,
               fontWeight: "bold",
-               fontSize: "1.4rem",
+              fontSize: "1.4rem",
             }}
           >
             Comparing the Profit Margin to two Similar Products.
           </Typography>
 
-         <Paper elevation={3}>
-<TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
-  <Table>
-    <TableHead sx={{ backgroundColor: "#bbdefb" }}>
-      <TableRow>
-        <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {data.matched.map((row, index) => {
-        const isFirstResult = index === 0;
+          <Paper elevation={3}>
+            <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
+              <Table>
+                <TableHead sx={{ backgroundColor: "#bbdefb" }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.matched.map((row, index) => {
+                    const isFirstResult = index === 0;
 
-        return (
-          <TableRow
-            key={row.id}
-            sx={{
-              backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
-              borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
-              "&:hover": { backgroundColor: "#f5f5f5" }
-            }}
-          >
-            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
-              {row.brand}
-            </TableCell>
-            <TableCell>
-              {row.product_url ? (
-                <img
-                  src={row.product_url}
-                  alt={`${row.brand} ${row.product_name}`}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    objectFit: "cover",
-                    borderRadius: "6px"
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBW MjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
-                  }}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    backgroundColor: "#f0f0f0",
-                    borderRadius: "6px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
-                  <Typography variant="caption" color="text.disabled">
-                    No img
-                  </Typography>
-                </Box>
-              )}
-            </TableCell>
-            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
-              {row.product_name}
-            </TableCell>
-            <TableCell>
-              <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
-                {row.profit_margin}
-              </Box>
-            </TableCell>
-          </TableRow>
-        );
-      })}
-    </TableBody>
-  </Table>
-</TableContainer>
-</Paper>
+                    return (
+                      <TableRow
+                        key={row.id}
+                        sx={{
+                          backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
+                          borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
+                          "&:hover": { backgroundColor: "#f5f5f5" }
+                        }}
+                      >
+                        <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
+                          {row.brand}
+                        </TableCell>
+                        <TableCell>
+                          {row.product_url ? (
+                            <img
+                              src={row.product_url}
+                              alt={`${row.brand} ${row.product_name}`}
+                              style={{
+                                width: 60,
+                                height: 60,
+                                objectFit: "cover",
+                                borderRadius: "6px"
+                              }}
+                              onError={(e) => {
+                                e.currentTarget.src =
+                                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                              }}
+                            />
+                          ) : (
+                            <Box
+                              sx={{
+                                width: 60,
+                                height: 60,
+                                backgroundColor: "#f0f0f0",
+                                borderRadius: "6px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}
+                            >
+                              <Typography variant="caption" color="text.disabled">
+                                No img
+                              </Typography>
+                            </Box>
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
+                          {row.product_name}
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
+                            {row.profit_margin}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
         </>
       )}
     </>

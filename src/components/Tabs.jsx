@@ -19,7 +19,6 @@ const tabs = [
   },
 ];
 
-// ✅ Small custom hook for media queries
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(false);
 
@@ -36,8 +35,9 @@ function useMediaQuery(query) {
   return matches;
 }
 
+
 export const Tabs = () => {
-  const [activeTab, setActiveTab] = useState(0); // ✅ first tab open by default
+  const [activeTab, setActiveTab] = useState(0);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const getSearchLabel = () => {

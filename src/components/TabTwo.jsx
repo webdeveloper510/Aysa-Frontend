@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import { 
-  Box, 
-  Typography, 
-  TextField, 
-  Autocomplete, 
-  CircularProgress 
+import {
+  Box,
+  Typography,
+  TextField,
+  Autocomplete,
+  CircularProgress
 } from "@mui/material";
 import axios from "axios";
 
@@ -26,7 +26,7 @@ export const TabTwo = () => {
   const [error, setError] = useState("");
   const [allCeoWorkerData, setAllCeoWorkerData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
-  
+
   useEffect(() => {
     const fetchAllCeoWorkerData = async () => {
       setInitialDataLoading(true);
@@ -62,7 +62,7 @@ export const TabTwo = () => {
             `${item["Company Name"] || ''} ${item.Year || ''}`.toLowerCase(),
             `${item["CEO Name"] || ''} ${item.Year || ''}`.toLowerCase(),
             `${item["Company Name"] || ''} ${item["CEO Name"] || ''} ${item.Year || ''}`.toLowerCase(),
-          ].filter(text => text.trim() !== '') 
+          ].filter(text => text.trim() !== '')
         }));
 
         setAllCeoWorkerData(formattedData);
@@ -84,29 +84,29 @@ export const TabTwo = () => {
 
     const query = searchQuery.toLowerCase().trim();
     const queryWords = query.split(/\s+/).filter(word => word.length > 0);
-    
+
     const filteredSuggestions = allCeoWorkerData.filter(item => {
       const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word => 
+      const matchesAllWords = queryWords.every(word =>
         item.searchText.some(text => text.includes(word))
       );
       const companyName = item.companyName.toLowerCase();
       const ceoName = item.ceoName.toLowerCase();
       const year = item.year.toString().toLowerCase();
-      
-      const matchesIndividualFields = 
-        companyName.includes(query) || 
+
+      const matchesIndividualFields =
+        companyName.includes(query) ||
         ceoName.includes(query) ||
         year.includes(query) ||
-        queryWords.some(word => 
-          companyName.includes(word) || 
+        queryWords.some(word =>
+          companyName.includes(word) ||
           ceoName.includes(word) ||
           year.includes(word)
         );
-      
+
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
     });
-    
+
     const sortedSuggestions = filteredSuggestions.sort((a, b) => {
       const aExactCompany = a.companyName.toLowerCase() === query;
       const bExactCompany = b.companyName.toLowerCase() === query;
@@ -125,11 +125,11 @@ export const TabTwo = () => {
       if (aYearMatch !== bYearMatch) return bYearMatch - aYearMatch;
       const companyCompare = a.companyName.localeCompare(b.companyName);
       if (companyCompare !== 0) return companyCompare;
-      
+
       return parseInt(b.year) - parseInt(a.year);
     });
 
-    return sortedSuggestions.slice(0, 15); 
+    return sortedSuggestions.slice(0, 15);
   }, [searchQuery, allCeoWorkerData]);
 
   const handleSearch = async (value) => {
@@ -144,13 +144,13 @@ export const TabTwo = () => {
     setError("");
 
     try {
-      console.log("Making CEO-Worker search request for:", value); 
+      console.log("Making CEO-Worker search request for:", value);
       const res = await axios.post(
         "https://api.the-aysa.com/ceo-worker-semantic-search",
-        { query: value }
+        { query: value, tab_type: "tax" }
       );
 
-      console.log("CEO-Worker search API response:", res.data); 
+      console.log("CEO-Worker search API response:", res.data);
       const rawData = res.data?.data || [];
       const data = rawData.map((row, index) => ({
         id: `${(row["Company Name"] || '').trim()}-${(row["CEO Name"] || '').trim()}-${(row["Year"] || '').toString().trim()}-${index}`,
@@ -161,28 +161,28 @@ export const TabTwo = () => {
         worker_salary: (row["Frontline Worker Salary"] || '').trim(),
       }));
 
-      console.log("Processed data:", data); 
+      console.log("Processed data:", data);
 
       setAllData(data);
-      
+
       // FIXED: Improved filtering logic with better search term matching
       const searchTerms = value.toLowerCase().trim().split(/\s+/);
-      
+
       const filtered = data.filter((row) => {
         const companyName = (row.company_name || '').toLowerCase();
         const ceoName = (row.ceo_name || '').toLowerCase();
         const year = (row.year || '').toString().toLowerCase();
-        
+
         // Check if any search term matches company name, CEO name, or year
-        return searchTerms.some(term => 
-          companyName.includes(term) || 
-          ceoName.includes(term) || 
+        return searchTerms.some(term =>
+          companyName.includes(term) ||
+          ceoName.includes(term) ||
           year.includes(term)
-        ) || 
-        // Also check if the full query matches (for cases like partial names)
-        companyName.includes(value.toLowerCase()) ||
-        ceoName.includes(value.toLowerCase()) ||
-        year.includes(value.toLowerCase());
+        ) ||
+          // Also check if the full query matches (for cases like partial names)
+          companyName.includes(value.toLowerCase()) ||
+          ceoName.includes(value.toLowerCase()) ||
+          year.includes(value.toLowerCase());
       });
 
       console.log("Filtered data before sorting:", filtered);
@@ -193,7 +193,7 @@ export const TabTwo = () => {
 
       const topFourYears = sorted.slice(0, 4);
 
-      console.log("Final filtered data:", topFourYears); 
+      console.log("Final filtered data:", topFourYears);
       setFilteredData(topFourYears);
     } catch (err) {
       console.error("CEO-Worker search failed:", err);
@@ -210,40 +210,40 @@ export const TabTwo = () => {
     }
   };
 
-const handleSuggestionSelect = (event, value) => {
-  if (value && typeof value === 'object') {
-    // Create a payload with CEO name, company name, and year
-    const payload = {
-      ceoName: value.ceoName,
-      companyName: value.companyName,
-      year: value.year,
-      ceoCompensation: value.ceoCompensation,
-      workerSalary: value.workerSalary
-    };
-    
-    console.log("Selected suggestion payload:", payload);
-    
-    // Instead of using the formatted label, use just the company name
-    // This avoids the double slash issue in the API call
-    const searchTerm = value.companyName; // or value.ceoName if you prefer
-    
-    setSearchQuery(value.label); // This shows the full formatted text in the input
-    handleSearch(searchTerm); // This sends a clean search term to the API
-    
-  } else if (typeof value === 'string') {
-    // Clean the string to remove any extra formatting
-    const cleanValue = value.replace(/\\/g, '').trim();
-    setSearchQuery(cleanValue);
-    handleSearch(cleanValue);
-  }
-};
+  const handleSuggestionSelect = (event, value) => {
+    if (value && typeof value === 'object') {
+      // Create a payload with CEO name, company name, and year
+      const payload = {
+        ceoName: value.ceoName,
+        companyName: value.companyName,
+        year: value.year,
+        ceoCompensation: value.ceoCompensation,
+        workerSalary: value.workerSalary
+      };
+
+      console.log("Selected suggestion payload:", payload);
+
+      // Instead of using the formatted label, use just the company name
+      // This avoids the double slash issue in the API call
+      const searchTerm = value.companyName; // or value.ceoName if you prefer
+
+      setSearchQuery(value.label); // This shows the full formatted text in the input
+      handleSearch(searchTerm); // This sends a clean search term to the API
+
+    } else if (typeof value === 'string') {
+      // Clean the string to remove any extra formatting
+      const cleanValue = value.replace(/\\/g, '').trim();
+      setSearchQuery(cleanValue);
+      handleSearch(cleanValue);
+    }
+  };
 
   const LoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -257,11 +257,11 @@ const handleSuggestionSelect = (event, value) => {
   );
 
   const InitialLoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -269,11 +269,11 @@ const handleSuggestionSelect = (event, value) => {
         Loading CEO-Worker data
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, color: "text.disabled" }}>
-        This may take a moment 
+        This may take a moment
       </Typography>
     </Box>
   );
-  
+
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }
@@ -291,7 +291,7 @@ const handleSuggestionSelect = (event, value) => {
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
-              if (!newInputValue) { 
+              if (!newInputValue) {
                 setSearchQuery("");
                 setFilteredData([]);
                 return;
@@ -301,12 +301,12 @@ const handleSuggestionSelect = (event, value) => {
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={
-              searchQuery.length < 1 
-                ? "Start typing to search for companies or CEOs..." 
+              searchQuery.length < 1
+                ? "Start typing to search for companies or CEOs..."
                 : "No matching CEO-Worker data found"
             }
             disabled={loading}
-            filterOptions={(options) => options} 
+            filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -348,13 +348,13 @@ const handleSuggestionSelect = (event, value) => {
       </div>
 
       {loading && <LoadingComponent />}
-      
+
       {error && (
         <Typography color="error" align="center">
           {error}
         </Typography>
       )}
-      
+
       {!loading && searchQuery && filteredData.length === 0 && !error && (
         <Typography
           align="center"
@@ -370,7 +370,7 @@ const handleSuggestionSelect = (event, value) => {
       )}
 
       {!!filteredData.length && (
-        <Box sx={{ p:2, display: "flex", flexDirection: "column" }} className="nopadding">
+        <Box sx={{ p: 2, display: "flex", flexDirection: "column" }} className="nopadding">
           <Box className="tab2Table" sx={{ overflowX: "auto" }}>
             <Box sx={{ minWidth: "750px" }}>
               {/* Header */}
@@ -420,7 +420,7 @@ const handleSuggestionSelect = (event, value) => {
                   <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.ceo_name}</Typography>
                   </Box>
-                  
+
                   <Box sx={{ ...cellStyle, backgroundColor: "rgb(254, 199, 199)" }}>
                     <Typography variant="h6">{row.ceo_total_compensation}</Typography>
                   </Box>

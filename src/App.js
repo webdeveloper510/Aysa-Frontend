@@ -16,7 +16,6 @@ function App() {
           </p>
           <label>Providing the true cost of goods to leverage purchasing power for good</label>
         </header>
-
         <Router />
 
         <Footer />
@@ -26,3 +25,7 @@ function App() {
 }
 
 export default App;
+
+// profit
+// tax
+// ceo-worker

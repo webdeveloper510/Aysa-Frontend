@@ -20,6 +20,7 @@ import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
 export const TabOne = ({ searchLabel = "Search by brands, products or types" }) => {
+
   const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,9 +44,9 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         }
 
         const result = await response.json();
-        console.log("Initial data fetch result:", result); 
+        console.log("Initial data fetch result:", result);
         const apiData = result.data || [];
-        
+
         const formattedData = apiData.map((item, index) => ({
           id: index,
           label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
@@ -58,13 +59,13 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
           image: item["Link to Product Pictures"] || "",
           searchText: [
             (item.Brand || '')?.toLowerCase(),
-            (item["Product Name"] || '')?.toLowerCase(), 
+            (item["Product Name"] || '')?.toLowerCase(),
             (item.Type || '')?.toLowerCase(), // Fixed: Use 'Type' instead of 'Product Type'
             `${item.Brand || ''} ${item["Product Name"] || ''}`?.toLowerCase(),
             `${item.Brand || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
             `${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
             `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase() // Fixed: Use 'Type'
-          ].filter(text => text.trim() !== '') 
+          ].filter(text => text.trim() !== '')
         }));
 
         setAllProductsData(formattedData);
@@ -86,10 +87,10 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
     const query = searchQuery?.toLowerCase().trim();
     const queryWords = query.split(/\s+/).filter(word => word.length > 0);
-    
+
     const filteredSuggestions = allProductsData.filter(item => {
       const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word => 
+      const matchesAllWords = queryWords.every(word =>
         item.searchText.some(text => text.includes(word))
       );
 
@@ -97,16 +98,16 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const productName = item.productName?.toLowerCase();
       const productType = item.type?.toLowerCase(); // This is now correctly using 'type' field
 
-      const matchesIndividualFields = 
-        brand?.includes(query) || 
-        productName?.includes(query) || 
+      const matchesIndividualFields =
+        brand?.includes(query) ||
+        productName?.includes(query) ||
         productType?.includes(query) ||
-        queryWords.some(word => 
-          brand?.includes(word) || 
-          productName?.includes(word) || 
+        queryWords.some(word =>
+          brand?.includes(word) ||
+          productName?.includes(word) ||
           productType?.includes(word)
         );
-      
+
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
     });
 
@@ -114,19 +115,19 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const aExactBrand = a.brand.toLowerCase() === query;
       const bExactBrand = b.brand.toLowerCase() === query;
       if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
-      
+
       const aBrandStarts = a.brand.toLowerCase().startsWith(query);
       const bBrandStarts = b.brand.toLowerCase().startsWith(query);
       if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
-      
+
       const aProductStarts = a.productName.toLowerCase().startsWith(query);
       const bProductStarts = b.productName.toLowerCase().startsWith(query);
       if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
-      
+
       const aTypeStarts = a.type.toLowerCase().startsWith(query);
       const bTypeStarts = b.type.toLowerCase().startsWith(query);
       if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-      
+
       return a.brand.localeCompare(b.brand);
     });
 
@@ -145,14 +146,14 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     setError("");
 
     try {
-      console.log("Making search request for:", query); 
-      
+      console.log("Making search request for:", query);
+
       const response = await fetch("https://api.the-aysa.com/product-semantic-search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, tab_type: "profit" }),
       });
 
       if (!response.ok) {
@@ -167,13 +168,13 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
           console.warn("formatItems received non-array:", items);
           return [];
         }
-        
+
         return items.map((item, index) => {
           const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
           const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
           const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
           const productionYear = item["Production Year"] || item["Production Year "] || 0;
-          
+
           return {
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
             brand: (item["Brand"] || "").trim(),
@@ -235,12 +236,12 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   const profitValueMade = firstProduct.profit_made_value || 0;
 
   const chartData = {
-    labels: [`Market Price: $${marketPriceValue}`], 
+    labels: [`Market Price: $${marketPriceValue}`],
     datasets: [
       {
         label: "Profit Margin",
-        data: [profitMarginValue], 
-        backgroundColor: "#4FC3F7", 
+        data: [profitMarginValue],
+        backgroundColor: "#4FC3F7",
         categoryPercentage: 0.6,
         barThickness: 80,
       },
@@ -275,7 +276,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         beginAtZero: true,
         max: 100,
         ticks: {
-          stepSize: 25, 
+          stepSize: 25,
           callback: function (value) {
             return `${value}%`;
           },
@@ -293,11 +294,11 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   };
 
   const LoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -311,11 +312,11 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   );
 
   const InitialLoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -323,7 +324,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         Loading product data
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, color: "text.disabled" }}>
-        This may take a moment 
+        This may take a moment
       </Typography>
     </Box>
   );
@@ -346,7 +347,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
-              if (!newInputValue) { 
+              if (!newInputValue) {
                 setSearchQuery("");
                 setData({ matched: [], compared: [] });
                 return;
@@ -356,25 +357,25 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={
-              searchQuery.length < 1 
-                ? "Start typing to search for brands, products, or types..." 
+              searchQuery.length < 1
+                ? "Start typing to search for brands, products, or types..."
                 : "No matching products found"
             }
             disabled={loading}
-            filterOptions={(options) => options} 
+            filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                   {option.image && (
                     <Box sx={{ mr: 2 }}>
-                      <img 
-                        src={option.image} 
+                      <img
+                        src={option.image}
                         alt={option.label}
-                        style={{ 
-                          width: 40, 
-                          height: 40, 
-                          objectFit: 'cover', 
-                          borderRadius: '4px' 
+                        style={{
+                          width: 40,
+                          height: 40,
+                          objectFit: 'cover',
+                          borderRadius: '4px'
                         }}
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -384,7 +385,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
                   )}
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body2" fontWeight="bold">
-                      <span style={{ color: '#1976d2' }}>{option.brand}</span> {option.productName} 
+                      <span style={{ color: '#1976d2' }}>{option.brand}</span> {option.productName}
                       <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.type}</span>
                     </Typography>
                     <Typography variant="caption" color="text.secondary">

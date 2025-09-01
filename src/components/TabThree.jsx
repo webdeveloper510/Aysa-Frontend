@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import { 
-  Box, 
-  Typography, 
-  TextField, 
-  Autocomplete, 
-  CircularProgress 
+import {
+  Box,
+  Typography,
+  TextField,
+  Autocomplete,
+  CircularProgress
 } from "@mui/material";
 import axios from "axios";
 
@@ -26,7 +26,7 @@ export const TabThree = () => {
   const [error, setError] = useState("");
   const [allTaxData, setAllTaxData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
-  const [selectedItem, setSelectedItem] = useState(null); 
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     const fetchAllTaxData = async () => {
@@ -58,7 +58,7 @@ export const TabThree = () => {
             (item["Company Name"] || '').toLowerCase(),
             (item.Year || '').toString().toLowerCase(),
             `${item["Company Name"] || ''} ${item.Year || ''}`.toLowerCase(),
-          ].filter(text => text.trim() !== '') 
+          ].filter(text => text.trim() !== '')
         }));
 
         setAllTaxData(formattedData);
@@ -80,26 +80,26 @@ export const TabThree = () => {
 
     const query = searchQuery.toLowerCase().trim();
     const queryWords = query.split(/\s+/).filter(word => word.length > 0);
-    
+
     const filteredSuggestions = allTaxData.filter(item => {
       const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word => 
+      const matchesAllWords = queryWords.every(word =>
         item.searchText.some(text => text.includes(word))
       );
       const companyName = item.companyName.toLowerCase();
       const year = item.year.toString().toLowerCase();
-      
-      const matchesIndividualFields = 
-        companyName.includes(query) || 
+
+      const matchesIndividualFields =
+        companyName.includes(query) ||
         year.includes(query) ||
-        queryWords.some(word => 
-          companyName.includes(word) || 
+        queryWords.some(word =>
+          companyName.includes(word) ||
           year.includes(word)
         );
-      
+
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
     });
-    
+
     const sortedSuggestions = filteredSuggestions.sort((a, b) => {
       const aExactCompany = a.companyName.toLowerCase() === query;
       const bExactCompany = b.companyName.toLowerCase() === query;
@@ -112,7 +112,7 @@ export const TabThree = () => {
       if (aYearMatch !== bYearMatch) return bYearMatch - aYearMatch;
       const companyCompare = a.companyName.localeCompare(b.companyName);
       if (companyCompare !== 0) return companyCompare;
-      
+
       return parseInt(b.year) - parseInt(a.year);
     });
 
@@ -131,41 +131,42 @@ export const TabThree = () => {
     setError("");
 
     try {
-      console.log("Making search request for:", query); 
-      
+      console.log("Making search request for:", query);
+
       const res = await axios.post("https://api.the-aysa.com/tax-semantic-search", {
         query: query,
+        tab_type: "ceo-worker"
       });
 
       console.log("Tax search API response:", res.data)
       const rawRows = res.data?.data || [];
 
-      console.log("Raw rows from API:", rawRows); 
+      console.log("Raw rows from API:", rawRows);
 
       const rows = rawRows.map((row, index) => ({
         id: `${(row["Company Name"] || '').trim()}-${(row["Year"] || '').toString().trim()}-${index}`,
         company_name: (row["Company Name"] || '').trim(),
         year: (row["Year"] || '').toString().trim(),
-        tax_paid: (row["Taxes Paid"] || '').trim(), 
-        tax_avoid: (row["Taxes Avoided"] || '').trim(), 
+        tax_paid: (row["Taxes Paid"] || '').trim(),
+        tax_avoid: (row["Taxes Avoided"] || '').trim(),
       }));
 
-      console.log("Processed rows:", rows); 
+      console.log("Processed rows:", rows);
 
       setAllData(rows);
-      
+
       const searchTerms = query.toLowerCase().trim().split(/\s+/);
-      
+
       const filtered = rows.filter((row) => {
         const companyName = (row.company_name || '').toLowerCase();
         const year = (row.year || '').toString().toLowerCase();
-        
-        return searchTerms.some(term => 
-          companyName.includes(term) || 
+
+        return searchTerms.some(term =>
+          companyName.includes(term) ||
           year.includes(term)
-        ) || 
-        companyName.includes(query.toLowerCase()) ||
-        year.includes(query.toLowerCase());
+        ) ||
+          companyName.includes(query.toLowerCase()) ||
+          year.includes(query.toLowerCase());
       });
 
       console.log("Filtered data before sorting:", filtered);
@@ -176,7 +177,7 @@ export const TabThree = () => {
 
       const topFourYears = sorted.slice(0, 4);
 
-      console.log("Final filtered data:", topFourYears); 
+      console.log("Final filtered data:", topFourYears);
       setFilteredData(topFourYears);
     } catch (err) {
       console.error("Tax search failed:", err);
@@ -202,10 +203,10 @@ export const TabThree = () => {
         taxesAvoided: value.taxesAvoided
       };
       setSelectedItem(payload);
-      setSearchQuery(value.label); 
-     const searchTerm = `${value.companyName} ${value.year}`;
+      setSearchQuery(value.label);
+      const searchTerm = `${value.companyName} ${value.year}`;
       handleSearch(searchTerm);
-      
+
     } else if (typeof value === 'string') {
 
       const cleanValue = value.replace(/\\/g, '').trim();
@@ -214,13 +215,13 @@ export const TabThree = () => {
     }
   };
 
- 
+
   const LoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -234,11 +235,11 @@ export const TabThree = () => {
   );
 
   const InitialLoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -246,11 +247,11 @@ export const TabThree = () => {
         Loading tax data
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, color: "text.disabled" }}>
-        This may take a moment 
+        This may take a moment
       </Typography>
     </Box>
   );
-  
+
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }
@@ -258,7 +259,7 @@ export const TabThree = () => {
   return (
     <>
       <div className="meow">
-       <Box m={3} className="nomargin">
+        <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
             options={suggestions}
@@ -268,7 +269,7 @@ export const TabThree = () => {
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
-              if (!newInputValue) { 
+              if (!newInputValue) {
                 setSearchQuery("");
                 setFilteredData([]);
                 return;
@@ -278,12 +279,12 @@ export const TabThree = () => {
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={
-              searchQuery.length < 1 
-                ? "Start typing to search for companies or years..." 
+              searchQuery.length < 1
+                ? "Start typing to search for companies or years..."
                 : "No matching tax data found"
             }
             disabled={loading}
-            filterOptions={(options) => options} 
+            filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -324,13 +325,13 @@ export const TabThree = () => {
       </div>
 
       {loading && <LoadingComponent />}
-      
+
       {error && (
         <Typography color="error" align="center">
           {error}
         </Typography>
       )}
-      
+
       {!loading && searchQuery && filteredData.length === 0 && !error && (
         <Typography
           align="center"
@@ -346,7 +347,7 @@ export const TabThree = () => {
       )}
 
       {!!filteredData.length && (
-       <Box sx={{ p:2, display: "flex", flexDirection: "column" }} className="nopadding">
+        <Box sx={{ p: 2, display: "flex", flexDirection: "column" }} className="nopadding">
           <Box className="tab3Table" sx={{ overflowX: "auto" }}>
             <Box sx={{ minWidth: "750px" }}>
               {/* Header */}

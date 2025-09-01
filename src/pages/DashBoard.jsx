@@ -32,7 +32,6 @@ const DashBoard = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-center">Dashboard</h1>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
           <thead className="bg-gray-200 text-gray-700">

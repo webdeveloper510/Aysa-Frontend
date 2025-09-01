@@ -516,99 +516,109 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             </Box>
           </Box>
 
-          <Typography
-            className="table-heading"
-            variant="h5"
-            align="center"
-            sx={{
-              backgroundColor: "#1976d2",
-              color: "white",
-              py: 2,
-              mt: 6,
-              mb: 0,
-              fontWeight: "bold",
-              fontSize: "1.4rem",
-            }}
-          >
-            Comparing the Profit Margin to two Similar Products.
-          </Typography>
+          {/* Only show the table and comparison heading when there are 2 or more products */}
+          {data.matched.length > 1 && (
+            <>
+              <Typography
+                className="table-heading"
+                variant="h5"
+                align="center"
+                sx={{
+                  backgroundColor: "#1976d2",
+                  color: "white",
+                  py: 2,
+                  mt: 6,
+                  mb: 0,
+                  fontWeight: "bold",
+                  fontSize: "1.4rem",
+                }}
+              >
+                Comparing the Profit Margin to Similar Products.
+              </Typography>
 
-          <Paper elevation={3}>
-            <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
-              <Table>
-                <TableHead sx={{ backgroundColor: "#bbdefb" }}>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.matched.map((row, index) => {
-                    const isFirstResult = index === 0;
-
-                    return (
-                      <TableRow
-                        key={row.id}
-                        sx={{
-                          backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
-                          borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
-                          "&:hover": { backgroundColor: "#f5f5f5" }
-                        }}
-                      >
-                        <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
-                          {row.brand}
-                        </TableCell>
-                        <TableCell>
-                          {row.product_url ? (
-                            <img
-                              src={row.product_url}
-                              alt={`${row.brand} ${row.product_name}`}
-                              style={{
-                                width: 60,
-                                height: 60,
-                                objectFit: "cover",
-                                borderRadius: "6px"
-                              }}
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
-                              }}
-                            />
-                          ) : (
-                            <Box
-                              sx={{
-                                width: 60,
-                                height: 60,
-                                backgroundColor: "#f0f0f0",
-                                borderRadius: "6px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center"
-                              }}
-                            >
-                              <Typography variant="caption" color="text.disabled">
-                                No img
-                              </Typography>
-                            </Box>
-                          )}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
-                          {row.product_name}
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
-                            {row.profit_margin}
-                          </Box>
-                        </TableCell>
+              <Paper elevation={3}>
+                <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
+                  <Table>
+                    <TableHead sx={{ backgroundColor: "#bbdefb" }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+                    </TableHead>
+                    <TableBody>
+                      {data.matched.map((row, index) => {
+                        const isFirstResult = index === 0;
+
+                        return (
+                          <TableRow
+                            key={row.id}
+                            sx={{
+                              backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
+                              borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
+                              "&:hover": { backgroundColor: "#f5f5f5" }
+                            }}
+                          >
+                            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
+                              {row.brand}
+                            </TableCell>
+                            <TableCell>
+                              {row.product_url ? (
+                                <img
+                                  src={row.product_url}
+                                  alt={`${row.brand} ${row.product_name}`}
+                                  style={{
+                                    width: 60,
+                                    height: 60,
+                                    objectFit: "cover",
+                                    borderRadius: "6px"
+                                  }}
+                                  onError={(e) => {
+                                    e.currentTarget.src =
+                                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                                  }}
+                                />
+                              ) : (
+                                <Box
+                                  sx={{
+                                    width: 60,
+                                    height: 60,
+                                    backgroundColor: "#f0f0f0",
+                                    borderRadius: "6px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                  }}
+                                >
+                                  <Typography variant="caption" color="text.disabled">
+                                    No img
+                                  </Typography>
+                                </Box>
+                              )}
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
+                              {row.product_name}
+                              {row.product_type && (
+                                <span style={{ color: '#000', fontWeight: 'normal' }}>
+                                  {' - '}{row.product_type}
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
+                                {row.profit_margin}
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </>
+          )}
         </>
       )}
     </>

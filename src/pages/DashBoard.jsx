@@ -53,7 +53,7 @@ const DashBoard = () => {
             ) : (
               <tr>
                 <td colSpan="3" className="text-center py-4 text-gray-500">
-                  No Data available
+                  No Data Available
                 </td>
               </tr>
             )}

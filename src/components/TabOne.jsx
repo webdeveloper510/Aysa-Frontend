@@ -80,59 +80,116 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     fetchAllProductsData();
   }, []);
 
-  const suggestions = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
-      return [];
+const suggestions = useMemo(() => {
+  if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
+    return [];
+  }
+
+  const query = searchQuery?.toLowerCase().trim();
+  const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+
+  const filteredSuggestions = allProductsData.filter(item => {
+    const brand = item.brand?.toLowerCase() || '';
+    const productName = item.productName?.toLowerCase() || '';
+    const productType = item.type?.toLowerCase() || '';
+    
+    // Create search terms for exact matching
+    const searchTerms = [
+      brand,
+      productName, 
+      productType,
+      `${brand} ${productName}`.trim(),
+      `${brand} ${productType}`.trim(),
+      `${productName} ${productType}`.trim(),
+      `${brand} ${productName} ${productType}`.trim()
+    ].filter(term => term.length > 0);
+
+    // Check if the full query matches any search term (starts with or includes)
+    const matchesFullQuery = searchTerms.some(term => 
+      term.startsWith(query) || term.includes(` ${query}`) || term.includes(`${query} `)
+    );
+
+    // For multi-word queries, ensure all words are present in the item
+    const matchesAllWords = queryWords.length > 1 ? 
+      queryWords.every(word => 
+        searchTerms.some(term => 
+          term.startsWith(word) || 
+          term.includes(` ${word}`) || 
+          term.includes(`${word} `) ||
+          term === word
+        )
+      ) : true;
+
+    // Individual field matching with word boundaries
+    const matchesIndividualFields = 
+      brand.startsWith(query) ||
+      productName.startsWith(query) ||
+      productType.startsWith(query) ||
+      brand.includes(` ${query}`) ||
+      productName.includes(` ${query}`) ||
+      productType.includes(` ${query}`) ||
+      // For single character or very short queries, be more strict
+      (query.length >= 2 && (
+        brand.includes(query) ||
+        productName.includes(query) ||
+        productType.includes(query)
+      ));
+
+    // Combine all matching strategies
+    return (matchesFullQuery && matchesAllWords) || matchesIndividualFields;
+  });
+
+  const sortedSuggestions = filteredSuggestions.sort((a, b) => {
+    const aBrand = a.brand.toLowerCase();
+    const bBrand = b.brand.toLowerCase();
+    const aProduct = a.productName.toLowerCase();
+    const bProduct = b.productName.toLowerCase();
+    const aType = a.type.toLowerCase();
+    const bType = b.type.toLowerCase();
+    const aExactBrand = aBrand === query;
+    const bExactBrand = bBrand === query;
+    if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
+
+    const aBrandStarts = aBrand.startsWith(query);
+    const bBrandStarts = bBrand.startsWith(query);
+    if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
+
+    const aProductStarts = aProduct.startsWith(query);
+    const bProductStarts = bProduct.startsWith(query);
+    if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
+
+    if (queryWords.length > 1) {
+      const aMatchScore = queryWords.reduce((score, word, index) => {
+        if (aBrand.startsWith(word) || aProduct.startsWith(word)) {
+          return score + (queryWords.length - index);
+        }
+        if (aBrand.includes(word) || aProduct.includes(word)) {
+          return score + 1;
+        }
+        return score;
+      }, 0);
+
+      const bMatchScore = queryWords.reduce((score, word, index) => {
+        if (bBrand.startsWith(word) || bProduct.startsWith(word)) {
+          return score + (queryWords.length - index);
+        }
+        if (bBrand.includes(word) || bProduct.includes(word)) {
+          return score + 1;
+        }
+        return score;
+      }, 0);
+
+      if (aMatchScore !== bMatchScore) return bMatchScore - aMatchScore;
     }
 
-    const query = searchQuery?.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+    const aTypeStarts = aType.startsWith(query);
+    const bTypeStarts = bType.startsWith(query);
+    if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
+    return aBrand.localeCompare(bBrand);
+  });
 
-    const filteredSuggestions = allProductsData.filter(item => {
-      const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word =>
-        item.searchText.some(text => text.includes(word))
-      );
-
-      const brand = item.brand?.toLowerCase();
-      const productName = item.productName?.toLowerCase();
-      const productType = item.type?.toLowerCase(); // This is now correctly using 'type' field
-
-      const matchesIndividualFields =
-        brand?.includes(query) ||
-        productName?.includes(query) ||
-        productType?.includes(query) ||
-        queryWords.some(word =>
-          brand?.includes(word) ||
-          productName?.includes(word) ||
-          productType?.includes(word)
-        );
-
-      return matchesFullQuery || matchesAllWords || matchesIndividualFields;
-    });
-
-    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-      const aExactBrand = a.brand.toLowerCase() === query;
-      const bExactBrand = b.brand.toLowerCase() === query;
-      if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
-
-      const aBrandStarts = a.brand.toLowerCase().startsWith(query);
-      const bBrandStarts = b.brand.toLowerCase().startsWith(query);
-      if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
-
-      const aProductStarts = a.productName.toLowerCase().startsWith(query);
-      const bProductStarts = b.productName.toLowerCase().startsWith(query);
-      if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
-
-      const aTypeStarts = a.type.toLowerCase().startsWith(query);
-      const bTypeStarts = b.type.toLowerCase().startsWith(query);
-      if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-
-      return a.brand.localeCompare(b.brand);
-    });
-
-    return sortedSuggestions.slice(0, 15);
-  }, [searchQuery, allProductsData]);
+  return sortedSuggestions.slice(0, 15);
+}, [searchQuery, allProductsData]);
 
   const handleSearch = async (query) => {
     if (!query.trim()) {

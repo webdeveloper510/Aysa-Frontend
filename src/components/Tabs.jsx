@@ -37,7 +37,7 @@ function useMediaQuery(query) {
 
 
 export const Tabs = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const getSearchLabel = () => {

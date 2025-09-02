@@ -23,14 +23,14 @@ export const Tabs = () => {
   const [activeTab, setActiveTab] = useState(null);
 
   const getSearchLabel = () => {
-    if (activeTab === null) {
+    if (activeTab === 0) {
       return "See what brands don't want you to know";
     }
     switch (activeTab) {
       case 0:
         return "Search by brands, products or type";
       default:
-        return tabs[activeTab].label;
+        return tabs[activeTab]?.label;
     }
   };
 

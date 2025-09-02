@@ -207,7 +207,11 @@ section.about-section {
 .about-row {
   background: #cbebff;
 }
-
+header.App-header label {
+  color: #2caffe;
+  font-size: 18px;
+  padding: 0px 10px 10px 10px;
+}
 /**************** responsive css ************/
 
 @media screen and (max-width: 1200px) {

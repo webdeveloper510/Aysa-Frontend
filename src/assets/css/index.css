@@ -205,14 +205,13 @@ section.about-section {
   background: #cbebff;
 }
 header.App-header label {
-    color:#2caffe;
-    margin-bottom: 10px;
-        font-size: 18px;
+  color: #2caffe;
+  margin-bottom: 10px;
+  font-size: 18px;
 }
 
-
 .accordion-wrapper {
-    width: 98%;
+  width: 98%;
 }
 
 .accordion-item {
@@ -220,20 +219,20 @@ header.App-header label {
 }
 
 .accordion-header {
-    padding: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    background: #cbebff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 5px solid #1674da;
-        color: #7d7676;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #cbebff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 5px solid #1674da;
+  color: #7d7676;
 }
 
 .accordion-header.open {
-    background: #67AFEF;
-    color: #fff;
+  background: #67afef;
+  color: #fff;
 }
 .accordion-content {
   padding: 12px;
@@ -253,89 +252,86 @@ header.App-header label {
   transform: rotate(90deg);
 }
 
-
-
 /**************** responsive css ************/
 
 @media screen and (max-width: 1200px) {
   .meow {
-  width: 70%;
-  margin: 0 auto;
-}
-.tab-wrapper{
-   width: 90%;
-}
+    width: 70%;
+    margin: 0 auto;
+  }
+  .tab-wrapper {
+    width: 90%;
+  }
 
-.tablebody .MuiBox-root h6 {
-  font-size: 30px;
-  line-height: normal;
-}
-.tablebody .MuiBox-root {
+  .tablebody .MuiBox-root h6 {
+    font-size: 30px;
+    line-height: normal;
+  }
+  .tablebody .MuiBox-root {
     padding: 40px 10px;
-}
-.tableheader .MuiBox-root{
-  font-size: 24px;
-}
+  }
+  .tableheader .MuiBox-root {
+    font-size: 24px;
+  }
 }
 
 @media screen and (max-width: 992px) {
   .meow {
-  width: 80%;
-  margin: 0 auto;
-}
-.tab-wrapper{
-   width: 90%;
-}
-.tab-buttons {
+    width: 80%;
+    margin: 0 auto;
+  }
+  .tab-wrapper {
+    width: 90%;
+  }
+  .tab-buttons {
     gap: 20px;
-}
-.nomargin {
+  }
+  .nomargin {
     margin-left: 0;
     margin-right: 0;
-}
+  }
 }
 
 @media screen and (max-width: 768px) {
   .about-row h1 {
     font-size: 30px;
-}
+  }
   .tab-content h4 {
     font-size: 27px;
-}
+  }
   .meow {
-  width: 100%;
-  margin: 0 auto;
-}
-.tab-wrapper{
-   width: 100%;
-}
+    width: 100%;
+    margin: 0 auto;
+  }
+  .tab-wrapper {
+    width: 100%;
+  }
 
-.tab-content{
-  margin:0px 20px;
-          width: 95%;
-}
-.table-heading {
+  .tab-content {
+    margin: 0px 20px;
+    width: 95%;
+  }
+  .table-heading {
     font-size: 19px;
-}
-    .profit-graph {
-        max-width: 80% !important;
-    }
-    .tablebody .MuiBox-root h6 {
-  font-size: 25px;
-  line-height: normal;
-}
-.nopadding {
+  }
+  .profit-graph {
+    max-width: 80% !important;
+  }
+  .tablebody .MuiBox-root h6 {
+    font-size: 25px;
+    line-height: normal;
+  }
+  .nopadding {
     padding: 0px;
-}
+  }
 }
 
 @media screen and (max-width: 480px) {
-
-    .table-heading {
-        font-size: 18px !important;
-        padding: 13px;
-    }
-    .profit-graph {
-        max-width: 100% !important;
-    }
+  .table-heading {
+    font-size: 18px !important;
+    padding: 13px;
+  }
+  .profit-graph {
+    max-width: 100% !important;
+  }
 }

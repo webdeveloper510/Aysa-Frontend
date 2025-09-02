@@ -207,57 +207,6 @@ section.about-section {
 .about-row {
   background: #cbebff;
 }
-header.App-header label {
-  color: #2caffe;
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-
-.accordion-wrapper {
-  width: 98%;
-}
-
-.accordion-item {
-  margin-bottom: 10px;
-}
-
-.accordion-header {
-  padding: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  background: #cbebff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 5px solid #1674da;
-  color: #7d7676;
-  border-radius: 50%;
-  height: 200px;
-  width: 200px;
-  margin: 0 auto;
-}
-
-.accordion-header.open {
-  background: #67afef;
-  color: #fff;
-}
-.accordion-content {
-  padding: 12px;
-  background: #fff;
-}
-
-/* Arrow styles */
-.arrow {
-  transition: transform 0.3s ease;
-}
-
-.arrow.right {
-  transform: rotate(0deg);
-}
-
-.arrow.down {
-  transform: rotate(90deg);
-}
 
 /**************** responsive css ************/
 
@@ -291,15 +240,33 @@ header.App-header label {
     width: 90%;
   }
   .tab-buttons {
-    gap: 20px;
+    gap: 35px;
   }
   .nomargin {
     margin-left: 0;
     margin-right: 0;
   }
+  .outer-circle {
+    width: 15em;
+    height: 15em;
+  }
+  .inner-circle {
+    width: 14em;
+    height: 14em;
+  }
+  .inner-circle span {
+    color: #7d7676;
+    font-size: 20px;
+  }
 }
 
 @media screen and (max-width: 768px) {
+  .tab-buttons {
+    display: block;
+  }
+  .outer-circle {
+    margin-bottom: 20px !important;
+  }
   .about-row h1 {
     font-size: 30px;
   }

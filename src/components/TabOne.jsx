@@ -79,7 +79,6 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
     fetchAllProductsData();
   }, []);
-
 const suggestions = useMemo(() => {
   if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
     return [];

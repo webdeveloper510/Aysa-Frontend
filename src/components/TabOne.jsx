@@ -53,18 +53,27 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
           value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
           brand: item.Brand || '',
           productName: item["Product Name"] || '',
-          type: item.Type || '', // Fixed: Use 'Type' instead of 'Product Type'
+          type: item.Type || '',
+          category: item.Category || '',
           profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
           productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           searchText: [
             (item.Brand || '')?.toLowerCase(),
             (item["Product Name"] || '')?.toLowerCase(),
-            (item.Type || '')?.toLowerCase(), // Fixed: Use 'Type' instead of 'Product Type'
+            (item.Type || '')?.toLowerCase(),
+            (item.Category || '')?.toLowerCase(),
             `${item.Brand || ''} ${item["Product Name"] || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
-            `${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase() // Fixed: Use 'Type'
+            `${item.Brand || ''} ${item.Type || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item.Category || ''}`?.toLowerCase(),
+            `${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(),
+            `${item["Product Name"] || ''} ${item.Category || ''}`?.toLowerCase(),
+            `${item.Type || ''} ${item.Category || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Category || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item.Type || ''} ${item.Category || ''}`?.toLowerCase(),
+            `${item["Product Name"] || ''} ${item.Type || ''} ${item.Category || ''}`?.toLowerCase(),
+            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''} ${item.Category || ''}`?.toLowerCase()
           ].filter(text => text.trim() !== '')
         }));
 
@@ -79,116 +88,138 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
     fetchAllProductsData();
   }, []);
-const suggestions = useMemo(() => {
-  if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
-    return [];
-  }
 
-  const query = searchQuery?.toLowerCase().trim();
-  const queryWords = query.split(/\s+/).filter(word => word.length > 0);
-
-  const filteredSuggestions = allProductsData.filter(item => {
-    const brand = item.brand?.toLowerCase() || '';
-    const productName = item.productName?.toLowerCase() || '';
-    const productType = item.type?.toLowerCase() || '';
-    
-    // Create search terms for exact matching
-    const searchTerms = [
-      brand,
-      productName, 
-      productType,
-      `${brand} ${productName}`.trim(),
-      `${brand} ${productType}`.trim(),
-      `${productName} ${productType}`.trim(),
-      `${brand} ${productName} ${productType}`.trim()
-    ].filter(term => term.length > 0);
-
-    // Check if the full query matches any search term (starts with or includes)
-    const matchesFullQuery = searchTerms.some(term => 
-      term.startsWith(query) || term.includes(` ${query}`) || term.includes(`${query} `)
-    );
-
-    // For multi-word queries, ensure all words are present in the item
-    const matchesAllWords = queryWords.length > 1 ? 
-      queryWords.every(word => 
-        searchTerms.some(term => 
-          term.startsWith(word) || 
-          term.includes(` ${word}`) || 
-          term.includes(`${word} `) ||
-          term === word
-        )
-      ) : true;
-
-    // Individual field matching with word boundaries
-    const matchesIndividualFields = 
-      brand.startsWith(query) ||
-      productName.startsWith(query) ||
-      productType.startsWith(query) ||
-      brand.includes(` ${query}`) ||
-      productName.includes(` ${query}`) ||
-      productType.includes(` ${query}`) ||
-      // For single character or very short queries, be more strict
-      (query.length >= 2 && (
-        brand.includes(query) ||
-        productName.includes(query) ||
-        productType.includes(query)
-      ));
-
-    // Combine all matching strategies
-    return (matchesFullQuery && matchesAllWords) || matchesIndividualFields;
-  });
-
-  const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-    const aBrand = a.brand.toLowerCase();
-    const bBrand = b.brand.toLowerCase();
-    const aProduct = a.productName.toLowerCase();
-    const bProduct = b.productName.toLowerCase();
-    const aType = a.type.toLowerCase();
-    const bType = b.type.toLowerCase();
-    const aExactBrand = aBrand === query;
-    const bExactBrand = bBrand === query;
-    if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
-
-    const aBrandStarts = aBrand.startsWith(query);
-    const bBrandStarts = bBrand.startsWith(query);
-    if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
-
-    const aProductStarts = aProduct.startsWith(query);
-    const bProductStarts = bProduct.startsWith(query);
-    if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
-
-    if (queryWords.length > 1) {
-      const aMatchScore = queryWords.reduce((score, word, index) => {
-        if (aBrand.startsWith(word) || aProduct.startsWith(word)) {
-          return score + (queryWords.length - index);
-        }
-        if (aBrand.includes(word) || aProduct.includes(word)) {
-          return score + 1;
-        }
-        return score;
-      }, 0);
-
-      const bMatchScore = queryWords.reduce((score, word, index) => {
-        if (bBrand.startsWith(word) || bProduct.startsWith(word)) {
-          return score + (queryWords.length - index);
-        }
-        if (bBrand.includes(word) || bProduct.includes(word)) {
-          return score + 1;
-        }
-        return score;
-      }, 0);
-
-      if (aMatchScore !== bMatchScore) return bMatchScore - aMatchScore;
+  // Modified suggestions to only show after 3 characters
+  const suggestions = useMemo(() => {
+    if (!searchQuery || searchQuery.length < 3 || allProductsData.length === 0) {
+      return [];
     }
 
-    const aTypeStarts = aType.startsWith(query);
-    const bTypeStarts = bType.startsWith(query);
-    if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-    return aBrand.localeCompare(bBrand);
-  });
+    const query = searchQuery?.toLowerCase().trim();
+    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
 
-  return sortedSuggestions.slice(0, 15);
-}, [searchQuery, allProductsData]);
+    const filteredSuggestions = allProductsData.filter(item => {
+      const brand = item.brand?.toLowerCase() || '';
+      const productName = item.productName?.toLowerCase() || '';
+      const productType = item.type?.toLowerCase() || '';
+      const category = item.category?.toLowerCase() || '';
+      
+      // Create search terms for exact matching
+      const searchTerms = [
+        brand,
+        productName, 
+        productType,
+        category,
+        `${brand} ${productName}`.trim(),
+        `${brand} ${productType}`.trim(),
+        `${brand} ${category}`.trim(),
+        `${productName} ${productType}`.trim(),
+        `${productName} ${category}`.trim(),
+        `${productType} ${category}`.trim(),
+        `${brand} ${productName} ${productType}`.trim(),
+        `${brand} ${productName} ${category}`.trim(),
+        `${brand} ${productType} ${category}`.trim(),
+        `${productName} ${productType} ${category}`.trim(),
+        `${brand} ${productName} ${productType} ${category}`.trim()
+      ].filter(term => term.length > 0);
+
+      // Check if the full query matches any search term (starts with or includes)
+      const matchesFullQuery = searchTerms.some(term => 
+        term.startsWith(query) || term.includes(` ${query}`) || term.includes(`${query} `)
+      );
+
+      // For multi-word queries, ensure all words are present in the item
+      const matchesAllWords = queryWords.length > 1 ? 
+        queryWords.every(word => 
+          searchTerms.some(term => 
+            term.startsWith(word) || 
+            term.includes(` ${word}`) || 
+            term.includes(`${word} `) ||
+            term === word
+          )
+        ) : true;
+
+      // Individual field matching with word boundaries
+      const matchesIndividualFields = 
+        brand.startsWith(query) ||
+        productName.startsWith(query) ||
+        productType.startsWith(query) ||
+        category.startsWith(query) ||
+        brand.includes(` ${query}`) ||
+        productName.includes(` ${query}`) ||
+        productType.includes(` ${query}`) ||
+        category.includes(` ${query}`) ||
+        // For queries 3+ characters, allow substring matching
+        (query.length >= 3 && (
+          brand.includes(query) ||
+          productName.includes(query) ||
+          productType.includes(query) ||
+          category.includes(query)
+        ));
+
+      // Combine all matching strategies
+      return (matchesFullQuery && matchesAllWords) || matchesIndividualFields;
+    });
+
+    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
+      const aBrand = a.brand.toLowerCase();
+      const bBrand = b.brand.toLowerCase();
+      const aProduct = a.productName.toLowerCase();
+      const bProduct = b.productName.toLowerCase();
+      const aType = a.type.toLowerCase();
+      const bType = b.type.toLowerCase();
+      const aCategory = a.category.toLowerCase();
+      const bCategory = b.category.toLowerCase();
+      
+      const aExactBrand = aBrand === query;
+      const bExactBrand = bBrand === query;
+      if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
+
+      const aBrandStarts = aBrand.startsWith(query);
+      const bBrandStarts = bBrand.startsWith(query);
+      if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
+
+      const aProductStarts = aProduct.startsWith(query);
+      const bProductStarts = bProduct.startsWith(query);
+      if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
+
+      const aCategoryStarts = aCategory.startsWith(query);
+      const bCategoryStarts = bCategory.startsWith(query);
+      if (aCategoryStarts !== bCategoryStarts) return bCategoryStarts - aCategoryStarts;
+
+      if (queryWords.length > 1) {
+        const aMatchScore = queryWords.reduce((score, word, index) => {
+          if (aBrand.startsWith(word) || aProduct.startsWith(word) || aCategory.startsWith(word)) {
+            return score + (queryWords.length - index);
+          }
+          if (aBrand.includes(word) || aProduct.includes(word) || aCategory.includes(word)) {
+            return score + 1;
+          }
+          return score;
+        }, 0);
+
+        const bMatchScore = queryWords.reduce((score, word, index) => {
+          if (bBrand.startsWith(word) || bProduct.startsWith(word) || bCategory.startsWith(word)) {
+            return score + (queryWords.length - index);
+          }
+          if (bBrand.includes(word) || bProduct.includes(word) || bCategory.includes(word)) {
+            return score + 1;
+          }
+          return score;
+        }, 0);
+
+        if (aMatchScore !== bMatchScore) return bMatchScore - aMatchScore;
+      }
+
+      const aTypeStarts = aType.startsWith(query);
+      const bTypeStarts = bType.startsWith(query);
+      if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
+      
+      return aBrand.localeCompare(bBrand);
+    });
+
+    return sortedSuggestions.slice(0, 15);
+  }, [searchQuery, allProductsData]);
 
   const handleSearch = async (query) => {
     if (!query.trim()) {
@@ -413,8 +444,10 @@ const suggestions = useMemo(() => {
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={
-              searchQuery.length < 1
-                ? "Start typing to search for brands, products, or types..."
+              searchQuery.length < 3
+                ? "Type at least 3 characters to search for brands, products, or types..."
+                : suggestions.length > 0
+                ? "" // Don't show "no options" text when suggestions are available
                 : "No matching products found"
             }
             disabled={loading}
@@ -443,6 +476,7 @@ const suggestions = useMemo(() => {
                     <Typography variant="body2" fontWeight="bold">
                       <span style={{ color: '#1976d2' }}>{option.brand}</span> {option.productName}
                       <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.type}</span>
+                      {option.category && <span style={{ color: '#999', fontWeight: 'normal' }}> • {option.category}</span>}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {option.profitMargin} margin • {option.productionYear}
@@ -457,7 +491,7 @@ const suggestions = useMemo(() => {
                 label={searchLabel}
                 variant="outlined"
                 className="input-form"
-                placeholder="Type to filter..."
+                placeholder="Type at least 3 characters to filter..."
                 fullWidth
                 disabled={loading || initialDataLoading}
                 InputProps={{
@@ -485,7 +519,7 @@ const suggestions = useMemo(() => {
         </Box>
       )}
 
-      {!loading && searchQuery && !data.matched.length && !data.compared.length && !error && (
+      {!loading && searchQuery && !data.matched.length && !data.compared.length && !error && suggestions.length === 0 && (
         <Box textAlign="center" my={6}>
           <Typography variant="h6" color="text.secondary">
             No Match found for "<strong>{searchQuery}</strong>"
@@ -495,7 +529,7 @@ const suggestions = useMemo(() => {
 
       {!loading && data.matched.length > 0 && (
         <>
-          <Typography variant="h4" align="center" fontWeight="bold" my={4}>
+          <Typography variant="h4" align="center" fontWeight="bold" my={4} sx={{ textTransform: 'capitalize' }}>
             {firstProduct.brand} {firstProduct.product_name}{" "}
             {firstProduct.product_type} ({firstProduct.production_year})
           </Typography>

@@ -20,6 +20,7 @@ import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
 export const TabOne = ({ searchLabel = "Search by brands, products or types" }) => {
+
   const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,27 +44,28 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         }
 
         const result = await response.json();
-        console.log("Initial data fetch result:", result); 
+        console.log("Initial data fetch result:", result);
         const apiData = result.data || [];
-                const formattedData = apiData.map((item, index) => ({
+
+        const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`.trim(),
-          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`.trim(),
+          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
+          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
           brand: item.Brand || '',
           productName: item["Product Name"] || '',
-          type: item["Product Type"] || '',
+          type: item.Type || '', // Fixed: Use 'Type' instead of 'Product Type'
           profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
           productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           searchText: [
             (item.Brand || '')?.toLowerCase(),
-            (item["Product Name"] || '')?.toLowerCase(), 
-            (item["Product Type"] || '')?.toLowerCase(),
+            (item["Product Name"] || '')?.toLowerCase(),
+            (item.Type || '')?.toLowerCase(), // Fixed: Use 'Type' instead of 'Product Type'
             `${item.Brand || ''} ${item["Product Name"] || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Type"] || ''}`?.toLowerCase(),
-            `${item["Product Name"] || ''} ${item["Product Type"] || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item["Product Type"] || ''}`?.toLowerCase()
-          ].filter(text => text.trim() !== '') 
+            `${item.Brand || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
+            `${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(), // Fixed: Use 'Type'
+            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase() // Fixed: Use 'Type'
+          ].filter(text => text.trim() !== '')
         }));
 
         setAllProductsData(formattedData);
@@ -77,58 +79,116 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
     fetchAllProductsData();
   }, []);
+const suggestions = useMemo(() => {
+  if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
+    return [];
+  }
 
-  const suggestions = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 1 || allProductsData.length === 0) {
-      return [];
+  const query = searchQuery?.toLowerCase().trim();
+  const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+
+  const filteredSuggestions = allProductsData.filter(item => {
+    const brand = item.brand?.toLowerCase() || '';
+    const productName = item.productName?.toLowerCase() || '';
+    const productType = item.type?.toLowerCase() || '';
+    
+    // Create search terms for exact matching
+    const searchTerms = [
+      brand,
+      productName, 
+      productType,
+      `${brand} ${productName}`.trim(),
+      `${brand} ${productType}`.trim(),
+      `${productName} ${productType}`.trim(),
+      `${brand} ${productName} ${productType}`.trim()
+    ].filter(term => term.length > 0);
+
+    // Check if the full query matches any search term (starts with or includes)
+    const matchesFullQuery = searchTerms.some(term => 
+      term.startsWith(query) || term.includes(` ${query}`) || term.includes(`${query} `)
+    );
+
+    // For multi-word queries, ensure all words are present in the item
+    const matchesAllWords = queryWords.length > 1 ? 
+      queryWords.every(word => 
+        searchTerms.some(term => 
+          term.startsWith(word) || 
+          term.includes(` ${word}`) || 
+          term.includes(`${word} `) ||
+          term === word
+        )
+      ) : true;
+
+    // Individual field matching with word boundaries
+    const matchesIndividualFields = 
+      brand.startsWith(query) ||
+      productName.startsWith(query) ||
+      productType.startsWith(query) ||
+      brand.includes(` ${query}`) ||
+      productName.includes(` ${query}`) ||
+      productType.includes(` ${query}`) ||
+      // For single character or very short queries, be more strict
+      (query.length >= 2 && (
+        brand.includes(query) ||
+        productName.includes(query) ||
+        productType.includes(query)
+      ));
+
+    // Combine all matching strategies
+    return (matchesFullQuery && matchesAllWords) || matchesIndividualFields;
+  });
+
+  const sortedSuggestions = filteredSuggestions.sort((a, b) => {
+    const aBrand = a.brand.toLowerCase();
+    const bBrand = b.brand.toLowerCase();
+    const aProduct = a.productName.toLowerCase();
+    const bProduct = b.productName.toLowerCase();
+    const aType = a.type.toLowerCase();
+    const bType = b.type.toLowerCase();
+    const aExactBrand = aBrand === query;
+    const bExactBrand = bBrand === query;
+    if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
+
+    const aBrandStarts = aBrand.startsWith(query);
+    const bBrandStarts = bBrand.startsWith(query);
+    if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
+
+    const aProductStarts = aProduct.startsWith(query);
+    const bProductStarts = bProduct.startsWith(query);
+    if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
+
+    if (queryWords.length > 1) {
+      const aMatchScore = queryWords.reduce((score, word, index) => {
+        if (aBrand.startsWith(word) || aProduct.startsWith(word)) {
+          return score + (queryWords.length - index);
+        }
+        if (aBrand.includes(word) || aProduct.includes(word)) {
+          return score + 1;
+        }
+        return score;
+      }, 0);
+
+      const bMatchScore = queryWords.reduce((score, word, index) => {
+        if (bBrand.startsWith(word) || bProduct.startsWith(word)) {
+          return score + (queryWords.length - index);
+        }
+        if (bBrand.includes(word) || bProduct.includes(word)) {
+          return score + 1;
+        }
+        return score;
+      }, 0);
+
+      if (aMatchScore !== bMatchScore) return bMatchScore - aMatchScore;
     }
 
-    const query = searchQuery?.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
-    
-    const filteredSuggestions = allProductsData.filter(item => {
-      const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word => 
-        item.searchText.some(text => text.includes(word))
-      );
+    const aTypeStarts = aType.startsWith(query);
+    const bTypeStarts = bType.startsWith(query);
+    if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
+    return aBrand.localeCompare(bBrand);
+  });
 
-      const brand = item.brand?.toLowerCase();
-      const productName = item.productName?.toLowerCase();
-      const productType = item.productType?.toLowerCase();
-
-      const matchesIndividualFields = 
-        brand?.includes(query) || 
-        productName?.includes(query) || 
-        productType?.includes(query) ||
-        queryWords.some(word => 
-          brand?.includes(word) || 
-          productName?.includes(word) || 
-          productType?.includes(word)
-        );
-      
-      return matchesFullQuery || matchesAllWords || matchesIndividualFields;
-    });
-
-    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-      const aExactBrand = a.brand.toLowerCase() === query;
-      const bExactBrand = b.brand.toLowerCase() === query;
-      if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
-      
-      const aBrandStarts = a.brand.toLowerCase().startsWith(query);
-      const bBrandStarts = b.brand.toLowerCase().startsWith(query);
-      if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
-      
-      const aProductStarts = a.productName.toLowerCase().startsWith(query);
-      const bProductStarts = b.productName.toLowerCase().startsWith(query);
-      if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
-            const aTypeStarts = a.type.toLowerCase().startsWith(query);
-      const bTypeStarts = b.type.toLowerCase().startsWith(query);
-      if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-            return a.brand.localeCompare(b.brand);
-    });
-
-    return sortedSuggestions.slice(0, 15);
-  }, [searchQuery, allProductsData]);
+  return sortedSuggestions.slice(0, 15);
+}, [searchQuery, allProductsData]);
 
   const handleSearch = async (query) => {
     if (!query.trim()) {
@@ -142,14 +202,14 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     setError("");
 
     try {
-      console.log("Making search request for:", query); 
-      
+      console.log("Making search request for:", query);
+
       const response = await fetch("https://api.the-aysa.com/product-semantic-search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, tab_type: "profit" }),
       });
 
       if (!response.ok) {
@@ -159,23 +219,23 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const result = await response.json();
       const searchData = result.data || [];
 
-        const formatItems = (items) => {
+      const formatItems = (items) => {
         if (!Array.isArray(items)) {
           console.warn("formatItems received non-array:", items);
           return [];
         }
-        
+
         return items.map((item, index) => {
           const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
           const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
           const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
           const productionYear = item["Production Year"] || item["Production Year "] || 0;
-          
+
           return {
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
             brand: (item["Brand"] || "").trim(),
             product_name: (item["Product Name"] || "").trim(),
-            product_type: (item["Product Type"] || "").trim(),
+            product_type: (item["Product Type"] || "").trim(), // Use 'Product Type' for search API
             production_year: parseInt(productionYear) || 0,
             profit_margin: profitMargin,
             profit_made: profitMade,
@@ -224,76 +284,77 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   };
 
   const firstProduct = data.matched?.[0] || {};
- const profitMarginValue = parseFloat(
-  String(firstProduct.profit_margin || "0").replace("%", "")
-);
+  const profitMarginValue = parseFloat(
+    String(firstProduct.profit_margin || "0").replace("%", "")
+  );
 
   const marketPriceValue = firstProduct.market_price || 0;
   const profitValueMade = firstProduct.profit_made_value || 0;
 
-const chartData = {
-  labels: [`Market Price: $${marketPriceValue}`], 
-  datasets: [
-    {
-      label: "Profit Margin",
-      data: [profitMarginValue], 
-      backgroundColor: "#4FC3F7", 
-      categoryPercentage: 0.6,
-      barThickness: 80,
-    },
-  ],
-};
+  const chartData = {
+    labels: [`Market Price: $${marketPriceValue}`],
+    datasets: [
+      {
+        label: "Profit Margin",
+        data: [profitMarginValue],
+        backgroundColor: "#4FC3F7",
+        categoryPercentage: 0.6,
+        barThickness: 80,
+      },
+    ],
+  };
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: function (context) {
-          return `Profit Margin: ${context.raw}%`;
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            return `Profit Margin: ${context.raw}%`;
+          },
         },
       },
     },
-  },
-  scales: {
-    x: {
-      title: {
-        display: true,
-        text: "Product",
-        font: { weight: "bold" },
-      },
-      grid: {
-        display: false,
-      },
-    },
-    y: {
-      beginAtZero: true,
-      max: 100,
-      ticks: {
-        stepSize: 25, 
-        callback: function (value) {
-          return `${value}%`;
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Product",
+          font: { weight: "bold" },
+        },
+        grid: {
+          display: false,
         },
       },
-      title: {
-        display: true,
-        text: "Profit Margin (%)",
-        font: { weight: "bold" },
-      },
-      grid: {
-        color: "#e0e0e0",
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 25,
+          callback: function (value) {
+            return `${value}%`;
+          },
+        },
+        title: {
+          display: true,
+          text: "Profit Margin (%)",
+          font: { weight: "bold" },
+        },
+        grid: {
+          color: "#e0e0e0",
+        },
       },
     },
-  },
-};
+  };
+
   const LoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -307,11 +368,11 @@ const chartOptions = {
   );
 
   const InitialLoadingComponent = () => (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      alignItems="center" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       py={8}
     >
       <CircularProgress size={60} thickness={4} />
@@ -319,7 +380,7 @@ const chartOptions = {
         Loading product data
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, color: "text.disabled" }}>
-        This may take a moment 
+        This may take a moment
       </Typography>
     </Box>
   );
@@ -342,7 +403,7 @@ const chartOptions = {
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
-              if (!newInputValue) { 
+              if (!newInputValue) {
                 setSearchQuery("");
                 setData({ matched: [], compared: [] });
                 return;
@@ -352,25 +413,25 @@ const chartOptions = {
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
             noOptionsText={
-              searchQuery.length < 1 
-                ? "Start typing to search for brands, products, or types..." 
+              searchQuery.length < 1
+                ? "Start typing to search for brands, products, or types..."
                 : "No matching products found"
             }
             disabled={loading}
-            filterOptions={(options) => options} 
+            filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                   {option.image && (
                     <Box sx={{ mr: 2 }}>
-                      <img 
-                        src={option.image} 
+                      <img
+                        src={option.image}
                         alt={option.label}
-                        style={{ 
-                          width: 40, 
-                          height: 40, 
-                          objectFit: 'cover', 
-                          borderRadius: '4px' 
+                        style={{
+                          width: 40,
+                          height: 40,
+                          objectFit: 'cover',
+                          borderRadius: '4px'
                         }}
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -380,7 +441,7 @@ const chartOptions = {
                   )}
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body2" fontWeight="bold">
-                      <span style={{ color: '#1976d2' }}>{option.brand}</span> {option.productName} 
+                      <span style={{ color: '#1976d2' }}>{option.brand}</span> {option.productName}
                       <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.type}</span>
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -511,99 +572,109 @@ const chartOptions = {
             </Box>
           </Box>
 
-          <Typography
-          className="table-heading"
-            variant="h5"
-            align="center"
-            sx={{
-              backgroundColor: "#1976d2",
-              color: "white",
-              py: 2,
-              mt: 6,
-              mb: 0,
-              fontWeight: "bold",
-               fontSize: "1.4rem",
-            }}
-          >
-            Comparing the Profit Margin to two Similar Products.
-          </Typography>
+          {/* Only show the table and comparison heading when there are 2 or more products */}
+          {data.matched.length > 1 && (
+            <>
+              <Typography
+                className="table-heading"
+                variant="h5"
+                align="center"
+                sx={{
+                  backgroundColor: "#1976d2",
+                  color: "white",
+                  py: 2,
+                  mt: 6,
+                  mb: 0,
+                  fontWeight: "bold",
+                  fontSize: "1.4rem",
+                }}
+              >
+                Comparing the Profit Margin to Similar Products.
+              </Typography>
 
-         <Paper elevation={3}>
-<TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
-  <Table>
-    <TableHead sx={{ backgroundColor: "#bbdefb" }}>
-      <TableRow>
-        <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {data.matched.map((row, index) => {
-        const isFirstResult = index === 0;
+              <Paper elevation={3}>
+                <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
+                  <Table>
+                    <TableHead sx={{ backgroundColor: "#bbdefb" }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.matched.map((row, index) => {
+                        const isFirstResult = index === 0;
 
-        return (
-          <TableRow
-            key={row.id}
-            sx={{
-              backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
-              borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
-              "&:hover": { backgroundColor: "#f5f5f5" }
-            }}
-          >
-            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
-              {row.brand}
-            </TableCell>
-            <TableCell>
-              {row.product_url ? (
-                <img
-                  src={row.product_url}
-                  alt={`${row.brand} ${row.product_name}`}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    objectFit: "cover",
-                    borderRadius: "6px"
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBW MjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
-                  }}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    backgroundColor: "#f0f0f0",
-                    borderRadius: "6px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
-                  <Typography variant="caption" color="text.disabled">
-                    No img
-                  </Typography>
-                </Box>
-              )}
-            </TableCell>
-            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
-              {row.product_name}
-            </TableCell>
-            <TableCell>
-              <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
-                {row.profit_margin}
-              </Box>
-            </TableCell>
-          </TableRow>
-        );
-      })}
-    </TableBody>
-  </Table>
-</TableContainer>
-</Paper>
+                        return (
+                          <TableRow
+                            key={row.id}
+                            sx={{
+                              backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
+                              borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
+                              "&:hover": { backgroundColor: "#f5f5f5" }
+                            }}
+                          >
+                            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
+                              {row.brand}
+                            </TableCell>
+                            <TableCell>
+                              {row.product_url ? (
+                                <img
+                                  src={row.product_url}
+                                  alt={`${row.brand} ${row.product_name}`}
+                                  style={{
+                                    width: 60,
+                                    height: 60,
+                                    objectFit: "cover",
+                                    borderRadius: "6px"
+                                  }}
+                                  onError={(e) => {
+                                    e.currentTarget.src =
+                                      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                                  }}
+                                />
+                              ) : (
+                                <Box
+                                  sx={{
+                                    width: 60,
+                                    height: 60,
+                                    backgroundColor: "#f0f0f0",
+                                    borderRadius: "6px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                  }}
+                                >
+                                  <Typography variant="caption" color="text.disabled">
+                                    No img
+                                  </Typography>
+                                </Box>
+                              )}
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
+                              {row.product_name}
+                              {row.product_type && (
+                                <span style={{ color: '#000', fontWeight: 'normal' }}>
+                                  {' - '}{row.product_type}
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
+                                {row.profit_margin}
+                              </Box>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </>
+          )}
         </>
       )}
     </>

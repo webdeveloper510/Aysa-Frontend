@@ -35,13 +35,12 @@ function useMediaQuery(query) {
   return matches;
 }
 
-
 export const Tabs = () => {
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const getSearchLabel = () => {
-    if (activeTab === null) {
+    if (activeTab === 0) {
       return "See what brands don't want you to know";
     }
     switch (activeTab) {
@@ -63,9 +62,7 @@ export const Tabs = () => {
               <div key={index} className="accordion-item">
                 <div
                   className={`accordion-header ${isOpen ? "open" : ""}`}
-                  onClick={() =>
-                    setActiveTab(isOpen ? null : index)
-                  }
+                  onClick={() => setActiveTab(isOpen ? 0 : index)}
                 >
                   <span>{tab.label}</span>
                   <span className={`arrow ${isOpen ? "down" : "right"}`}>
@@ -74,7 +71,9 @@ export const Tabs = () => {
                 </div>
                 {isOpen && (
                   <div className="accordion-content">
-                    {React.cloneElement(tab.content, { searchLabel: getSearchLabel() })}
+                    {React.cloneElement(tab.content, {
+                      searchLabel: getSearchLabel(),
+                    })}
                   </div>
                 )}
               </div>
@@ -88,7 +87,9 @@ export const Tabs = () => {
             {tabs.map((tab, index) => (
               <div
                 key={index}
-                className={`outer-circle ${activeTab === index ? "active" : ""}`}
+                className={`outer-circle ${
+                  activeTab === index ? "active" : ""
+                }`}
                 onClick={() => setActiveTab(index)}
               >
                 <div className="inner-circle">

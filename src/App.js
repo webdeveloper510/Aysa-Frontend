@@ -14,7 +14,7 @@ function App() {
           <p className="header" onClick={test}>
             Aysa
           </p>
-          <label>Providing the true cost of goods to leverage purchasing power for good</label>
+          <label>Empowering smarter spending with real data.</label>
         </header>
         <Router />
 

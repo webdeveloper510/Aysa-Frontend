@@ -19,26 +19,30 @@ import {
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
-export const TabOne = ({ searchLabel = "Search by brands, products or types" }) => {
-
+export const TabOne = ({
+  searchLabel = "Search by brands, products or types",
+}) => {
   const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [allProductsData, setAllProductsData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
-
+  const [status, setStatus] = useState(0);
+  console.log("All Products Data:", data);
   useEffect(() => {
     const fetchAllProductsData = async () => {
       setInitialDataLoading(true);
       try {
-        const response = await fetch("https://api.the-aysa.com/get-profit-margin-data", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
+        const response = await fetch(
+          "https://api.the-aysa.com/get-profit-margin-data",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -49,32 +53,50 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
-          value: `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`.trim(),
-          brand: item.Brand || '',
-          productName: item["Product Name"] || '',
-          type: item.Type || '',
-          category: item.Category || '',
-          profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
-          productionYear: item["Production Year"] || item["Production Year "] || "N/A",
+          label: `${item.Brand || ""} ${item["Product Name"] || ""} ${
+            item.Type || ""
+          }`.trim(),
+          value: `${item.Brand || ""} ${item["Product Name"] || ""} ${
+            item.Type || ""
+          }`.trim(),
+          brand: item.Brand || "",
+          productName: item["Product Name"] || "",
+          type: item.Type || "",
+          category: item.Category || "",
+          profitMargin:
+            item["Profit Margin"] || item["Profit Margin "] || "N/A",
+          productionYear:
+            item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           searchText: [
-            (item.Brand || '')?.toLowerCase(),
-            (item["Product Name"] || '')?.toLowerCase(),
-            (item.Type || '')?.toLowerCase(),
-            (item.Category || '')?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item.Type || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item.Category || ''}`?.toLowerCase(),
-            `${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(),
-            `${item["Product Name"] || ''} ${item.Category || ''}`?.toLowerCase(),
-            `${item.Type || ''} ${item.Category || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Category || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item.Type || ''} ${item.Category || ''}`?.toLowerCase(),
-            `${item["Product Name"] || ''} ${item.Type || ''} ${item.Category || ''}`?.toLowerCase(),
-            `${item.Brand || ''} ${item["Product Name"] || ''} ${item.Type || ''} ${item.Category || ''}`?.toLowerCase()
-          ].filter(text => text.trim() !== '')
+            (item.Brand || "")?.toLowerCase(),
+            (item["Product Name"] || "")?.toLowerCase(),
+            (item.Type || "")?.toLowerCase(),
+            (item.Category || "")?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""}`?.toLowerCase(),
+            `${item.Brand || ""} ${item.Type || ""}`?.toLowerCase(),
+            `${item.Brand || ""} ${item.Category || ""}`?.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Type || ""}`?.toLowerCase(),
+            `${item["Product Name"] || ""} ${
+              item.Category || ""
+            }`?.toLowerCase(),
+            `${item.Type || ""} ${item.Category || ""}`?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${
+              item.Type || ""
+            }`?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${
+              item.Category || ""
+            }`?.toLowerCase(),
+            `${item.Brand || ""} ${item.Type || ""} ${
+              item.Category || ""
+            }`?.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Type || ""} ${
+              item.Category || ""
+            }`?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${
+              item.Type || ""
+            } ${item.Category || ""}`?.toLowerCase(),
+          ].filter((text) => text.trim() !== ""),
         }));
 
         setAllProductsData(formattedData);
@@ -91,23 +113,27 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
   // Modified suggestions to only show after 3 characters
   const suggestions = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 3 || allProductsData.length === 0) {
+    if (
+      !searchQuery ||
+      searchQuery.length < 3 ||
+      allProductsData.length === 0
+    ) {
       return [];
     }
 
     const query = searchQuery?.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
 
-    const filteredSuggestions = allProductsData.filter(item => {
-      const brand = item.brand?.toLowerCase() || '';
-      const productName = item.productName?.toLowerCase() || '';
-      const productType = item.type?.toLowerCase() || '';
-      const category = item.category?.toLowerCase() || '';
-      
+    const filteredSuggestions = allProductsData.filter((item) => {
+      const brand = item.brand?.toLowerCase() || "";
+      const productName = item.productName?.toLowerCase() || "";
+      const productType = item.type?.toLowerCase() || "";
+      const category = item.category?.toLowerCase() || "";
+
       // Create search terms for exact matching
       const searchTerms = [
         brand,
-        productName, 
+        productName,
         productType,
         category,
         `${brand} ${productName}`.trim(),
@@ -120,27 +146,33 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         `${brand} ${productName} ${category}`.trim(),
         `${brand} ${productType} ${category}`.trim(),
         `${productName} ${productType} ${category}`.trim(),
-        `${brand} ${productName} ${productType} ${category}`.trim()
-      ].filter(term => term.length > 0);
+        `${brand} ${productName} ${productType} ${category}`.trim(),
+      ].filter((term) => term.length > 0);
 
       // Check if the full query matches any search term (starts with or includes)
-      const matchesFullQuery = searchTerms.some(term => 
-        term.startsWith(query) || term.includes(` ${query}`) || term.includes(`${query} `)
+      const matchesFullQuery = searchTerms.some(
+        (term) =>
+          term.startsWith(query) ||
+          term.includes(` ${query}`) ||
+          term.includes(`${query} `)
       );
 
       // For multi-word queries, ensure all words are present in the item
-      const matchesAllWords = queryWords.length > 1 ? 
-        queryWords.every(word => 
-          searchTerms.some(term => 
-            term.startsWith(word) || 
-            term.includes(` ${word}`) || 
-            term.includes(`${word} `) ||
-            term === word
-          )
-        ) : true;
+      const matchesAllWords =
+        queryWords.length > 1
+          ? queryWords.every((word) =>
+              searchTerms.some(
+                (term) =>
+                  term.startsWith(word) ||
+                  term.includes(` ${word}`) ||
+                  term.includes(`${word} `) ||
+                  term === word
+              )
+            )
+          : true;
 
       // Individual field matching with word boundaries
-      const matchesIndividualFields = 
+      const matchesIndividualFields =
         brand.startsWith(query) ||
         productName.startsWith(query) ||
         productType.startsWith(query) ||
@@ -150,12 +182,11 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         productType.includes(` ${query}`) ||
         category.includes(` ${query}`) ||
         // For queries 3+ characters, allow substring matching
-        (query.length >= 3 && (
-          brand.includes(query) ||
-          productName.includes(query) ||
-          productType.includes(query) ||
-          category.includes(query)
-        ));
+        (query.length >= 3 &&
+          (brand.includes(query) ||
+            productName.includes(query) ||
+            productType.includes(query) ||
+            category.includes(query)));
 
       // Combine all matching strategies
       return (matchesFullQuery && matchesAllWords) || matchesIndividualFields;
@@ -170,7 +201,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const bType = b.type.toLowerCase();
       const aCategory = a.category.toLowerCase();
       const bCategory = b.category.toLowerCase();
-      
+
       const aExactBrand = aBrand === query;
       const bExactBrand = bBrand === query;
       if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
@@ -181,28 +212,46 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
 
       const aProductStarts = aProduct.startsWith(query);
       const bProductStarts = bProduct.startsWith(query);
-      if (aProductStarts !== bProductStarts) return bProductStarts - aProductStarts;
+      if (aProductStarts !== bProductStarts)
+        return bProductStarts - aProductStarts;
 
       const aCategoryStarts = aCategory.startsWith(query);
       const bCategoryStarts = bCategory.startsWith(query);
-      if (aCategoryStarts !== bCategoryStarts) return bCategoryStarts - aCategoryStarts;
+      if (aCategoryStarts !== bCategoryStarts)
+        return bCategoryStarts - aCategoryStarts;
 
       if (queryWords.length > 1) {
         const aMatchScore = queryWords.reduce((score, word, index) => {
-          if (aBrand.startsWith(word) || aProduct.startsWith(word) || aCategory.startsWith(word)) {
+          if (
+            aBrand.startsWith(word) ||
+            aProduct.startsWith(word) ||
+            aCategory.startsWith(word)
+          ) {
             return score + (queryWords.length - index);
           }
-          if (aBrand.includes(word) || aProduct.includes(word) || aCategory.includes(word)) {
+          if (
+            aBrand.includes(word) ||
+            aProduct.includes(word) ||
+            aCategory.includes(word)
+          ) {
             return score + 1;
           }
           return score;
         }, 0);
 
         const bMatchScore = queryWords.reduce((score, word, index) => {
-          if (bBrand.startsWith(word) || bProduct.startsWith(word) || bCategory.startsWith(word)) {
+          if (
+            bBrand.startsWith(word) ||
+            bProduct.startsWith(word) ||
+            bCategory.startsWith(word)
+          ) {
             return score + (queryWords.length - index);
           }
-          if (bBrand.includes(word) || bProduct.includes(word) || bCategory.includes(word)) {
+          if (
+            bBrand.includes(word) ||
+            bProduct.includes(word) ||
+            bCategory.includes(word)
+          ) {
             return score + 1;
           }
           return score;
@@ -214,7 +263,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
       const aTypeStarts = aType.startsWith(query);
       const bTypeStarts = bType.startsWith(query);
       if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-      
+
       return aBrand.localeCompare(bBrand);
     });
 
@@ -225,29 +274,37 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
     if (!query.trim()) {
       setData({ matched: [], compared: [] });
       setSearchQuery("");
+      setStatus(0);
       return;
     }
 
     setSearchQuery(query);
+    setStatus(0);
     setLoading(true);
     setError("");
 
     try {
       console.log("Making search request for:", query);
 
-      const response = await fetch("https://api.the-aysa.com/product-semantic-search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, tab_type: "profit" }),
-      });
+      const response = await fetch(
+        "https://api.the-aysa.com/product-semantic-search",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query, tab_type: "profit" }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
+      console.log(result.status);
+
+      setStatus(result.status);
       const searchData = result.data || [];
 
       const formatItems = (items) => {
@@ -257,10 +314,15 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         }
 
         return items.map((item, index) => {
-          const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
-          const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
-          const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
-          const productionYear = item["Production Year"] || item["Production Year "] || 0;
+          const profitMargin = String(
+            item["Profit Margin"] || item["Profit Margin "] || "0%"
+          );
+          const profitMade =
+            item["Profit Made"] || item["Profit Made "] || "$0";
+          const releasePrice =
+            item["Release Price"] || item["Release Price "] || "$0";
+          const productionYear =
+            item["Production Year"] || item["Production Year "] || 0;
 
           return {
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
@@ -275,8 +337,12 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             category: item["Category"] || "",
             similarity: item["similarity"] || 0,
             cluster: item["cluster"] || 0,
-            market_price: parseFloat(releasePrice?.replace(/[^0-9.]/g, "") || "0"),
-            profit_made_value: parseFloat(profitMade?.replace(/[^0-9.]/g, "") || "0"),
+            market_price: parseFloat(
+              releasePrice?.replace(/[^0-9.]/g, "") || "0"
+            ),
+            profit_made_value: parseFloat(
+              profitMade?.replace(/[^0-9.]/g, "") || "0"
+            ),
           };
         });
       };
@@ -286,10 +352,11 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         matched: formattedData,
         compared: [],
       });
-
     } catch (err) {
       console.error("Search failed:", err);
-      setError(`Failed to load product data: ${err.message}. Please try again.`);
+      setError(
+        `Failed to load product data: ${err.message}. Please try again.`
+      );
       setData({ matched: [], compared: [] });
     } finally {
       setLoading(false);
@@ -304,12 +371,16 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
   };
 
   const handleSuggestionSelect = (event, value) => {
-    if (value && typeof value === 'object') {
+    if (value && typeof value === "object") {
       const selectedQuery = value.value;
       setSearchQuery(selectedQuery);
+      setStatus(0);
+
       handleSearch(selectedQuery);
-    } else if (typeof value === 'string') {
+    } else if (typeof value === "string") {
       setSearchQuery(value);
+      setStatus(0);
+
       handleSearch(value);
     }
   };
@@ -429,17 +500,20 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             freeSolo
             options={suggestions}
             getOptionLabel={(option) => {
-              if (typeof option === 'string') return option;
-              return option.label || '';
+              if (typeof option === "string") return option;
+              return option.label || "";
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
                 setSearchQuery("");
+                setStatus(0);
+
                 setData({ matched: [], compared: [] });
                 return;
               }
               setSearchQuery(newInputValue);
+              setStatus(0);
             }}
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}
@@ -454,7 +528,9 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
             filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", width: "100%" }}
+                >
                   {option.image && (
                     <Box sx={{ mr: 2 }}>
                       <img
@@ -463,20 +539,29 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
                         style={{
                           width: 40,
                           height: 40,
-                          objectFit: 'cover',
-                          borderRadius: '4px'
+                          objectFit: "cover",
+                          borderRadius: "4px",
                         }}
                         onError={(e) => {
-                          e.target.style.display = 'none';
+                          e.target.style.display = "none";
                         }}
                       />
                     </Box>
                   )}
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body2" fontWeight="bold">
-                      <span style={{ color: '#1976d2' }}>{option.brand}</span> {option.productName}
-                      <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.type}</span>
-                      {option.category && <span style={{ color: '#999', fontWeight: 'normal' }}> • {option.category}</span>}
+                      <span style={{ color: "#1976d2" }}>{option.brand}</span>{" "}
+                      {option.productName}
+                      <span style={{ color: "#666", fontWeight: "normal" }}>
+                        {" "}
+                        - {option.type}
+                      </span>
+                      {option.category && (
+                        <span style={{ color: "#999", fontWeight: "normal" }}>
+                          {" "}
+                          • {option.category}
+                        </span>
+                      )}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {option.profitMargin} margin • {option.productionYear}
@@ -519,19 +604,48 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
         </Box>
       )}
 
-      {!loading && searchQuery && !data.matched.length && !data.compared.length && !error && suggestions.length === 0 && (
-        <Box textAlign="center" my={6}>
-          <Typography variant="h6" color="text.secondary">
-            No Match found for "<strong>{searchQuery}</strong>"
-          </Typography>
-        </Box>
+      {!loading && searchQuery && !error && (
+        <>
+          {/* Case 1: API status 404 */}
+          {status === 404 && (
+            <Box textAlign="center" my={6}>
+              <Typography variant="h6" color="text.secondary">
+                Product Not Matched with "<strong>{searchQuery}</strong>"
+              </Typography>
+            </Box>
+          )}
+
+          {/* Case 2: No API hit yet (status === 0), but suggestions exist */}
+          {status === 0 && suggestions.length > 0 && !data.matched.length && (
+            <Box textAlign="center" my={6}>
+              <Typography variant="h6" color="text.secondary">
+                Product Not Matched with "<strong>{searchQuery}</strong>"
+              </Typography>
+            </Box>
+          )}
+
+          {/* Case 3: No API hit, no suggestions */}
+          {status === 0 && suggestions.length === 0 && !data.matched.length && (
+            <Box textAlign="center" my={6}>
+              <Typography variant="h6" color="text.secondary">
+                Product Not Matched with "<strong>{searchQuery}</strong>"
+              </Typography>
+            </Box>
+          )}
+        </>
       )}
 
       {!loading && data.matched.length > 0 && (
         <>
-          <Typography variant="h4" align="center" fontWeight="bold" my={4} sx={{ textTransform: 'capitalize' }}>
-            {firstProduct.brand} {firstProduct.product_name}{" "}
-            {firstProduct.product_type} ({firstProduct.production_year})
+           <Typography
+            variant="h4"
+            align="center"
+            fontWeight="bold"
+            my={4}
+            sx={{ textTransform: "capitalize" }}
+          >
+            {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`
+              .replace(/\b(\w+)\s+\1\b/gi, "$1")}
           </Typography>
 
           <Box
@@ -627,14 +741,21 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
               </Typography>
 
               <Paper elevation={3}>
-                <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto" }}>
+                <TableContainer
+                  component={Paper}
+                  sx={{ maxWidth: "100%", overflowX: "auto" }}
+                >
                   <Table>
                     <TableHead sx={{ backgroundColor: "#bbdefb" }}>
                       <TableRow>
                         <TableCell sx={{ fontWeight: "bold" }}>Brand</TableCell>
                         <TableCell sx={{ fontWeight: "bold" }}>Image</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>Product Name</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>Profit Margin</TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>
+                          Product Name
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: "bold" }}>
+                          Profit Margin
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -645,12 +766,18 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
                           <TableRow
                             key={row.id}
                             sx={{
-                              backgroundColor: isFirstResult ? "#e3f2fd" : "inherit",
-                              borderLeft: isFirstResult ? "4px solid #1976d2" : "none",
-                              "&:hover": { backgroundColor: "#f5f5f5" }
+                              backgroundColor: isFirstResult
+                                ? "#e3f2fd"
+                                : "inherit",
+                              borderLeft: isFirstResult
+                                ? "4px solid #1976d2"
+                                : "none",
+                              "&:hover": { backgroundColor: "#f5f5f5" },
                             }}
                           >
-                            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : 500 }}>
+                            <TableCell
+                              sx={{ fontWeight: isFirstResult ? "bold" : 500 }}
+                            >
                               {row.brand}
                             </TableCell>
                             <TableCell>
@@ -662,7 +789,7 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
                                     width: 60,
                                     height: 60,
                                     objectFit: "cover",
-                                    borderRadius: "6px"
+                                    borderRadius: "6px",
                                   }}
                                   onError={(e) => {
                                     e.currentTarget.src =
@@ -678,25 +805,40 @@ export const TabOne = ({ searchLabel = "Search by brands, products or types" }) 
                                     borderRadius: "6px",
                                     display: "flex",
                                     alignItems: "center",
-                                    justifyContent: "center"
+                                    justifyContent: "center",
                                   }}
                                 >
-                                  <Typography variant="caption" color="text.disabled">
+                                  <Typography
+                                    variant="caption"
+                                    color="text.disabled"
+                                  >
                                     No img
                                   </Typography>
                                 </Box>
                               )}
                             </TableCell>
-                            <TableCell sx={{ fontWeight: isFirstResult ? "bold" : "normal" }}>
+                            <TableCell
+                              sx={{
+                                fontWeight: isFirstResult ? "bold" : "normal",
+                              }}
+                            >
                               {row.product_name}
                               {row.product_type && (
-                                <span style={{ color: '#000', fontWeight: 'normal' }}>
-                                  {' - '}{row.product_type}
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontWeight: "normal",
+                                  }}
+                                >
+                                  {" - "}
+                                  {row.product_type}
                                 </span>
                               )}
                             </TableCell>
                             <TableCell>
-                              <Box sx={{ fontWeight: "bold", color: "#1976d2" }}>
+                              <Box
+                                sx={{ fontWeight: "bold", color: "#1976d2" }}
+                              >
                                 {row.profit_margin}
                               </Box>
                             </TableCell>

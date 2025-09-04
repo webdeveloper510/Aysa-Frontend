@@ -341,9 +341,13 @@ export const TabOne = ({
                 setStatus(0);
                 setData({ matched: [], compared: [] });
               } else {
-                // unselect previously chosen option when user types
                 setSelectedOption(null);
                 setStatus(0);
+              }
+            }}
+            onBlur={(event) => {
+              if (searchQuery.trim()) {
+                handleSearch(searchQuery.trim());
               }
             }}
             onChange={(event, newValue) => {

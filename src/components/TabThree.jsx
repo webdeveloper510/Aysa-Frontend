@@ -275,6 +275,11 @@ export const TabThree = () => {
               return option.label || "";
             }}
             inputValue={searchQuery}
+            onBlur={(event) => {
+              if (searchQuery.trim()) {
+                handleSearch(searchQuery.trim());
+              }
+            }}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
                 setSearchQuery("");

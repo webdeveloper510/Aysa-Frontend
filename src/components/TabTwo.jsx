@@ -50,9 +50,8 @@ export const TabTwo = () => {
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${
-            item.Year || ""
-          })`.trim(),
+          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${item.Year || ""
+            })`.trim(),
           value: item["Company Name"] || "",
           companyName: item["Company Name"] || "",
           ceoName: item["CEO Name"] || "",
@@ -63,14 +62,12 @@ export const TabTwo = () => {
             (item["Company Name"] || "").toLowerCase(),
             (item["CEO Name"] || "").toLowerCase(),
             (item.Year || "").toString().toLowerCase(),
-            `${item["Company Name"] || ""} ${
-              item["CEO Name"] || ""
-            }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item["CEO Name"] || ""
+              }`.toLowerCase(),
             `${item["Company Name"] || ""} ${item.Year || ""}`.toLowerCase(),
             `${item["CEO Name"] || ""} ${item.Year || ""}`.toLowerCase(),
-            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${
-              item.Year || ""
-            }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${item.Year || ""
+              }`.toLowerCase(),
           ].filter((text) => text.trim() !== ""),
         }));
 
@@ -244,7 +241,7 @@ export const TabTwo = () => {
       };
 
       console.log("Selected suggestion payload:", payload);
-      
+
       // Instead of using the formatted label, use just the company name
       // This avoids the double slash issue in the API call
       const searchTerm = value.companyName; // or value.ceoName if you prefer
@@ -323,6 +320,11 @@ export const TabTwo = () => {
               }
               setSelectedOption(null);
               setSearchQuery(newInputValue);
+            }}
+            onBlur={(event) => {
+              if (searchQuery.trim()) {
+                handleSearch(searchQuery.trim());
+              }
             }}
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}

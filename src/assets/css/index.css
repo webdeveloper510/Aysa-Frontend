@@ -265,7 +265,7 @@ header.App-header label {
   z-index: -1;
 }
 
-.css-1tlcqt-MuiAutocomplete-root .MuiOutlinedInput-root {
+.autoinput .MuiOutlinedInput-root {
   padding: 9px;
   min-height: 50px;
   background: #fff;

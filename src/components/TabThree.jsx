@@ -4,7 +4,7 @@ import {
   Typography,
   TextField,
   Autocomplete,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 
@@ -48,17 +48,17 @@ export const TabThree = () => {
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item["Company Name"] || ''} (${item.Year || ''})`.trim(),
-          value: item["Company Name"] || '',
-          companyName: item["Company Name"] || '',
-          year: item.Year || '',
+          label: `${item["Company Name"] || ""} (${item.Year || ""})`.trim(),
+          value: item["Company Name"] || "",
+          companyName: item["Company Name"] || "",
+          year: item.Year || "",
           taxesPaid: item["Taxes Paid"] || item["Tax Paid"] || "N/A",
           taxesAvoided: item["Taxes Avoided"] || item["Tax Avoided"] || "N/A",
           searchText: [
-            (item["Company Name"] || '').toLowerCase(),
-            (item.Year || '').toString().toLowerCase(),
-            `${item["Company Name"] || ''} ${item.Year || ''}`.toLowerCase(),
-          ].filter(text => text.trim() !== '')
+            (item["Company Name"] || "").toLowerCase(),
+            (item.Year || "").toString().toLowerCase(),
+            `${item["Company Name"] || ""} ${item.Year || ""}`.toLowerCase(),
+          ].filter((text) => text.trim() !== ""),
         }));
 
         setAllTaxData(formattedData);
@@ -79,12 +79,14 @@ export const TabThree = () => {
     }
 
     const query = searchQuery.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
 
-    const filteredSuggestions = allTaxData.filter(item => {
-      const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word =>
-        item.searchText.some(text => text.includes(word))
+    const filteredSuggestions = allTaxData.filter((item) => {
+      const matchesFullQuery = item.searchText.some((text) =>
+        text.includes(query)
+      );
+      const matchesAllWords = queryWords.every((word) =>
+        item.searchText.some((text) => text.includes(word))
       );
       const companyName = item.companyName.toLowerCase();
       const year = item.year.toString().toLowerCase();
@@ -92,9 +94,8 @@ export const TabThree = () => {
       const matchesIndividualFields =
         companyName.includes(query) ||
         year.includes(query) ||
-        queryWords.some(word =>
-          companyName.includes(word) ||
-          year.includes(word)
+        queryWords.some(
+          (word) => companyName.includes(word) || year.includes(word)
         );
 
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
@@ -106,7 +107,8 @@ export const TabThree = () => {
       if (aExactCompany !== bExactCompany) return bExactCompany - aExactCompany;
       const aCompanyStarts = a.companyName.toLowerCase().startsWith(query);
       const bCompanyStarts = b.companyName.toLowerCase().startsWith(query);
-      if (aCompanyStarts !== bCompanyStarts) return bCompanyStarts - aCompanyStarts;
+      if (aCompanyStarts !== bCompanyStarts)
+        return bCompanyStarts - aCompanyStarts;
       const aYearMatch = a.year.toString() === query;
       const bYearMatch = b.year.toString() === query;
       if (aYearMatch !== bYearMatch) return bYearMatch - aYearMatch;
@@ -133,22 +135,27 @@ export const TabThree = () => {
     try {
       console.log("Making search request for:", query);
 
-      const res = await axios.post("https://api.the-aysa.com/tax-semantic-search", {
-        query: query,
-        tab_type: "ceo-worker"
-      });
+      const res = await axios.post(
+        "https://api.the-aysa.com/tax-semantic-search",
+        {
+          query: query,
+          tab_type: "ceo-worker",
+        }
+      );
 
-      console.log("Tax search API response:", res.data)
+      console.log("Tax search API response:", res.data);
       const rawRows = res.data?.data || [];
 
       console.log("Raw rows from API:", rawRows);
 
       const rows = rawRows.map((row, index) => ({
-        id: `${(row["Company Name"] || '').trim()}-${(row["Year"] || '').toString().trim()}-${index}`,
-        company_name: (row["Company Name"] || '').trim(),
-        year: (row["Year"] || '').toString().trim(),
-        tax_paid: (row["Taxes Paid"] || '').trim(),
-        tax_avoid: (row["Taxes Avoided"] || '').trim(),
+        id: `${(row["Company Name"] || "").trim()}-${(row["Year"] || "")
+          .toString()
+          .trim()}-${index}`,
+        company_name: (row["Company Name"] || "").trim(),
+        year: (row["Year"] || "").toString().trim(),
+        tax_paid: (row["Taxes Paid"] || "").trim(),
+        tax_avoid: (row["Taxes Avoided"] || "").trim(),
       }));
 
       console.log("Processed rows:", rows);
@@ -158,15 +165,16 @@ export const TabThree = () => {
       const searchTerms = query.toLowerCase().trim().split(/\s+/);
 
       const filtered = rows.filter((row) => {
-        const companyName = (row.company_name || '').toLowerCase();
-        const year = (row.year || '').toString().toLowerCase();
+        const companyName = (row.company_name || "").toLowerCase();
+        const year = (row.year || "").toString().toLowerCase();
 
-        return searchTerms.some(term =>
-          companyName.includes(term) ||
-          year.includes(term)
-        ) ||
+        return (
+          searchTerms.some(
+            (term) => companyName.includes(term) || year.includes(term)
+          ) ||
           companyName.includes(query.toLowerCase()) ||
-          year.includes(query.toLowerCase());
+          year.includes(query.toLowerCase())
+        );
       });
 
       console.log("Filtered data before sorting:", filtered);
@@ -195,26 +203,23 @@ export const TabThree = () => {
   };
 
   const handleSuggestionSelect = (event, value) => {
-    if (value && typeof value === 'object') {
+    if (value && typeof value === "object") {
       const payload = {
         companyName: value.companyName,
         year: value.year,
         taxesPaid: value.taxesPaid,
-        taxesAvoided: value.taxesAvoided
+        taxesAvoided: value.taxesAvoided,
       };
       setSelectedItem(payload);
       setSearchQuery(value.label);
       const searchTerm = `${value.companyName} ${value.year}`;
       handleSearch(searchTerm);
-
-    } else if (typeof value === 'string') {
-
-      const cleanValue = value.replace(/\\/g, '').trim();
+    } else if (typeof value === "string") {
+      const cleanValue = value.replace(/\\/g, "").trim();
       setSearchQuery(cleanValue);
       handleSearch(cleanValue);
     }
   };
-
 
   const LoadingComponent = () => (
     <Box
@@ -263,9 +268,10 @@ export const TabThree = () => {
           <Autocomplete
             freeSolo
             options={suggestions}
+            className="autoinput"
             getOptionLabel={(option) => {
-              if (typeof option === 'string') return option;
-              return option.label || '';
+              if (typeof option === "string") return option;
+              return option.label || "";
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
@@ -287,11 +293,18 @@ export const TabThree = () => {
             filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", width: "100%" }}
+                >
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body2" fontWeight="bold">
-                      <span style={{ color: '#1976d2' }}>{option.companyName}</span>
-                      <span style={{ color: '#999', fontWeight: 'normal' }}> ({option.year})</span>
+                      <span style={{ color: "#1976d2" }}>
+                        {option.companyName}
+                      </span>
+                      <span style={{ color: "#999", fontWeight: "normal" }}>
+                        {" "}
+                        ({option.year})
+                      </span>
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Paid: {option.taxesPaid} • Avoided: {option.taxesAvoided}
@@ -347,7 +360,10 @@ export const TabThree = () => {
       )}
 
       {!!filteredData.length && (
-        <Box sx={{ p: 2, display: "flex", flexDirection: "column" }} className="nopadding">
+        <Box
+          sx={{ p: 2, display: "flex", flexDirection: "column" }}
+          className="nopadding"
+        >
           <Box className="tab3Table" sx={{ overflowX: "auto" }}>
             <Box sx={{ minWidth: "750px" }}>
               {/* Header */}

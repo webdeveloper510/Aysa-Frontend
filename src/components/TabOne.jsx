@@ -498,6 +498,7 @@ export const TabOne = ({
         <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
+            className="autoinput"
             options={suggestions}
             getOptionLabel={(option) => {
               if (typeof option === "string") return option;
@@ -637,15 +638,17 @@ export const TabOne = ({
 
       {!loading && data.matched.length > 0 && (
         <>
-           <Typography
+          <Typography
             variant="h4"
             align="center"
             fontWeight="bold"
             my={4}
             sx={{ textTransform: "capitalize" }}
           >
-            {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`
-              .replace(/\b(\w+)\s+\1\b/gi, "$1")}
+            {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+              /\b(\w+)\s+\1\b/gi,
+              "$1"
+            )}
           </Typography>
 
           <Box

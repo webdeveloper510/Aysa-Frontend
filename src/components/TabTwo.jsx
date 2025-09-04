@@ -4,7 +4,7 @@ import {
   Typography,
   TextField,
   Autocomplete,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 
@@ -31,12 +31,15 @@ export const TabTwo = () => {
     const fetchAllCeoWorkerData = async () => {
       setInitialDataLoading(true);
       try {
-        const response = await fetch("https://api.the-aysa.com/get-ceo-worker-data", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "https://api.the-aysa.com/get-ceo-worker-data",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -47,22 +50,28 @@ export const TabTwo = () => {
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item["Company Name"] || ''} - ${item["CEO Name"] || ''} (${item.Year || ''})`.trim(),
-          value: item["Company Name"] || '',
-          companyName: item["Company Name"] || '',
-          ceoName: item["CEO Name"] || '',
-          year: item.Year || '',
+          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${
+            item.Year || ""
+          })`.trim(),
+          value: item["Company Name"] || "",
+          companyName: item["Company Name"] || "",
+          ceoName: item["CEO Name"] || "",
+          year: item.Year || "",
           ceoCompensation: item["CEO Total Compensation"] || "N/A",
           workerSalary: item["Frontline Worker Salary"] || "N/A",
           searchText: [
-            (item["Company Name"] || '').toLowerCase(),
-            (item["CEO Name"] || '').toLowerCase(),
-            (item.Year || '').toString().toLowerCase(),
-            `${item["Company Name"] || ''} ${item["CEO Name"] || ''}`.toLowerCase(),
-            `${item["Company Name"] || ''} ${item.Year || ''}`.toLowerCase(),
-            `${item["CEO Name"] || ''} ${item.Year || ''}`.toLowerCase(),
-            `${item["Company Name"] || ''} ${item["CEO Name"] || ''} ${item.Year || ''}`.toLowerCase(),
-          ].filter(text => text.trim() !== '')
+            (item["Company Name"] || "").toLowerCase(),
+            (item["CEO Name"] || "").toLowerCase(),
+            (item.Year || "").toString().toLowerCase(),
+            `${item["Company Name"] || ""} ${
+              item["CEO Name"] || ""
+            }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item.Year || ""}`.toLowerCase(),
+            `${item["CEO Name"] || ""} ${item.Year || ""}`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${
+              item.Year || ""
+            }`.toLowerCase(),
+          ].filter((text) => text.trim() !== ""),
         }));
 
         setAllCeoWorkerData(formattedData);
@@ -78,17 +87,23 @@ export const TabTwo = () => {
   }, []);
 
   const suggestions = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 1 || allCeoWorkerData.length === 0) {
+    if (
+      !searchQuery ||
+      searchQuery.length < 1 ||
+      allCeoWorkerData.length === 0
+    ) {
       return [];
     }
 
     const query = searchQuery.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
 
-    const filteredSuggestions = allCeoWorkerData.filter(item => {
-      const matchesFullQuery = item.searchText.some(text => text.includes(query));
-      const matchesAllWords = queryWords.every(word =>
-        item.searchText.some(text => text.includes(word))
+    const filteredSuggestions = allCeoWorkerData.filter((item) => {
+      const matchesFullQuery = item.searchText.some((text) =>
+        text.includes(query)
+      );
+      const matchesAllWords = queryWords.every((word) =>
+        item.searchText.some((text) => text.includes(word))
       );
       const companyName = item.companyName.toLowerCase();
       const ceoName = item.ceoName.toLowerCase();
@@ -98,10 +113,11 @@ export const TabTwo = () => {
         companyName.includes(query) ||
         ceoName.includes(query) ||
         year.includes(query) ||
-        queryWords.some(word =>
-          companyName.includes(word) ||
-          ceoName.includes(word) ||
-          year.includes(word)
+        queryWords.some(
+          (word) =>
+            companyName.includes(word) ||
+            ceoName.includes(word) ||
+            year.includes(word)
         );
 
       return matchesFullQuery || matchesAllWords || matchesIndividualFields;
@@ -116,7 +132,8 @@ export const TabTwo = () => {
       if (aExactCeo !== bExactCeo) return bExactCeo - aExactCeo;
       const aCompanyStarts = a.companyName.toLowerCase().startsWith(query);
       const bCompanyStarts = b.companyName.toLowerCase().startsWith(query);
-      if (aCompanyStarts !== bCompanyStarts) return bCompanyStarts - aCompanyStarts;
+      if (aCompanyStarts !== bCompanyStarts)
+        return bCompanyStarts - aCompanyStarts;
       const aCeoStarts = a.ceoName.toLowerCase().startsWith(query);
       const bCeoStarts = b.ceoName.toLowerCase().startsWith(query);
       if (aCeoStarts !== bCeoStarts) return bCeoStarts - aCeoStarts;
@@ -153,12 +170,14 @@ export const TabTwo = () => {
       console.log("CEO-Worker search API response:", res.data);
       const rawData = res.data?.data || [];
       const data = rawData.map((row, index) => ({
-        id: `${(row["Company Name"] || '').trim()}-${(row["CEO Name"] || '').trim()}-${(row["Year"] || '').toString().trim()}-${index}`,
-        company_name: (row["Company Name"] || '').trim(),
-        year: (row["Year"] || '').toString().trim(),
-        ceo_name: (row["CEO Name"] || '').trim(),
-        ceo_total_compensation: (row["CEO Total Compensation"] || '').trim(),
-        worker_salary: (row["Frontline Worker Salary"] || '').trim(),
+        id: `${(row["Company Name"] || "").trim()}-${(
+          row["CEO Name"] || ""
+        ).trim()}-${(row["Year"] || "").toString().trim()}-${index}`,
+        company_name: (row["Company Name"] || "").trim(),
+        year: (row["Year"] || "").toString().trim(),
+        ceo_name: (row["CEO Name"] || "").trim(),
+        ceo_total_compensation: (row["CEO Total Compensation"] || "").trim(),
+        worker_salary: (row["Frontline Worker Salary"] || "").trim(),
       }));
 
       console.log("Processed data:", data);
@@ -169,20 +188,23 @@ export const TabTwo = () => {
       const searchTerms = value.toLowerCase().trim().split(/\s+/);
 
       const filtered = data.filter((row) => {
-        const companyName = (row.company_name || '').toLowerCase();
-        const ceoName = (row.ceo_name || '').toLowerCase();
-        const year = (row.year || '').toString().toLowerCase();
+        const companyName = (row.company_name || "").toLowerCase();
+        const ceoName = (row.ceo_name || "").toLowerCase();
+        const year = (row.year || "").toString().toLowerCase();
 
         // Check if any search term matches company name, CEO name, or year
-        return searchTerms.some(term =>
-          companyName.includes(term) ||
-          ceoName.includes(term) ||
-          year.includes(term)
-        ) ||
+        return (
+          searchTerms.some(
+            (term) =>
+              companyName.includes(term) ||
+              ceoName.includes(term) ||
+              year.includes(term)
+          ) ||
           // Also check if the full query matches (for cases like partial names)
           companyName.includes(value.toLowerCase()) ||
           ceoName.includes(value.toLowerCase()) ||
-          year.includes(value.toLowerCase());
+          year.includes(value.toLowerCase())
+        );
       });
 
       console.log("Filtered data before sorting:", filtered);
@@ -211,14 +233,14 @@ export const TabTwo = () => {
   };
 
   const handleSuggestionSelect = (event, value) => {
-    if (value && typeof value === 'object') {
+    if (value && typeof value === "object") {
       // Create a payload with CEO name, company name, and year
       const payload = {
         ceoName: value.ceoName,
         companyName: value.companyName,
         year: value.year,
         ceoCompensation: value.ceoCompensation,
-        workerSalary: value.workerSalary
+        workerSalary: value.workerSalary,
       };
 
       console.log("Selected suggestion payload:", payload);
@@ -232,7 +254,7 @@ export const TabTwo = () => {
 
     } else if (typeof value === 'string') {
       // Clean the string to remove any extra formatting
-      const cleanValue = value.replace(/\\/g, '').trim();
+      const cleanValue = value.replace(/\\/g, "").trim();
       setSearchQuery(cleanValue);
       handleSearch(cleanValue);
     }
@@ -286,9 +308,10 @@ export const TabTwo = () => {
             freeSolo
             value={selectedOption}
             options={suggestions}
+            className="autoinput"
             getOptionLabel={(option) => {
-              if (typeof option === 'string') return option;
-              return option.label || '';
+              if (typeof option === "string") return option;
+              return option.label || "";
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
@@ -312,15 +335,26 @@ export const TabTwo = () => {
             filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", width: "100%" }}
+                >
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body2" fontWeight="bold">
-                      <span style={{ color: '#1976d2' }}>{option.companyName}</span>
-                      <span style={{ color: '#666', fontWeight: 'normal' }}> - {option.ceoName}</span>
-                      <span style={{ color: '#999', fontWeight: 'normal' }}> ({option.year})</span>
+                      <span style={{ color: "#1976d2" }}>
+                        {option.companyName}
+                      </span>
+                      <span style={{ color: "#666", fontWeight: "normal" }}>
+                        {" "}
+                        - {option.ceoName}
+                      </span>
+                      <span style={{ color: "#999", fontWeight: "normal" }}>
+                        {" "}
+                        ({option.year})
+                      </span>
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      CEO: {option.ceoCompensation} • Worker: {option.workerSalary}
+                      CEO: {option.ceoCompensation} • Worker:{" "}
+                      {option.workerSalary}
                     </Typography>
                   </Box>
                 </Box>
@@ -373,7 +407,10 @@ export const TabTwo = () => {
       )}
 
       {!!filteredData.length && (
-        <Box sx={{ p: 2, display: "flex", flexDirection: "column" }} className="nopadding">
+        <Box
+          sx={{ p: 2, display: "flex", flexDirection: "column" }}
+          className="nopadding"
+        >
           <Box className="tab2Table" sx={{ overflowX: "auto" }}>
             <Box sx={{ minWidth: "750px" }}>
               {/* Header */}
@@ -424,8 +461,12 @@ export const TabTwo = () => {
                     <Typography variant="h6">{row.ceo_name}</Typography>
                   </Box>
 
-                  <Box sx={{ ...cellStyle, backgroundColor: "rgb(254, 199, 199)" }}>
-                    <Typography variant="h6">{row.ceo_total_compensation}</Typography>
+                  <Box
+                    sx={{ ...cellStyle, backgroundColor: "rgb(254, 199, 199)" }}
+                  >
+                    <Typography variant="h6">
+                      {row.ceo_total_compensation}
+                    </Typography>
                   </Box>
                   <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
                     <Typography variant="h6">{row.worker_salary}</Typography>

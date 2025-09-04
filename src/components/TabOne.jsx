@@ -510,6 +510,7 @@ export const TabOne = ({
         <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
+            className="autoinput"
             options={suggestions}
             value={selectedOption}
             inputValue={searchQuery}
@@ -654,6 +655,7 @@ export const TabOne = ({
       {!loading && data.matched.length > 0 && (
         <>
           <Typography
+          <Typography
             variant="h4"
             align="center"
             fontWeight="bold"
@@ -661,6 +663,10 @@ export const TabOne = ({
             sx={{ textTransform: "capitalize" }}
           >
             {extraWordRemover([firstProduct.brand, firstProduct.product_name, firstProduct.product_type, firstProduct.production_year])}
+            {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+              /\b(\w+)\s+\1\b/gi,
+              "$1"
+            )}
           </Typography>
 
           <Box

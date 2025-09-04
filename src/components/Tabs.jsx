@@ -41,7 +41,7 @@ export const Tabs = () => {
 
   const getSearchLabel = () => {
     if (activeTab === 0) {
-      return "See what brands don't want you to know";
+      return "Search by brand or product name";
     }
     switch (activeTab) {
       case 0:

@@ -27,6 +27,7 @@ export const TabThree = () => {
   const [allTaxData, setAllTaxData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const fetchAllTaxData = async () => {
@@ -135,7 +136,7 @@ export const TabThree = () => {
 
       const res = await axios.post("https://api.the-aysa.com/tax-semantic-search", {
         query: query,
-        tab_type: "ceo-worker"
+        tab_type: "tax"
       });
 
       console.log("Tax search API response:", res.data)
@@ -204,7 +205,7 @@ export const TabThree = () => {
       };
       setSelectedItem(payload);
       setSearchQuery(value.label);
-      const searchTerm = `${value.companyName} ${value.year}`;
+      const searchTerm = `${value.companyName} (${value.year})`;
       handleSearch(searchTerm);
 
     } else if (typeof value === 'string') {
@@ -214,7 +215,6 @@ export const TabThree = () => {
       handleSearch(cleanValue);
     }
   };
-
 
   const LoadingComponent = () => (
     <Box
@@ -262,6 +262,7 @@ export const TabThree = () => {
         <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
+            value={selectedOption}
             options={suggestions}
             getOptionLabel={(option) => {
               if (typeof option === 'string') return option;
@@ -271,9 +272,11 @@ export const TabThree = () => {
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
                 setSearchQuery("");
+                setSelectedOption(null);
                 setFilteredData([]);
                 return;
               }
+              setSelectedOption(null);
               setSearchQuery(newInputValue);
             }}
             onChange={handleSuggestionSelect}

@@ -26,7 +26,7 @@ export const TabTwo = () => {
   const [error, setError] = useState("");
   const [allCeoWorkerData, setAllCeoWorkerData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
-
+  const [selectedOption, setSelectedOption] = useState(null);
   useEffect(() => {
     const fetchAllCeoWorkerData = async () => {
       setInitialDataLoading(true);
@@ -147,7 +147,7 @@ export const TabTwo = () => {
       console.log("Making CEO-Worker search request for:", value);
       const res = await axios.post(
         "https://api.the-aysa.com/ceo-worker-semantic-search",
-        { query: value, tab_type: "tax" }
+        { query: value, tab_type: "ceo-worker" }
       );
 
       console.log("CEO-Worker search API response:", res.data);
@@ -222,13 +222,13 @@ export const TabTwo = () => {
       };
 
       console.log("Selected suggestion payload:", payload);
-
+      
       // Instead of using the formatted label, use just the company name
       // This avoids the double slash issue in the API call
       const searchTerm = value.companyName; // or value.ceoName if you prefer
 
       setSearchQuery(value.label); // This shows the full formatted text in the input
-      handleSearch(searchTerm); // This sends a clean search term to the API
+      handleSearch(value.label); // This sends a clean search term to the API
 
     } else if (typeof value === 'string') {
       // Clean the string to remove any extra formatting
@@ -284,6 +284,7 @@ export const TabTwo = () => {
         <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
+            value={selectedOption}
             options={suggestions}
             getOptionLabel={(option) => {
               if (typeof option === 'string') return option;
@@ -292,10 +293,12 @@ export const TabTwo = () => {
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
+                setSelectedOption(null);
                 setSearchQuery("");
                 setFilteredData([]);
                 return;
               }
+              setSelectedOption(null);
               setSearchQuery(newInputValue);
             }}
             onChange={handleSuggestionSelect}

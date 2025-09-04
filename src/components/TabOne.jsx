@@ -29,6 +29,7 @@ export const TabOne = ({
   const [allProductsData, setAllProductsData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [status, setStatus] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
   console.log("All Products Data:", data);
   useEffect(() => {
     const fetchAllProductsData = async () => {
@@ -53,12 +54,10 @@ export const TabOne = ({
 
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item.Brand || ""} ${item["Product Name"] || ""} ${
-            item.Type || ""
-          }`.trim(),
-          value: `${item.Brand || ""} ${item["Product Name"] || ""} ${
-            item.Type || ""
-          }`.trim(),
+          label: `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
+            }`.trim(),
+          value: `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
+            }`.trim(),
           brand: item.Brand || "",
           productName: item["Product Name"] || "",
           type: item.Type || "",
@@ -77,25 +76,19 @@ export const TabOne = ({
             `${item.Brand || ""} ${item.Type || ""}`?.toLowerCase(),
             `${item.Brand || ""} ${item.Category || ""}`?.toLowerCase(),
             `${item["Product Name"] || ""} ${item.Type || ""}`?.toLowerCase(),
-            `${item["Product Name"] || ""} ${
-              item.Category || ""
-            }`?.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Category || ""
+              }`?.toLowerCase(),
             `${item.Type || ""} ${item.Category || ""}`?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""} ${
-              item.Type || ""
-            }`?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""} ${
-              item.Category || ""
-            }`?.toLowerCase(),
-            `${item.Brand || ""} ${item.Type || ""} ${
-              item.Category || ""
-            }`?.toLowerCase(),
-            `${item["Product Name"] || ""} ${item.Type || ""} ${
-              item.Category || ""
-            }`?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""} ${
-              item.Type || ""
-            } ${item.Category || ""}`?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
+              }`?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Category || ""
+              }`?.toLowerCase(),
+            `${item.Brand || ""} ${item.Type || ""} ${item.Category || ""
+              }`?.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Type || ""} ${item.Category || ""
+              }`?.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
+              } ${item.Category || ""}`?.toLowerCase(),
           ].filter((text) => text.trim() !== ""),
         }));
 
@@ -110,6 +103,25 @@ export const TabOne = ({
 
     fetchAllProductsData();
   }, []);
+
+   const extraWordRemover = (strArr) => {
+    const seen = new Set();
+    const words = [];
+
+    strArr.forEach((el) => {
+      if (!el) return;
+      el.toString().split(" ").forEach((word) => {
+        if (!seen.has(word.toLowerCase())) {
+          seen.add(word.toLowerCase());
+          words.push(word);
+        }
+      });
+    });
+
+    return words.join(" ");
+  };
+
+
 
   // Modified suggestions to only show after 3 characters
   const suggestions = useMemo(() => {
@@ -161,14 +173,14 @@ export const TabOne = ({
       const matchesAllWords =
         queryWords.length > 1
           ? queryWords.every((word) =>
-              searchTerms.some(
-                (term) =>
-                  term.startsWith(word) ||
-                  term.includes(` ${word}`) ||
-                  term.includes(`${word} `) ||
-                  term === word
-              )
+            searchTerms.some(
+              (term) =>
+                term.startsWith(word) ||
+                term.includes(` ${word}`) ||
+                term.includes(`${word} `) ||
+                term === word
             )
+          )
           : true;
 
       // Individual field matching with word boundaries
@@ -499,38 +511,42 @@ export const TabOne = ({
           <Autocomplete
             freeSolo
             options={suggestions}
+            value={selectedOption}
+            inputValue={searchQuery}
             getOptionLabel={(option) => {
               if (typeof option === "string") return option;
               return option.label || "";
             }}
-            inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
-              if (!newInputValue) {
-                setSearchQuery("");
-                setStatus(0);
-
-                setData({ matched: [], compared: [] });
-                return;
-              }
               setSearchQuery(newInputValue);
-              setStatus(0);
+
+              if (!newInputValue) {
+                setSelectedOption(null);
+                setStatus(0);
+                setData({ matched: [], compared: [] });
+              } else {
+                // unselect previously chosen option when user types
+                setSelectedOption(null);
+                setStatus(0);
+              }
             }}
-            onChange={handleSuggestionSelect}
+            onChange={(event, newValue) => {
+              setSelectedOption(newValue); // update selection only when clicking/choosing
+              handleSuggestionSelect(event, newValue);
+            }}
             onKeyDown={handleKeyPress}
             noOptionsText={
               searchQuery.length < 3
                 ? "Type at least 3 characters to search for brands, products, or types..."
                 : suggestions.length > 0
-                ? "" // Don't show "no options" text when suggestions are available
-                : "No matching products found"
+                  ? ""
+                  : "No matching products found"
             }
             disabled={loading}
             filterOptions={(options) => options}
             renderOption={(props, option) => (
               <Box component="li" {...props} key={option.id}>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", width: "100%" }}
-                >
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
                   {option.image && (
                     <Box sx={{ mr: 2 }}>
                       <img
@@ -540,7 +556,7 @@ export const TabOne = ({
                           width: 40,
                           height: 40,
                           objectFit: "cover",
-                          borderRadius: "4px",
+                          borderRadius: "4px"
                         }}
                         onError={(e) => {
                           e.target.style.display = "none";
@@ -586,7 +602,7 @@ export const TabOne = ({
                       {loading && <CircularProgress size={20} />}
                       {params.InputProps.endAdornment}
                     </>
-                  ),
+                  )
                 }}
               />
             )}
@@ -637,15 +653,14 @@ export const TabOne = ({
 
       {!loading && data.matched.length > 0 && (
         <>
-           <Typography
+          <Typography
             variant="h4"
             align="center"
             fontWeight="bold"
             my={4}
             sx={{ textTransform: "capitalize" }}
           >
-            {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`
-              .replace(/\b(\w+)\s+\1\b/gi, "$1")}
+            {extraWordRemover([firstProduct.brand, firstProduct.product_name, firstProduct.product_type, firstProduct.production_year])}
           </Typography>
 
           <Box

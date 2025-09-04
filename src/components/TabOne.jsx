@@ -11,10 +11,8 @@ import {
   TextField,
   Autocomplete,
   CircularProgress,
-  Card,
-  CardContent,
-  TableContainer,
   Tooltip,
+  TableContainer,
 } from "@mui/material";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
@@ -30,65 +28,46 @@ export const TabOne = ({
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [status, setStatus] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
-  console.log("All Products Data:", data);
+
   useEffect(() => {
     const fetchAllProductsData = async () => {
       setInitialDataLoading(true);
       try {
         const response = await fetch(
           "https://api.the-aysa.com/get-profit-margin-data",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          { method: "GET", headers: { "Content-Type": "application/json" } }
         );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const result = await response.json();
-        console.log("Initial data fetch result:", result);
         const apiData = result.data || [];
 
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
-            }`.trim(),
-          value: `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
-            }`.trim(),
+          label: `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""}`.trim(),
+          value: `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""}`.trim(),
           brand: item.Brand || "",
           productName: item["Product Name"] || "",
           type: item.Type || "",
           category: item.Category || "",
-          profitMargin:
-            item["Profit Margin"] || item["Profit Margin "] || "N/A",
-          productionYear:
-            item["Production Year"] || item["Production Year "] || "N/A",
+          profitMargin: item["Profit Margin"] || item["Profit Margin "] || "N/A",
+          productionYear: item["Production Year"] || item["Production Year "] || "N/A",
           image: item["Link to Product Pictures"] || "",
           searchText: [
-            (item.Brand || "")?.toLowerCase(),
-            (item["Product Name"] || "")?.toLowerCase(),
-            (item.Type || "")?.toLowerCase(),
-            (item.Category || "")?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""}`?.toLowerCase(),
-            `${item.Brand || ""} ${item.Type || ""}`?.toLowerCase(),
-            `${item.Brand || ""} ${item.Category || ""}`?.toLowerCase(),
-            `${item["Product Name"] || ""} ${item.Type || ""}`?.toLowerCase(),
-            `${item["Product Name"] || ""} ${item.Category || ""
-              }`?.toLowerCase(),
-            `${item.Type || ""} ${item.Category || ""}`?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
-              }`?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Category || ""
-              }`?.toLowerCase(),
-            `${item.Brand || ""} ${item.Type || ""} ${item.Category || ""
-              }`?.toLowerCase(),
-            `${item["Product Name"] || ""} ${item.Type || ""} ${item.Category || ""
-              }`?.toLowerCase(),
-            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""
-              } ${item.Category || ""}`?.toLowerCase(),
+            (item.Brand || "").toLowerCase(),
+            (item["Product Name"] || "").toLowerCase(),
+            (item.Type || "").toLowerCase(),
+            (item.Category || "").toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""}`.toLowerCase(),
+            `${item.Brand || ""} ${item.Type || ""}`.toLowerCase(),
+            `${item.Brand || ""} ${item.Category || ""}`.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Type || ""}`.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Category || ""}`.toLowerCase(),
+            `${item.Type || ""} ${item.Category || ""}`.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""}`.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Category || ""}`.toLowerCase(),
+            `${item.Brand || ""} ${item.Type || ""} ${item.Category || ""}`.toLowerCase(),
+            `${item["Product Name"] || ""} ${item.Type || ""} ${item.Category || ""}`.toLowerCase(),
+            `${item.Brand || ""} ${item["Product Name"] || ""} ${item.Type || ""} ${item.Category || ""}`.toLowerCase(),
           ].filter((text) => text.trim() !== ""),
         }));
 
@@ -104,10 +83,9 @@ export const TabOne = ({
     fetchAllProductsData();
   }, []);
 
-   const extraWordRemover = (strArr) => {
+  const extraWordRemover = (strArr) => {
     const seen = new Set();
     const words = [];
-
     strArr.forEach((el) => {
       if (!el) return;
       el.toString().split(" ").forEach((word) => {
@@ -117,170 +95,35 @@ export const TabOne = ({
         }
       });
     });
-
     return words.join(" ");
   };
 
-
-
-  // Modified suggestions to only show after 3 characters
+  // ===== Improved Search Suggestions =====
   const suggestions = useMemo(() => {
-    if (
-      !searchQuery ||
-      searchQuery.length < 3 ||
-      allProductsData.length === 0
-    ) {
-      return [];
-    }
+    if (!searchQuery || searchQuery.length < 3 || allProductsData.length === 0) return [];
 
-    const query = searchQuery?.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
+    const queryWords = searchQuery.toLowerCase().trim().split(/\s+/);
 
-    const filteredSuggestions = allProductsData.filter((item) => {
-      const brand = item.brand?.toLowerCase() || "";
-      const productName = item.productName?.toLowerCase() || "";
-      const productType = item.type?.toLowerCase() || "";
-      const category = item.category?.toLowerCase() || "";
-
-      // Create search terms for exact matching
-      const searchTerms = [
-        brand,
-        productName,
-        productType,
-        category,
-        `${brand} ${productName}`.trim(),
-        `${brand} ${productType}`.trim(),
-        `${brand} ${category}`.trim(),
-        `${productName} ${productType}`.trim(),
-        `${productName} ${category}`.trim(),
-        `${productType} ${category}`.trim(),
-        `${brand} ${productName} ${productType}`.trim(),
-        `${brand} ${productName} ${category}`.trim(),
-        `${brand} ${productType} ${category}`.trim(),
-        `${productName} ${productType} ${category}`.trim(),
-        `${brand} ${productName} ${productType} ${category}`.trim(),
-      ].filter((term) => term.length > 0);
-
-      // Check if the full query matches any search term (starts with or includes)
-      const matchesFullQuery = searchTerms.some(
-        (term) =>
-          term.startsWith(query) ||
-          term.includes(` ${query}`) ||
-          term.includes(`${query} `)
-      );
-
-      // For multi-word queries, ensure all words are present in the item
-      const matchesAllWords =
-        queryWords.length > 1
-          ? queryWords.every((word) =>
-            searchTerms.some(
-              (term) =>
-                term.startsWith(word) ||
-                term.includes(` ${word}`) ||
-                term.includes(`${word} `) ||
-                term === word
-            )
-          )
-          : true;
-
-      // Individual field matching with word boundaries
-      const matchesIndividualFields =
-        brand.startsWith(query) ||
-        productName.startsWith(query) ||
-        productType.startsWith(query) ||
-        category.startsWith(query) ||
-        brand.includes(` ${query}`) ||
-        productName.includes(` ${query}`) ||
-        productType.includes(` ${query}`) ||
-        category.includes(` ${query}`) ||
-        // For queries 3+ characters, allow substring matching
-        (query.length >= 3 &&
-          (brand.includes(query) ||
-            productName.includes(query) ||
-            productType.includes(query) ||
-            category.includes(query)));
-
-      // Combine all matching strategies
-      return (matchesFullQuery && matchesAllWords) || matchesIndividualFields;
-    });
-
-    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-      const aBrand = a.brand.toLowerCase();
-      const bBrand = b.brand.toLowerCase();
-      const aProduct = a.productName.toLowerCase();
-      const bProduct = b.productName.toLowerCase();
-      const aType = a.type.toLowerCase();
-      const bType = b.type.toLowerCase();
-      const aCategory = a.category.toLowerCase();
-      const bCategory = b.category.toLowerCase();
-
-      const aExactBrand = aBrand === query;
-      const bExactBrand = bBrand === query;
-      if (aExactBrand !== bExactBrand) return bExactBrand - aExactBrand;
-
-      const aBrandStarts = aBrand.startsWith(query);
-      const bBrandStarts = bBrand.startsWith(query);
-      if (aBrandStarts !== bBrandStarts) return bBrandStarts - aBrandStarts;
-
-      const aProductStarts = aProduct.startsWith(query);
-      const bProductStarts = bProduct.startsWith(query);
-      if (aProductStarts !== bProductStarts)
-        return bProductStarts - aProductStarts;
-
-      const aCategoryStarts = aCategory.startsWith(query);
-      const bCategoryStarts = bCategory.startsWith(query);
-      if (aCategoryStarts !== bCategoryStarts)
-        return bCategoryStarts - aCategoryStarts;
-
-      if (queryWords.length > 1) {
-        const aMatchScore = queryWords.reduce((score, word, index) => {
-          if (
-            aBrand.startsWith(word) ||
-            aProduct.startsWith(word) ||
-            aCategory.startsWith(word)
-          ) {
-            return score + (queryWords.length - index);
-          }
-          if (
-            aBrand.includes(word) ||
-            aProduct.includes(word) ||
-            aCategory.includes(word)
-          ) {
-            return score + 1;
-          }
-          return score;
+    const filteredSuggestions = allProductsData
+      .map(item => {
+        let score = queryWords.reduce((s, word) => {
+          const match = item.searchText.some(text => text.includes(word));
+          return s + (match ? 1 : 0);
         }, 0);
 
-        const bMatchScore = queryWords.reduce((score, word, index) => {
-          if (
-            bBrand.startsWith(word) ||
-            bProduct.startsWith(word) ||
-            bCategory.startsWith(word)
-          ) {
-            return score + (queryWords.length - index);
-          }
-          if (
-            bBrand.includes(word) ||
-            bProduct.includes(word) ||
-            bCategory.includes(word)
-          ) {
-            return score + 1;
-          }
-          return score;
-        }, 0);
+        // Boost exact brand matches
+        if (item.brand.toLowerCase() === searchQuery.toLowerCase()) score += 5;
+        // Boost starts-with matches
+        if (item.searchText.some(text => text.startsWith(searchQuery.toLowerCase()))) score += 3;
 
-        if (aMatchScore !== bMatchScore) return bMatchScore - aMatchScore;
-      }
+        return { ...item, score };
+      })
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score);
 
-      const aTypeStarts = aType.startsWith(query);
-      const bTypeStarts = bType.startsWith(query);
-      if (aTypeStarts !== bTypeStarts) return bTypeStarts - aTypeStarts;
-
-      return aBrand.localeCompare(bBrand);
-    });
-
-    return sortedSuggestions.slice(0, 15);
+    return filteredSuggestions.slice(0, 15);
   }, [searchQuery, allProductsData]);
+  // =======================================
 
   const handleSearch = async (query) => {
     if (!query.trim()) {
@@ -296,51 +139,34 @@ export const TabOne = ({
     setError("");
 
     try {
-      console.log("Making search request for:", query);
-
       const response = await fetch(
         "https://api.the-aysa.com/product-semantic-search",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query, tab_type: "profit" }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
-      console.log(result.status);
 
       setStatus(result.status);
       const searchData = result.data || [];
 
       const formatItems = (items) => {
-        if (!Array.isArray(items)) {
-          console.warn("formatItems received non-array:", items);
-          return [];
-        }
-
+        if (!Array.isArray(items)) return [];
         return items.map((item, index) => {
-          const profitMargin = String(
-            item["Profit Margin"] || item["Profit Margin "] || "0%"
-          );
-          const profitMade =
-            item["Profit Made"] || item["Profit Made "] || "$0";
-          const releasePrice =
-            item["Release Price"] || item["Release Price "] || "$0";
-          const productionYear =
-            item["Production Year"] || item["Production Year "] || 0;
+          const profitMargin = String(item["Profit Margin"] || item["Profit Margin "] || "0%");
+          const profitMade = item["Profit Made"] || item["Profit Made "] || "$0";
+          const releasePrice = item["Release Price"] || item["Release Price "] || "$0";
+          const productionYear = item["Production Year"] || item["Production Year "] || 0;
 
           return {
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
             brand: (item["Brand"] || "").trim(),
             product_name: (item["Product Name"] || "").trim(),
-            product_type: (item["Product Type"] || "").trim(), // Use 'Product Type' for search API
+            product_type: (item["Product Type"] || "").trim(),
             production_year: parseInt(productionYear) || 0,
             profit_margin: profitMargin,
             profit_made: profitMade,
@@ -349,26 +175,17 @@ export const TabOne = ({
             category: item["Category"] || "",
             similarity: item["similarity"] || 0,
             cluster: item["cluster"] || 0,
-            market_price: parseFloat(
-              releasePrice?.replace(/[^0-9.]/g, "") || "0"
-            ),
-            profit_made_value: parseFloat(
-              profitMade?.replace(/[^0-9.]/g, "") || "0"
-            ),
+            market_price: parseFloat(releasePrice?.replace(/[^0-9.]/g, "") || "0"),
+            profit_made_value: parseFloat(profitMade?.replace(/[^0-9.]/g, "") || "0"),
           };
         });
       };
 
       const formattedData = formatItems(searchData);
-      setData({
-        matched: formattedData,
-        compared: [],
-      });
+      setData({ matched: formattedData, compared: [] });
     } catch (err) {
       console.error("Search failed:", err);
-      setError(
-        `Failed to load product data: ${err.message}. Please try again.`
-      );
+      setError(`Failed to load product data: ${err.message}. Please try again.`);
       setData({ matched: [], compared: [] });
     } finally {
       setLoading(false);
@@ -387,12 +204,10 @@ export const TabOne = ({
       const selectedQuery = value.value;
       setSearchQuery(selectedQuery);
       setStatus(0);
-
       handleSearch(selectedQuery);
     } else if (typeof value === "string") {
       setSearchQuery(value);
       setStatus(0);
-
       handleSearch(value);
     }
   };
@@ -655,7 +470,6 @@ export const TabOne = ({
       {!loading && data.matched.length > 0 && (
         <>
           <Typography
-          <Typography
             variant="h4"
             align="center"
             fontWeight="bold"
@@ -663,10 +477,6 @@ export const TabOne = ({
             sx={{ textTransform: "capitalize" }}
           >
             {extraWordRemover([firstProduct.brand, firstProduct.product_name, firstProduct.product_type, firstProduct.production_year])}
-            {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
-              /\b(\w+)\s+\1\b/gi,
-              "$1"
-            )}
           </Typography>
 
           <Box

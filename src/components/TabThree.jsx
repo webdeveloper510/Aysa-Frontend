@@ -161,20 +161,19 @@ export const TabThree = () => {
 
       console.log("Processed rows:", rows);
 
-      setAllData(rows);
-
-      const searchTerms = query.toLowerCase().trim().split(/\s+/);
+      // ✅ Split query into words + numbers (so Apple2024 → ["apple", "2024"])
+      const searchTerms = query.toLowerCase().trim().match(/[a-z]+|\d+/g) || [];
+      console.log("searchTerms:", searchTerms);
 
       const filtered = rows.filter((row) => {
         const companyName = (row.company_name || "").toLowerCase();
         const year = (row.year || "").toString().toLowerCase();
 
-        return (
-          searchTerms.some(
-            (term) => companyName.includes(term) || year.includes(term)
-          ) ||
-          companyName.includes(query.toLowerCase()) ||
-          year.includes(query.toLowerCase())
+        console.log("company:", companyName);
+        console.log("year:", year);
+
+        return searchTerms.some(
+          (term) => companyName.includes(term) || year.includes(term)
         );
       });
 

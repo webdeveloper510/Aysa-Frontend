@@ -26,7 +26,7 @@ export const TabTwo = () => {
   const [error, setError] = useState("");
   const [allCeoWorkerData, setAllCeoWorkerData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
-
+  const [selectedOption, setSelectedOption] = useState(null);
   useEffect(() => {
     const fetchAllCeoWorkerData = async () => {
       setInitialDataLoading(true);
@@ -50,9 +50,8 @@ export const TabTwo = () => {
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${
-            item.Year || ""
-          })`.trim(),
+          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${item.Year || ""
+            })`.trim(),
           value: item["Company Name"] || "",
           companyName: item["Company Name"] || "",
           ceoName: item["CEO Name"] || "",
@@ -63,14 +62,12 @@ export const TabTwo = () => {
             (item["Company Name"] || "").toLowerCase(),
             (item["CEO Name"] || "").toLowerCase(),
             (item.Year || "").toString().toLowerCase(),
-            `${item["Company Name"] || ""} ${
-              item["CEO Name"] || ""
-            }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item["CEO Name"] || ""
+              }`.toLowerCase(),
             `${item["Company Name"] || ""} ${item.Year || ""}`.toLowerCase(),
             `${item["CEO Name"] || ""} ${item.Year || ""}`.toLowerCase(),
-            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${
-              item.Year || ""
-            }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${item.Year || ""
+              }`.toLowerCase(),
           ].filter((text) => text.trim() !== ""),
         }));
 
@@ -164,7 +161,7 @@ export const TabTwo = () => {
       console.log("Making CEO-Worker search request for:", value);
       const res = await axios.post(
         "https://api.the-aysa.com/ceo-worker-semantic-search",
-        { query: value, tab_type: "tax" }
+        { query: value, tab_type: "ceo-worker" }
       );
 
       console.log("CEO-Worker search API response:", res.data);
@@ -250,8 +247,9 @@ export const TabTwo = () => {
       const searchTerm = value.companyName; // or value.ceoName if you prefer
 
       setSearchQuery(value.label); // This shows the full formatted text in the input
-      handleSearch(searchTerm); // This sends a clean search term to the API
-    } else if (typeof value === "string") {
+      handleSearch(value.label); // This sends a clean search term to the API
+
+    } else if (typeof value === 'string') {
       // Clean the string to remove any extra formatting
       const cleanValue = value.replace(/\\/g, "").trim();
       setSearchQuery(cleanValue);
@@ -305,6 +303,7 @@ export const TabTwo = () => {
         <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
+            value={selectedOption}
             options={suggestions}
             className="autoinput"
             getOptionLabel={(option) => {
@@ -314,11 +313,18 @@ export const TabTwo = () => {
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
+                setSelectedOption(null);
                 setSearchQuery("");
                 setFilteredData([]);
                 return;
               }
+              setSelectedOption(null);
               setSearchQuery(newInputValue);
+            }}
+            onBlur={(event) => {
+              if (searchQuery.trim()) {
+                handleSearch(searchQuery.trim());
+              }
             }}
             onChange={handleSuggestionSelect}
             onKeyDown={handleKeyPress}

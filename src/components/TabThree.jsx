@@ -27,6 +27,7 @@ export const TabThree = () => {
   const [allTaxData, setAllTaxData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const fetchAllTaxData = async () => {
@@ -139,7 +140,7 @@ export const TabThree = () => {
         "https://api.the-aysa.com/tax-semantic-search",
         {
           query: query,
-          tab_type: "ceo-worker",
+          tab_type: "tax",
         }
       );
 
@@ -160,20 +161,19 @@ export const TabThree = () => {
 
       console.log("Processed rows:", rows);
 
-      setAllData(rows);
-
-      const searchTerms = query.toLowerCase().trim().split(/\s+/);
+      // ✅ Split query into words + numbers (so Apple2024 → ["apple", "2024"])
+      const searchTerms = query.toLowerCase().trim().match(/[a-z]+|\d+/g) || [];
+      console.log("searchTerms:", searchTerms);
 
       const filtered = rows.filter((row) => {
         const companyName = (row.company_name || "").toLowerCase();
         const year = (row.year || "").toString().toLowerCase();
 
-        return (
-          searchTerms.some(
-            (term) => companyName.includes(term) || year.includes(term)
-          ) ||
-          companyName.includes(query.toLowerCase()) ||
-          year.includes(query.toLowerCase())
+        console.log("company:", companyName);
+        console.log("year:", year);
+
+        return searchTerms.some(
+          (term) => companyName.includes(term) || year.includes(term)
         );
       });
 
@@ -212,7 +212,7 @@ export const TabThree = () => {
       };
       setSelectedItem(payload);
       setSearchQuery(value.label);
-      const searchTerm = `${value.companyName} ${value.year}`;
+      const searchTerm = `${value.companyName} (${value.year})`;
       handleSearch(searchTerm);
     } else if (typeof value === "string") {
       const cleanValue = value.replace(/\\/g, "").trim();
@@ -267,6 +267,7 @@ export const TabThree = () => {
         <Box m={3} className="nomargin">
           <Autocomplete
             freeSolo
+            value={selectedOption}
             options={suggestions}
             className="autoinput"
             getOptionLabel={(option) => {
@@ -274,12 +275,19 @@ export const TabThree = () => {
               return option.label || "";
             }}
             inputValue={searchQuery}
+            onBlur={(event) => {
+              if (searchQuery.trim()) {
+                handleSearch(searchQuery.trim());
+              }
+            }}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
                 setSearchQuery("");
+                setSelectedOption(null);
                 setFilteredData([]);
                 return;
               }
+              setSelectedOption(null);
               setSearchQuery(newInputValue);
             }}
             onChange={handleSuggestionSelect}

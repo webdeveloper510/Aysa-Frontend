@@ -350,14 +350,14 @@ div#mobile-inital-render {
   header.App-header label {
     padding: 0px 10px 5px;
   }
-  /* .outer-circle {
+  .outer-circle {
     width: 10em;
     height: 10em;
   }
   .inner-circle {
     width: 9em;
     height: 9em;
-  } */
+  }
   .inner-circle span {
     font-size: 15px;
   }
@@ -374,17 +374,18 @@ div#mobile-inital-render {
     font-size: 27px;
   }
   .nomargin {
-    margin: 0px !important;
+    margin: 0px 0px 10px 0px !important;
   }
   .meow {
     width: 100%;
     margin: 0 auto;
   }
+
   .tab-wrapper {
     width: 100%;
     margin: 15px auto;
+    flex-direction: column-reverse;
   }
-
   .tab-content {
     margin: 0px 20px;
     width: 95%;

@@ -162,7 +162,11 @@ export const TabThree = () => {
       console.log("Processed rows:", rows);
 
       // ✅ Split query into words + numbers (so Apple2024 → ["apple", "2024"])
-      const searchTerms = query.toLowerCase().trim().match(/[a-z]+|\d+/g) || [];
+      const searchTerms =
+        query
+          .toLowerCase()
+          .trim()
+          .match(/[a-z]+|\d+/g) || [];
       console.log("searchTerms:", searchTerms);
 
       const filtered = rows.filter((row) => {

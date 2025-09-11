@@ -12,6 +12,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; */
   font-family: "Inter", sans-serif !important;
+  background: #fcfcfc;
 }
 
 code {
@@ -25,6 +26,34 @@ header.App-header p {
   padding: 15px 20px 5px;
 }
 /************** tabs css *********************/
+
+/* .comparisonTable {
+  display: none;
+} */
+.comparisonTable {
+  width: 800px;
+  margin: 20px auto;
+}
+.serachedProduct h4 {
+  margin: 0px 0px 30px 0px;
+  text-align: left;
+}
+.serachedProduct {
+  width: 600px;
+  margin: 20px auto 0px;
+  border: 1px solid #ddd;
+  padding: 30px;
+  border-radius: 20px;
+}
+
+.paygap_card {
+  width: 600px;
+  margin: 20px auto 0px;
+}
+svg.compareIcon {
+  font-size: 30px;
+  margin-right: 5px;
+}
 .App {
   display: flex;
   flex-direction: column;
@@ -42,56 +71,50 @@ header.App-header p {
   margin: 40px auto;
   flex: 1;
   width: 75%;
+  position: relative;
   /* min-height: 680px; */
 }
 
 .tab-buttons {
   display: flex;
   justify-content: center;
-  gap: 60px;
+  gap: 15px;
   flex-wrap: wrap;
+  margin-top: 100px;
 }
 
 .outer-circle {
-  width: 11em;
-  height: 11em;
-  border-radius: 50%;
-  border: 12px solid #c7d6dc;
-  background-color: white;
+  width: 12em;
+  /* background-color: #dbf2ff; */
   position: relative;
-  box-shadow: 0 6px 7px rgba(0, 0, 0, 0.25);
   margin: 0 !important;
   cursor: pointer;
-}
-.inner-circle {
-  width: 10em;
-  height: 10em;
-  border-radius: 50%;
-  border: 10px solid #1674da;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #cbebff;
   display: flex;
   align-items: center;
-  flex-direction: row;
-  justify-content: center !important;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 0px;
 }
-.outer-circle.active .inner-circle {
-  background-color: #67afef;
+
+.outer-circle.active {
+  background-color: #298de1;
 }
 
 .outer-circle.active span {
   color: #fff;
 }
-.inner-circle span {
-  color: #7d7676;
-  font-size: 16px;
+.outer-circle span {
+  color: #2e4353;
+  font-size: 23px;
   padding: 10px;
   line-height: 21px;
   text-align: center;
   font-weight: 500;
+}
+span.tabsIcons {
+  font-size: 70px;
+  color: #298de1;
 }
 .tab-content {
   width: 100%;
@@ -198,7 +221,12 @@ section.about-section {
   height: 42px;
 }
 .meow {
-  width: 50%;
+  width: 700px;
+  margin: 0 auto;
+  position: absolute;
+  top: 0;
+  left: 0px;
+  right: 0px;
   margin: 0 auto;
 }
 .chart-heading {
@@ -283,7 +311,7 @@ div#mobile-inital-render {
 
 @media screen and (max-width: 1200px) {
   .meow {
-    width: 70%;
+    width: 700px;
     margin: 0 auto;
   }
   .tab-wrapper {
@@ -304,7 +332,7 @@ div#mobile-inital-render {
 
 @media screen and (max-width: 992px) {
   .meow {
-    width: 80%;
+    width: 615px;
     margin: 0 auto;
   }
   .tab-wrapper {
@@ -318,8 +346,8 @@ div#mobile-inital-render {
     margin-right: 0;
   }
   .outer-circle {
-    width: 15em;
-    height: 15em;
+    width: 10em;
+    height: 9em;
   }
   .inner-circle {
     width: 14em;
@@ -351,22 +379,30 @@ div#mobile-inital-render {
     padding: 0px 10px 5px;
   }
   .outer-circle {
-    width: 10em;
-    height: 10em;
+    height: auto;
+    width: 100%;
+    padding: 10px 5px;
   }
   .inner-circle {
     width: 9em;
     height: 9em;
   }
+  .tab-buttons {
+    gap: 10px;
+    margin-top: 80px;
+    width: 100%;
+    flex-wrap: nowrap !important;
+  }
   .inner-circle span {
     font-size: 15px;
   }
-  .tab-buttons {
-    display: block;
+  .outer-circle span {
+    font-size: 18px;
   }
-  .outer-circle {
-    margin-bottom: 10px !important;
+  span.tabsIcons {
+    font-size: 30px;
   }
+
   .about-row h1 {
     font-size: 30px;
   }
@@ -382,9 +418,8 @@ div#mobile-inital-render {
   }
 
   .tab-wrapper {
-    width: 100%;
+    width: 95%;
     margin: 15px auto;
-    flex-direction: column-reverse;
   }
   .tab-content {
     margin: 0px 20px;

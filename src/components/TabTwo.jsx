@@ -5,7 +5,11 @@ import {
   TextField,
   Autocomplete,
   CircularProgress,
+  Card,
+  CardContent,
+  LinearProgress,
 } from "@mui/material";
+
 import axios from "axios";
 
 const cellStyle = {
@@ -50,8 +54,9 @@ export const TabTwo = () => {
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
-          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${item.Year || ""
-            })`.trim(),
+          label: `${item["Company Name"] || ""} - ${item["CEO Name"] || ""} (${
+            item.Year || ""
+          })`.trim(),
           value: item["Company Name"] || "",
           companyName: item["Company Name"] || "",
           ceoName: item["CEO Name"] || "",
@@ -62,12 +67,14 @@ export const TabTwo = () => {
             (item["Company Name"] || "").toLowerCase(),
             (item["CEO Name"] || "").toLowerCase(),
             (item.Year || "").toString().toLowerCase(),
-            `${item["Company Name"] || ""} ${item["CEO Name"] || ""
-              }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${
+              item["CEO Name"] || ""
+            }`.toLowerCase(),
             `${item["Company Name"] || ""} ${item.Year || ""}`.toLowerCase(),
             `${item["CEO Name"] || ""} ${item.Year || ""}`.toLowerCase(),
-            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${item.Year || ""
-              }`.toLowerCase(),
+            `${item["Company Name"] || ""} ${item["CEO Name"] || ""} ${
+              item.Year || ""
+            }`.toLowerCase(),
           ].filter((text) => text.trim() !== ""),
         }));
 
@@ -213,6 +220,7 @@ export const TabTwo = () => {
       const topFourYears = sorted.slice(0, 4);
 
       console.log("Final filtered data:", topFourYears);
+
       setFilteredData(topFourYears);
     } catch (err) {
       console.error("CEO-Worker search failed:", err);
@@ -248,8 +256,7 @@ export const TabTwo = () => {
 
       setSearchQuery(value.label); // This shows the full formatted text in the input
       handleSearch(value.label); // This sends a clean search term to the API
-
-    } else if (typeof value === 'string') {
+    } else if (typeof value === "string") {
       // Clean the string to remove any extra formatting
       const cleanValue = value.replace(/\\/g, "").trim();
       setSearchQuery(cleanValue);
@@ -409,75 +416,88 @@ export const TabTwo = () => {
       )}
 
       {!!filteredData.length && (
-        <Box
-          sx={{ p: 2, display: "flex", flexDirection: "column" }}
-          className="nopadding"
-        >
-          <Box className="tab2Table" sx={{ overflowX: "auto" }}>
-            <Box sx={{ minWidth: "750px" }}>
-              {/* Header */}
+        <div className="paygap_card">
+          {filteredData.map((row, index) => (
+            <Card
+              elevation={3}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                p: 2,
+                borderRadius: 3,
+                mb: 2,
+              }}
+            >
+              {/* Left Section */}
+              <CardContent
+                sx={{ width: "50%", marginRight: "20px", flex: 1, p: 0 }}
+              >
+                <Typography
+                  variant="h4"
+                  align="left"
+                  sx={{ fontWeight: "bold", mb: 3 }}
+                >
+                  {row.company_name} ({row.year})
+                </Typography>
+
+                {/* Progress Bar */}
+                <Box sx={{ mt: 1, mb: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={row.worker_salary} // adjust dynamically
+                    sx={{
+                      height: 12,
+                      borderRadius: 2,
+                      backgroundColor: "#e0e0e0",
+                      "& .MuiLinearProgress-bar": {
+                        backgroundColor: "#1976d2", // blue color
+                      },
+                    }}
+                  />
+                </Box>
+
+                {/* CEO vs Worker info */}
+                <Typography
+                  align="left"
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{ color: "#000" }}
+                >
+                  {row.ceo_name} –{" "}
+                  <strong> $ {row.ceo_total_compensation}</strong> vs Worker{" "}
+                  <strong>{row.worker_salary}</strong>
+                </Typography>
+                <Typography
+                  align="left"
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{ color: "#000" }}
+                >
+                  (2,143× gap)
+                </Typography>
+              </CardContent>
+
+              {/* Right Section (Circle) */}
               <Box
-                className="tableheader"
                 sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(5, 1fr)",
-                  gap: 1,
+                  minWidth: 120,
+                  minHeight: 120,
+                  borderRadius: "50%",
+                  backgroundColor: "#18A677",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "bold",
+                  fontSize: "2rem",
                 }}
               >
-                <Box sx={{ ...cellStyle, backgroundColor: "#E3F2FD" }}>
-                  Company <br /> Name
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#E3F2FD" }}>
-                  Year
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#E3F2FD" }}>
-                  CEO <br /> Name
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#E3F2FD" }}>
-                  CEO Total Compensation
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#E3F2FD" }}>
-                  Frontline Worker Salary
-                </Box>
+                2,142x
               </Box>
-
-              {/* Body */}
-              {filteredData.map((row, index) => (
-                <Box
-                  key={`${row.company_name}-${row.ceo_name}-${row.year}-${index}`}
-                  className="tablebody"
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(5, 1fr)",
-                    gap: 1,
-                    mt: 1, // Add margin top to create space between rows
-                  }}
-                >
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.company_name}</Typography>
-                  </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.year}</Typography>
-                  </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.ceo_name}</Typography>
-                  </Box>
-
-                  <Box
-                    sx={{ ...cellStyle, backgroundColor: "rgb(254, 199, 199)" }}
-                  >
-                    <Typography variant="h6">
-                      {row.ceo_total_compensation}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.worker_salary}</Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        </Box>
+            </Card>
+          ))}
+        </div>
       )}
     </>
   );

@@ -2,19 +2,25 @@ import { useState, useEffect } from "react";
 import { TabOne } from "./TabOne";
 import { TabTwo } from "./TabTwo";
 import { TabThree } from "./TabThree";
+import { AiFillDollarCircle } from "react-icons/ai";
+import { RiUser2Fill } from "react-icons/ri";
+import { TbBuildingBank } from "react-icons/tb";
 import React from "react";
 
 const tabs = [
   {
-    label: "Discover the profit margin of any product",
+    label: "Profit Margin",
+    icon: <AiFillDollarCircle />,
     content: <TabOne />,
   },
   {
-    label: "Expose the CEO-Worker pay gap",
+    label: "Pay Gap",
+    icon: <RiUser2Fill />,
     content: <TabTwo />,
   },
   {
-    label: "Uncover corporate tax avoidance",
+    label: "Tax Avoidance",
+    icon: <TbBuildingBank />,
     content: <TabThree />,
   },
 ];
@@ -44,14 +50,13 @@ export const Tabs = () => {
               className={`outer-circle ${activeTab === index ? "active" : ""}`}
               onClick={() => setActiveTab(index)}
             >
-              <div className="inner-circle">
-                <span>{tab.label}</span>
-              </div>
+              <span className="tabsIcons"> {tab.icon} </span>
+              <span>{tab.label}</span>
             </div>
           ))}
         </div>
 
-        <div className="tab-content" id="mobile-render-search">
+        <div className="tab-content" id="below-render-search">
           {activeTab !== null ? (
             React.cloneElement(tabs[activeTab].content, {
               searchLabel: getSearchLabel(),

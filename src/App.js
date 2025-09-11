@@ -14,7 +14,10 @@ function App() {
           <p className="header" onClick={test}>
             Aysa
           </p>
-          <label>Empowering smarter spending with real data</label>
+          <label>
+            See what brands don’t want you to know — profit margins, pay gaps,
+            and tax avoidance at your fingertips.
+          </label>
         </header>
         <Router />
 

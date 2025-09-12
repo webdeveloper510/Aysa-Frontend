@@ -182,6 +182,7 @@ export const TabTwo = () => {
         ceo_name: (row["CEO Name"] || "").trim(),
         ceo_total_compensation: (row["CEO Total Compensation"] || "").trim(),
         worker_salary: (row["Frontline Worker Salary"] || "").trim(),
+        pay_ratio: (row["Pay Ratio"] || "N/A").trim(),
       }));
 
       console.log("Processed data:", data);
@@ -474,7 +475,7 @@ export const TabTwo = () => {
                   color="text.secondary"
                   sx={{ color: "#000" }}
                 >
-                  (2,143× gap)
+                 {`(${row["pay_ratio"].toLowerCase().replace("x", " x")} Gap)`}
                 </Typography>
               </CardContent>
 
@@ -493,7 +494,7 @@ export const TabTwo = () => {
                   fontSize: "2rem",
                 }}
               >
-                2,142x
+                {`${row["pay_ratio"].toLowerCase().replace("x", " x")}`}
               </Box>
             </Card>
           ))}

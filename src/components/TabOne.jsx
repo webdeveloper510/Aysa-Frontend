@@ -23,7 +23,7 @@ export const TabOne = ({
   const [allProductsData, setAllProductsData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [status, setStatus] = useState(0);
-  const [showComparison, setshowComparison] = useState(false);
+  const [showComparison, setshowComparison] = useState(true);
 
   const handleCompare = () => {
     setshowComparison((prev) => !prev);
@@ -491,6 +491,7 @@ export const TabOne = ({
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }
+  console.log(data.matched);
 
   return (
     <>
@@ -639,101 +640,104 @@ export const TabOne = ({
 
       {!loading && data.matched.length > 0 && (
         <>
-          <div className="serachedProduct">
-            <Typography
-              variant="h4"
-              align="center"
-              fontWeight="bold"
-              my={4}
-              sx={{ textTransform: "capitalize" }}
-            >
-              {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
-                /\b(\w+)\s+\1\b/gi,
-                "$1"
-              )}
-            </Typography>
+          {false && (
+            <div className="serachedProduct">
+              <Typography
+                variant="h4"
+                align="center"
+                fontWeight="bold"
+                my={4}
+                sx={{ textTransform: "capitalize" }}
+              >
+                {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                  /\b(\w+)\s+\1\b/gi,
+                  "$1"
+                )}
+              </Typography>
 
-            <div className="w-full">
-              {/* Label Row */}
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  Profit Margin
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  {firstProduct?.profit_margin
-                    ? `${firstProduct.profit_margin}`
-                    : "N/A"}
-                </span>
-              </div>
+              <div className="w-full">
+                {/* Label Row */}
+                <div className="flex justify-between mb-1">
+                  <span className="text-md font-medium text-gray-700">
+                    Profit Margin
+                  </span>
+                  <span className="text-md font-medium text-gray-700">
+                    {firstProduct?.profit_margin
+                      ? `${firstProduct.profit_margin}`
+                      : "N/A"}
+                  </span>
+                </div>
 
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${firstProduct?.profit_margin || 0}` }}
-                />
-              </div>
-            </div>
-
-            <div className="w-full mt-4">
-              {/* Label Row */}
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  CEO-Worker Pay Gap
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  {firstProduct?.profit_margin
-                    ? `${firstProduct.profit_margin}`
-                    : "N/A"}
-                </span>
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div
+                    className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                    style={{ width: `${firstProduct?.profit_margin || 0}` }}
+                  />
+                </div>
               </div>
 
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${firstProduct?.profit_margin || 0}` }}
-                />
-              </div>
-            </div>
+              <div className="w-full mt-4">
+                {/* Label Row */}
+                <div className="flex justify-between mb-1">
+                  <span className="text-md font-medium text-gray-700">
+                    CEO-Worker Pay Gap
+                  </span>
+                  <span className="text-md font-medium text-gray-700">
+                    {firstProduct?.profit_margin
+                      ? `${firstProduct.profit_margin}`
+                      : "N/A"}
+                  </span>
+                </div>
 
-            <div className="w-full mt-4">
-              <div className="flex justify-between mb-1">
-                <h5 className="text-lg font-medium text-gray-700">
-                  Corporate Tax Avoidance
-                </h5>
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div
+                    className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                    style={{ width: `${firstProduct?.profit_margin || 0}` }}
+                  />
+                </div>
               </div>
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  Tax Paid :
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  $15.5 billion
-                </span>
+
+              <div className="w-full mt-4">
+                <div className="flex justify-between mb-1">
+                  <h5 className="text-lg font-medium text-gray-700">
+                    Corporate Tax Avoidance
+                  </h5>
+                </div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-md font-medium text-gray-700">
+                    Tax Paid :
+                  </span>
+                  <span className="text-md font-medium text-gray-700">
+                    $15.5 billion
+                  </span>
+                </div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-md font-medium text-gray-700">
+                    Avoided :
+                  </span>
+                  <span className="text-md font-medium text-gray-700">
+                    $4.5 billion
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  Avoided :
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  $4.5 billion
-                </span>
+              <div className="w-full mt-4">
+                <p>
+                  {firstProduct.brand} makes {firstProduct.profit_margin} on a{" "}
+                  {"$999"} {firstProduct.product_name} its CEO Pay Gap{" "}
+                  {firstProduct.profit_margin} times more than the average
+                  worker.
+                </p>
+              </div>
+              <div className="w-full mt-4">
+                <Button variant="contained" onClick={handleCompare}>
+                  <MdOutlineCompareArrows className="compareIcon" /> Click Here
+                  to Compare Profit Margins
+                </Button>
               </div>
             </div>
-            <div className="w-full mt-4">
-              <p>
-                {firstProduct.brand} makes {firstProduct.profit_margin} on a{" "}
-                {"$999"} {firstProduct.product_name} its CEO Pay Gap{" "}
-                {firstProduct.profit_margin} times more than the average worker.
-              </p>
-            </div>
-            <div className="w-full mt-4">
-              <Button variant="contained" onClick={handleCompare}>
-                <MdOutlineCompareArrows className="compareIcon" /> Click Here to
-                Compare Profit Margins
-              </Button>
-            </div>
-          </div>
+          )}
 
           {/* <Box
             display="flex"
@@ -912,13 +916,13 @@ export const TabOne = ({
                           {row?.profit_margin?.replace(" ", "") || "0%"}
                         </Typography>
 
-                        {!loading && i === 0 && (
+                        {!loading && i ===0 && (
                           <Typography
                             variant="body2"
                             color="text.secondary"
                             sx={{ mt: 1 }}
                           >
-                            {row.brand} earns {row.profit_made} profit on every{" "}
+                            {row.brand} earns {row.profit_margin}  profit on every{" "}
                             {row.release_price} {row.product_name} sold.
                           </Typography>
                         )}

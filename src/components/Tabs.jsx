@@ -6,6 +6,7 @@ import { AiFillDollarCircle } from "react-icons/ai";
 import { RiUser2Fill } from "react-icons/ri";
 import { TbBuildingBank } from "react-icons/tb";
 import React from "react";
+import { TabNull } from "./TabNull";
 
 const tabs = [
   {
@@ -62,7 +63,7 @@ export const Tabs = () => {
               searchLabel: getSearchLabel(),
             })
           ) : (
-            <TabOne searchLabel={getSearchLabel()} />
+            <TabNull searchLabel={getSearchLabel()} />
           )}
         </div>
       </>

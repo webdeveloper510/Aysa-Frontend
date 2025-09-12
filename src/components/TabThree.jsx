@@ -5,6 +5,9 @@ import {
   TextField,
   Autocomplete,
   CircularProgress,
+  Card,
+  CardContent,
+  LinearProgress,
 } from "@mui/material";
 import axios from "axios";
 
@@ -372,87 +375,86 @@ export const TabThree = () => {
       )}
 
       {!!filteredData.length && (
-        <Box
-          sx={{ p: 2, display: "flex", flexDirection: "column" }}
-          className="nopadding"
-        >
-          <Box className="tab3Table" sx={{ overflowX: "auto" }}>
-            <Box sx={{ minWidth: "750px" }}>
-              {/* Header */}
-              <Box
-                className="tableheader"
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(4, 1fr)",
-                  gap: 1,
-                }}
-              >
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                  Company <br /> Name
-                </Box>
-                <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                  Year
-                </Box>
-                <Box
-                  sx={{
-                    ...cellStyle,
-                    backgroundColor: "#15A271",
-                    color: "#fff",
-                  }}
-                >
-                  Tax Paid
-                </Box>
-                <Box
-                  sx={{
-                    ...cellStyle,
-                    backgroundColor: "#EC4137",
-                    color: "#fff",
-                  }}
-                >
-                  Tax Avoided
-                </Box>
-              </Box>
 
+ <div className="taxavoidance_card">
+            
               {/* Body */}
               {filteredData.map((row, index) => (
-                <Box
+    <>
+
+<Card
+              elevation={3}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                p: 2,
+                borderRadius: 3,
+                mb: 2,
+              }}
+            >
+              {/* Left Section */}
+              <CardContent
+                sx={{ width: "50%", marginRight: "20px", flex: 1, p: 0 }}
+              >
+              <Typography
+                  variant="h4"
+                  align="left"
+                  sx={{ fontWeight: "bold", mb: 3 }}
+                >
+                  {row.company_name} ({row.year})
+                </Typography>
+ <Box
                   key={`${row.company_name}-${row.year}-${index}`}
                   className="tablebody"
                   sx={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(4, 1fr)",
-                    gap: 1,
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: 0,
                   }}
                 >
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.company_name}</Typography>
-                  </Box>
-                  <Box sx={{ ...cellStyle, backgroundColor: "#FCFAF6" }}>
-                    <Typography variant="h6">{row.year}</Typography>
-                  </Box>
                   <Box
                     sx={{
-                      ...cellStyle,
                       backgroundColor: "#E9E7CA",
                       color: "#0C7E57",
                     }}
                   >
-                    <Typography variant="h6">{row.tax_paid}</Typography>
+                    <Typography variant="h6">
+                      <span>Tax Paid</span>
+                      {row.tax_paid}</Typography>
                   </Box>
                   <Box
                     sx={{
-                      ...cellStyle,
                       backgroundColor: "#FEC7C7",
                       color: "#EC4137",
                     }}
                   >
-                    <Typography variant="h6">{row.tax_avoid}</Typography>
+                    <Typography variant="h6">
+                       <span>Tax Avoided</span>
+                      {row.tax_avoid}</Typography>
                   </Box>
                 </Box>
+
+              </CardContent>
+
+              
+            </Card>
+             <Typography variant="h6">
+{row.company_name} paid {row.tax_paid} but avoided {row.tax_avoid} in {row.year}
+ 
+             </Typography>
+
+
+
+               
+                </>
               ))}
-            </Box>
-          </Box>
-        </Box>
+           
+     
+
+ </div>
+
+       
       )}
     </>
   );

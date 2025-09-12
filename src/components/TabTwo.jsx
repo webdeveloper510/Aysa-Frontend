@@ -225,7 +225,8 @@ export const TabTwo = () => {
       setFilteredData(topFourYears);
     } catch (err) {
       console.error("CEO-Worker search failed:", err);
-      setError(`Failed to load data: ${err.message}. Please try again.`);
+      setError(`CEO-Worker Not found: ${searchQuery}.`);
+      // setError(`Failed to load data: ${err.message}. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -475,7 +476,7 @@ export const TabTwo = () => {
                   color="text.secondary"
                   sx={{ color: "#000" }}
                 >
-                 {`(${row["pay_ratio"].toLowerCase().replace("x", " x")} Gap)`}
+                  {`(${row["pay_ratio"].toLowerCase().replace("x", " x")} Gap)`}
                 </Typography>
               </CardContent>
 

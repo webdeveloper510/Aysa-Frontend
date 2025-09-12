@@ -196,7 +196,9 @@ export const TabThree = () => {
       setFilteredData(topFourYears);
     } catch (err) {
       console.error("Tax search failed:", err);
-      setError(`Failed to load data: ${err.message}. Please try again.`);
+      setError(`Tax data Not Matched with: ${searchQuery}.`);
+
+      // setError(`Failed to load data: ${err.message}. Please try again.`);
     } finally {
       setLoading(false);
     }

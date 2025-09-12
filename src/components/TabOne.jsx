@@ -348,15 +348,19 @@ export const TabOne = ({
       };
 
       const formattedData = formatItems(searchData);
+      console.log(
+        formattedData,
+        "Here Getting the Datta ---------------------------->",
+        showComparison
+      );
       setData({
         matched: formattedData,
         compared: [],
       });
+      setshowComparison(true);
     } catch (err) {
       console.error("Search failed:", err);
-      setError(
-        `Failed to load product data: ${err.message}. Please try again.`
-      );
+      setError(`Product Not Matched with: ${searchQuery}.`);
       setData({ matched: [], compared: [] });
     } finally {
       setLoading(false);
@@ -386,70 +390,70 @@ export const TabOne = ({
   };
 
   const firstProduct = data.matched?.[0] || {};
-  const profitMarginValue = parseFloat(
-    String(firstProduct.profit_margin || "0").replace("%", "")
-  );
+  // const profitMarginValue = parseFloat(
+  //   String(firstProduct.profit_margin || "0").replace("%", "")
+  // );
 
-  const marketPriceValue = firstProduct.market_price || 0;
-  const profitValueMade = firstProduct.profit_made_value || 0;
+  // const marketPriceValue = firstProduct.market_price || 0;
+  // const profitValueMade = firstProduct.profit_made_value || 0;
 
-  const chartData = {
-    labels: [`Market Price: $${marketPriceValue}`],
-    datasets: [
-      {
-        label: "Profit Margin",
-        data: [profitMarginValue],
-        backgroundColor: "#4FC3F7",
-        categoryPercentage: 0.6,
-        barThickness: 80,
-      },
-    ],
-  };
+  // const chartData = {
+  //   labels: [`Market Price: $${marketPriceValue}`],
+  //   datasets: [
+  //     {
+  //       label: "Profit Margin",
+  //       data: [profitMarginValue],
+  //       backgroundColor: "#4FC3F7",
+  //       categoryPercentage: 0.6,
+  //       barThickness: 80,
+  //     },
+  //   ],
+  // };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            return `Profit Margin: ${context.raw}%`;
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Product",
-          font: { weight: "bold" },
-        },
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        beginAtZero: true,
-        max: 100,
-        ticks: {
-          stepSize: 25,
-          callback: function (value) {
-            return `${value}%`;
-          },
-        },
-        title: {
-          display: true,
-          text: "Profit Margin (%)",
-          font: { weight: "bold" },
-        },
-        grid: {
-          color: "#e0e0e0",
-        },
-      },
-    },
-  };
+  // const chartOptions = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: { display: false },
+  //     tooltip: {
+  //       callbacks: {
+  //         label: function (context) {
+  //           return `Profit Margin: ${context.raw}%`;
+  //         },
+  //       },
+  //     },
+  //   },
+  //   scales: {
+  //     x: {
+  //       title: {
+  //         display: true,
+  //         text: "Product",
+  //         font: { weight: "bold" },
+  //       },
+  //       grid: {
+  //         display: false,
+  //       },
+  //     },
+  //     y: {
+  //       beginAtZero: true,
+  //       max: 100,
+  //       ticks: {
+  //         stepSize: 25,
+  //         callback: function (value) {
+  //           return `${value}%`;
+  //         },
+  //       },
+  //       title: {
+  //         display: true,
+  //         text: "Profit Margin (%)",
+  //         font: { weight: "bold" },
+  //       },
+  //       grid: {
+  //         color: "#e0e0e0",
+  //       },
+  //     },
+  //   },
+  // };
 
   const LoadingComponent = () => (
     <Box
@@ -916,14 +920,14 @@ export const TabOne = ({
                           {row?.profit_margin?.replace(" ", "") || "0%"}
                         </Typography>
 
-                        {!loading && i ===0 && (
+                        {!loading && i === 0 && (
                           <Typography
                             variant="body2"
                             color="text.secondary"
                             sx={{ mt: 1 }}
                           >
-                            {row.brand} earns {row.profit_margin}  profit on every{" "}
-                            {row.release_price} {row.product_name} sold.
+                            {row.brand} earns {row.profit_margin} profit on
+                            every {row.release_price} {row.product_name} sold.
                           </Typography>
                         )}
                       </Card>

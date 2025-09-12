@@ -363,9 +363,7 @@ export const TabNull = ({
       });
     } catch (err) {
       console.error("Search failed:", err);
-      setError(
-        `Failed to load product data: ${err.message}. Please try again.`
-      );
+      setError(`Product Not Matched with: ${searchQuery}.`);
       setData({ matched: [], compared: [] });
     } finally {
       setLoading(false);
@@ -932,18 +930,17 @@ export const TabNull = ({
                           {row["Profit Margin"] || "0%"}
                         </Typography>
 
-                        {!loading &&
-                          i === 0 && (
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mt: 1 }}
-                              >
-                                {row.Brand} earns {row["Profit Margin"]} profit
-                                on every {row["Release Price"]}{" "}
-                                {row["Product Name"]} sold.
-                              </Typography>
-                            )}
+                        {!loading && i === 0 && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 1 }}
+                          >
+                            {row.Brand} earns {row["Profit Margin"]} profit on
+                            every {row["Release Price"]} {row["Product Name"]}{" "}
+                            sold.
+                          </Typography>
+                        )}
                       </Card>
                     ))}
                   </Box>

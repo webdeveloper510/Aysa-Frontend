@@ -686,8 +686,15 @@ export const TabNull = ({
                             borderRadius: "12px",
                             boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                           }}
+                          // onError={(e) => {
+                          //   e.target.style.display = "block";
+                          // }}
+
                           onError={(e) => {
-                            e.target.style.display = "none";
+                            e.currentTarget.src =
+                              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                            e.currentTarget.style.width = "200px"; // 👈 enforce width even on fallback
+                            e.currentTarget.style.height = "200px";
                           }}
                         />
                       </Box>

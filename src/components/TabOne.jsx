@@ -23,13 +23,25 @@ export const TabOne = ({
   const [allProductsData, setAllProductsData] = useState([]);
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [status, setStatus] = useState(0);
+  const [deviceType, setDeviceType] = useState("desktop");
   const [showComparison, setshowComparison] = useState(true);
+  const [globalData, setglobalData] = useState({});
 
   const handleCompare = () => {
     setshowComparison((prev) => !prev);
   };
 
   console.log("All Products Data:", data);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    if (/Mobi|Android|iPhone|iPod|iPad/i.test(ua)) {
+      setDeviceType("mobile");
+    } else {
+      setDeviceType("desktop");
+    }
+  }, []);
+
   useEffect(() => {
     const fetchAllProductsData = async () => {
       setInitialDataLoading(true);
@@ -293,7 +305,11 @@ export const TabOne = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query, tab_type: "profit" }),
+          body: JSON.stringify({
+            query,
+            tab_type: "profit",
+            device_type: deviceType,
+          }),
         }
       );
 
@@ -303,6 +319,7 @@ export const TabOne = ({
 
       const result = await response.json();
       console.log(result.status);
+      setglobalData(result);
 
       setStatus(result.status);
       const searchData = result.data || [];
@@ -668,7 +685,7 @@ export const TabOne = ({
                   <span className="text-md font-medium text-gray-700">
                     {firstProduct?.profit_margin
                       ? `${firstProduct.profit_margin}`
-                      : "N/A"}
+                      : "$0"}
                   </span>
                 </div>
 
@@ -690,7 +707,7 @@ export const TabOne = ({
                   <span className="text-md font-medium text-gray-700">
                     {firstProduct?.profit_margin
                       ? `${firstProduct.profit_margin}`
-                      : "N/A"}
+                      : "$0"}
                   </span>
                 </div>
 
@@ -825,7 +842,7 @@ export const TabOne = ({
                     align="center"
                     sx={{ fontWeight: "bold", mb: 3 }}
                   >
-                    Compare Profit Margins
+                    Comparing Profit Margins
                   </Typography>
 
                   <Box
@@ -837,102 +854,120 @@ export const TabOne = ({
                     }}
                   >
                     {data.matched.map((row, i) => (
-                      <Card
-                        key={row.id}
-                        elevation={3}
-                        sx={{
-                          p: 2,
-                          textAlign: "center",
-                          borderRadius: 3,
-                        }}
-                      >
-                        {/* Product Image */}
-                        <Box sx={{ mb: 2 }}>
-                          {row.product_url ? (
-                            <img
-                              src={row.product_url}
-                              alt={`${row.brand} ${row.product_name}`}
-                              style={{
-                                width: "100%",
-                                maxHeight: 150,
-                                objectFit: "contain",
-                                borderRadius: "8px",
-                              }}
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
-                              }}
-                            />
-                          ) : (
+                      <>
+                        <Card
+                          key={row.id}
+                          elevation={3}
+                          sx={{
+                            p: 2,
+                            textAlign: "center",
+                            borderRadius: 3,
+                          }}
+                        >
+                          {/* Product Image */}
+                          <Box sx={{ mb: 2 }}>
+                            {row.product_url ? (
+                              <img
+                                src={row.product_url}
+                                alt={`${row.brand} ${row.product_name}`}
+                                style={{
+                                  width: "100%",
+                                  maxHeight: 150,
+                                  objectFit: "contain",
+                                  borderRadius: "8px",
+                                }}
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                                }}
+                              />
+                            ) : (
+                              <Box
+                                sx={{
+                                  width: "100%",
+                                  height: 150,
+                                  backgroundColor: "#f0f0f0",
+                                  borderRadius: "8px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="text.disabled"
+                                >
+                                  No Image
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: "bold", mb: 1 }}
+                          >
+                            {row.brand} {row.product_name} {row.product_type}
+                          </Typography>
+
+                          <Box sx={{ width: "100%", mb: 1 }}>
                             <Box
                               sx={{
                                 width: "100%",
-                                height: 150,
-                                backgroundColor: "#f0f0f0",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
+                                height: 12,
+                                backgroundColor: "#e0e0e0",
+                                borderRadius: 2,
+                                overflow: "hidden",
                               }}
                             >
-                              <Typography
-                                variant="caption"
-                                color="text.disabled"
-                              >
-                                No Image
-                              </Typography>
+                              <Box
+                                sx={{
+                                  height: "100%",
+                                  backgroundColor: "#2196f3",
+                                  borderRadius: 2,
+                                  transition: "width 0.5s ease",
+                                  width: `${
+                                    row?.profit_margin?.replace(" ", "") || "0%"
+                                  }`,
+                                }}
+                              />
                             </Box>
-                          )}
-                        </Box>
-
-                        <Typography
-                          variant="h6"
-                          sx={{ fontWeight: "bold", mb: 1 }}
-                        >
-                          {row.brand} {row.product_name}
-                        </Typography>
-
-                        <Box sx={{ width: "100%", mb: 1 }}>
-                          <Box
-                            sx={{
-                              width: "100%",
-                              height: 12,
-                              backgroundColor: "#e0e0e0",
-                              borderRadius: 2,
-                              overflow: "hidden",
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                height: "100%",
-                                backgroundColor: "#2196f3",
-                                borderRadius: 2,
-                                transition: "width 0.5s ease",
-                                width: `${
-                                  row?.profit_margin?.replace(" ", "") || "0%"
-                                }`,
-                              }}
-                            />
                           </Box>
-                        </Box>
 
-                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                          {row?.profit_margin?.replace(" ", "") || "0%"}
-                        </Typography>
-
-                        {!loading && i === 0 && (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 1 }}
-                          >
-                            {row.brand} earns {row.profit_margin} profit on
-                            every {row.release_price} {row.product_name} sold.
+                          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            {row?.profit_margin?.replace(" ", "") || "0%"}
                           </Typography>
-                        )}
-                      </Card>
+
+                          {!loading && i === 0 && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mt: 1 }}
+                            >
+                              {row.brand} makes {row.profit_margin} on a every{" "}
+                              {row.release_price} {row.product_name}
+                              {row.product_type} , and its CEO earns{" "}
+                              {globalData?.ceo_worker_data.length > 0
+                                ? `${globalData.ceo_worker_data[0]["Pay Ration"]
+                                    .toLowerCase()
+                                    .replace("x", "")}`
+                                : "$0"}{" "}
+                              more than the average worker.
+                            </Typography>
+                          )}
+                        </Card>
+                      </>
                     ))}
                   </Box>
+
+                  {/* {data?.matched?.map((row, i) => (
+                    <Typography key={i} variant="h6" mt="10px">
+                      CEO {row.ceo_name} made {row.ceo_total_compensation} vs.
+                      worker {row.worker_salary}. That’s{" "}
+                      {row["pay_ratio"]?.toLowerCase().replace("x", "")} times
+                      more.
+                    </Typography>
+                  ))} */}
                 </Box>
               </div>
             </>

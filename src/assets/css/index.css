@@ -46,7 +46,8 @@ header.App-header p {
   border-radius: 20px;
 }
 
-.paygap_card , .taxavoidance_card {
+.paygap_card,
+.taxavoidance_card {
   width: 600px;
   margin: 20px auto 0px;
 }
@@ -80,9 +81,10 @@ svg.compareIcon {
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
-  margin-top: 100px;
 }
-
+.customWidthCeo {
+  width: 70%;
+}
 .outer-circle {
   width: 12em;
   /* background-color: #dbf2ff; */
@@ -170,6 +172,9 @@ section.about-section {
 .tablebody .MuiBox-root {
   padding: 40px 10px;
 }
+.nopadding {
+  padding-bottom: 0px !important;
+}
 .tablebody .MuiBox-root h6 {
   font-family: "Antonio", sans-serif;
   font-size: 40px;
@@ -177,10 +182,10 @@ section.about-section {
   line-height: 122%;
   display: flex;
   align-items: center;
-  flex-direction: column;
+  justify-content: space-around;
 }
 .tablebody .MuiBox-root h6 span {
-    font-size: 30px;
+  font-size: 30px;
 }
 .tab3Table .tablebody {
   margin-top: 8px;
@@ -223,7 +228,6 @@ section.about-section {
 .meow {
   width: 700px;
   margin: 0 auto;
-  position: absolute;
   top: 0;
   left: 0px;
   right: 0px;
@@ -389,7 +393,6 @@ div#mobile-inital-render {
   }
   .tab-buttons {
     gap: 10px;
-    margin-top: 80px;
     width: 100%;
     flex-wrap: nowrap !important;
   }

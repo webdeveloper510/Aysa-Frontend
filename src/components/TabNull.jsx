@@ -7,6 +7,7 @@ import {
   TextField,
   Autocomplete,
   CircularProgress,
+  Grid,
   Card,
 } from "@mui/material";
 //import { Bar } from "react-chartjs-2";
@@ -660,90 +661,164 @@ export const TabNull = ({
               )}
             </Typography>
 
-            <div className="w-full">
-              {/* Label Row */}
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  Profit Margin
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  {globalData?.data[0]["Profit Margin"] || "N/A"}
-                </span>
-              </div>
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start", // optional if you want top alignment
+              }}
+            >
+              {/* Left Column */}
+              <Grid item xs={12} md={6}>
+                <Box display="flex" flexWrap="wrap" justifyContent="center">
+                  <Box>
+                    {firstProduct.product_url ? (
+                      <Box textAlign="center">
+                        <img
+                          src={firstProduct.product_url}
+                          alt={`${firstProduct.brand} ${firstProduct.product_name}`}
+                          style={{
+                            width: "100%",
+                            maxWidth: "200px",
+                            height: "auto",
+                            borderRadius: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          height: "300px",
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography color="text.disabled">
+                          No image available
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              </Grid>
 
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${globalData?.data[0]["Profit Margin"] || 0}`,
-                  }}
-                />
-              </div>
-            </div>
+              <Grid
+                item
+                xs={12}
+                md={6}
+                sx={{
+                  minWidth: "260px",
+                }}
+              >
+                <div className="w-full">
+                  {/* Label Row */}
+                  <div className="flex justify-between mb-1">
+                    <span className="text-md font-medium text-gray-700">
+                      Profit Margin
+                    </span>
+                    <span className="text-md font-medium text-gray-700">
+                      {globalData?.data[0]["Profit Margin"] || "N/A"}
+                    </span>
+                  </div>
 
-            <div className="w-full mt-4">
-              {/* Label Row */}
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  CEO-Worker Pay Gap
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  {globalData.ceo_worker_data.length > 0
-                    ? `${globalData.ceo_worker_data[0]["Pay Ration"]
-                        .toLowerCase()
-                        .replace("x", " x")} `
-                    : "N/A"}
-                </span>
-              </div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${globalData?.data[0]["Profit Margin"] || 0}`,
+                      }}
+                    />
+                  </div>
+                </div>
 
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${firstProduct?.profit_margin || 0}` }}
-                />
-              </div>
-            </div>
+                <div className="w-full mt-4">
+                  {/* Label Row */}
+                  <div className="flex justify-between mb-1">
+                    <span className="text-md font-medium text-gray-700">
+                      CEO-Worker Pay Gap
+                    </span>
+                    <span className="text-md font-medium text-gray-700">
+                      {globalData.ceo_worker_data.length > 0
+                        ? `${globalData.ceo_worker_data[0]["Pay Ration"]
+                            .toLowerCase()
+                            .replace("x", " x")} `
+                        : "$0"}
+                    </span>
+                  </div>
 
-            <div className="w-full mt-4">
-              <div className="flex justify-between mb-1">
-                <h5 className="text-lg font-medium text-gray-700">
-                  Corporate Tax Avoidance
-                </h5>
-              </div>
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  Tax Paid :
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  {globalData.tax_data.length > 0
-                    ? `${globalData?.tax_data[0]["Taxes Paid"]}`
-                    : "N/A"}
-                </span>
-              </div>
-              <div className="flex justify-between mb-1">
-                <span className="text-md font-medium text-gray-700">
-                  Avoided :
-                </span>
-                <span className="text-md font-medium text-gray-700">
-                  {globalData.tax_data.length > 0
-                    ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
-                    : "N/A"}
-                </span>
-              </div>
-            </div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    {globalData?.ceo_worker_data?.length > 0 && (
+                      <div
+                        className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min(
+                            parseFloat(
+                              globalData.ceo_worker_data[0]["Pay Ration"]
+                                .toLowerCase()
+                                .replace("x", "")
+                            ) || 0,
+                            100 // cap at 100%
+                          )}%`,
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="w-full mt-4">
+                  <div className="flex justify-between mb-1">
+                    <h5 className="text-lg font-medium text-gray-700">
+                      Corporate Tax Avoidance
+                    </h5>
+                  </div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-md font-medium text-gray-700">
+                      Tax Paid :
+                    </span>
+                    <span className="text-md font-medium text-gray-700">
+                      {globalData.tax_data.length > 0
+                        ? `${globalData?.tax_data[0]["Taxes Paid"]}`
+                        : "$0"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-md font-medium text-gray-700">
+                      Avoided :
+                    </span>
+                    <span className="text-md font-medium text-gray-700">
+                      {globalData.tax_data.length > 0
+                        ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
+                        : "$0"}
+                    </span>
+                  </div>
+                </div>
+              </Grid>
+            </Grid>
+
             <div className="w-full mt-4">
               <p>
                 {firstProduct.brand} makes{" "}
                 {globalData?.data[0]["Profit Margin"] || "N/A"} on a{" "}
                 {globalData?.data[0]["Release Price"]}{" "}
-                {firstProduct.product_name} its CEO Pay Gap{" "}
+                {firstProduct.product_name}{" "}
+                {globalData?.data[0]["Product Type"]} , and its CEO Pay Gap{" "}
                 {globalData?.ceo_worker_data.length > 0
                   ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                       .toLowerCase()
                       .replace("x", " x")}`
-                  : "N/A"}{" "}
+                  : "$0"}{" "}
                 more than the average worker.
               </p>
             </div>
@@ -837,7 +912,7 @@ export const TabNull = ({
                     align="center"
                     sx={{ fontWeight: "bold", mb: 3 }}
                   >
-                    Compare Profit Margins
+                    Comparing Profit Margins
                   </Typography>
 
                   <Box
@@ -901,7 +976,8 @@ export const TabNull = ({
                           variant="h6"
                           sx={{ fontWeight: "bold", mb: 1 }}
                         >
-                          {row.Brand} {row["Product Name"]}
+                          {row.Brand} {row["Product Name"]}{" "}
+                          {row["Product Type"]}
                         </Typography>
 
                         <Box sx={{ width: "100%", mb: 1 }}>
@@ -936,9 +1012,16 @@ export const TabNull = ({
                             color="text.secondary"
                             sx={{ mt: 1 }}
                           >
-                            {row.Brand} earns {row["Profit Margin"]} profit on
-                            every {row["Release Price"]} {row["Product Name"]}{" "}
-                            sold.
+                            {row.Brand} makes {row["Profit Margin"]} on a{" "}
+                            {row["Release Price"]} {firstProduct.product_name}{" "}
+                            {globalData?.data[0]["Product Type"]}
+                            {row.product_type} , and its CEO earns{" "}
+                            {globalData?.ceo_worker_data.length > 0
+                              ? `${globalData.ceo_worker_data[0]["Pay Ration"]
+                                  .toLowerCase()
+                                  .replace("x", "")}`
+                              : "$0"}{" "}
+                            times more than the average worker.
                           </Typography>
                         )}
                       </Card>

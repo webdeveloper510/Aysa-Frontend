@@ -377,86 +377,79 @@ export const TabThree = () => {
       )}
 
       {!!filteredData.length && (
-
- <div className="taxavoidance_card">
-            
-              {/* Body */}
-              {filteredData.map((row, index) => (
-    <>
-
-<Card
-              elevation={3}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                p: 2,
-                borderRadius: 3,
-                mb: 2,
-              }}
-            >
-              {/* Left Section */}
-              <CardContent
-                sx={{ width: "50%", marginRight: "20px", flex: 1, p: 0 }}
+        <div className="taxavoidance_card">
+          {/* Body */}
+          {filteredData.map((row, index) => (
+            <>
+              <Card
+                elevation={3}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  p: 2,
+                  borderRadius: 3,
+                  mb: 2,
+                }}
               >
-              <Typography
-                  variant="h4"
-                  align="left"
-                  sx={{ fontWeight: "bold", mb: 3 }}
-                >
-                  {row.company_name} ({row.year})
-                </Typography>
- <Box
-                  key={`${row.company_name}-${row.year}-${index}`}
-                  className="tablebody"
+                {/* Left Section */}
+                <CardContent
+                  className="nopadding"
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(2, 1fr)",
-                    gap: 0,
+                    width: "50%",
+                    marginRight: "20px",
+                    flex: 1,
+                    p: 0,
                   }}
                 >
+                  <Typography
+                    variant="h4"
+                    align="left"
+                    sx={{ fontWeight: "bold", mb: 3 }}
+                  >
+                    {row.company_name} ({row.year})
+                  </Typography>
                   <Box
+                    key={`${row.company_name}-${row.year}-${index}`}
+                    className="tablebody"
                     sx={{
-                      backgroundColor: "#E9E7CA",
-                      color: "#0C7E57",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(1, 1fr)",
+                      gap: 0,
                     }}
                   >
-                    <Typography variant="h6">
-                      <span>Tax Paid</span>
-                      {row.tax_paid}</Typography>
+                    <Box
+                      sx={{
+                        backgroundColor: "#E9E7CA",
+                        color: "#0C7E57",
+                      }}
+                    >
+                      <Typography variant="h6">
+                        <span>Tax Paid</span>
+                        {row.tax_paid}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        backgroundColor: "#FEC7C7",
+                        color: "#EC4137",
+                      }}
+                    >
+                      <Typography variant="h6">
+                        <span>Tax Avoided</span>
+                        {row.tax_avoid}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box
-                    sx={{
-                      backgroundColor: "#FEC7C7",
-                      color: "#EC4137",
-                    }}
-                  >
-                    <Typography variant="h6">
-                       <span>Tax Avoided</span>
-                      {row.tax_avoid}</Typography>
-                  </Box>
-                </Box>
-
-              </CardContent>
-
-              
-            </Card>
-             <Typography variant="h6">
-{row.company_name} paid {row.tax_paid} but avoided {row.tax_avoid} in {row.year}
- 
-             </Typography>
-
-
-
-               
-                </>
-              ))}
-           
-     
-
- </div>
-
-       
+                  <Typography variant="h6" mt="10px">
+                    {row.company_name} paid {row.tax_paid} but avoided{" "}
+                    {row.tax_avoid} in {row.year} by exploiting tax loopholes.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </>
+          ))}
+        </div>
       )}
     </>
   );

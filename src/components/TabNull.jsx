@@ -660,7 +660,6 @@ export const TabNull = ({
                 "$1"
               )}
             </Typography>
-
             <Grid
               container
               spacing={2}
@@ -813,7 +812,6 @@ export const TabNull = ({
                 </div>
               </Grid>
             </Grid>
-
             <div className="w-full mt-4">
               <p>
                 {firstProduct.brand} makes{" "}
@@ -829,12 +827,14 @@ export const TabNull = ({
                 more than the average worker.
               </p>
             </div>
-            <div className="w-full mt-4">
-              <Button variant="contained" onClick={handleCompare}>
-                <MdOutlineCompareArrows className="compareIcon" /> Click Here to
-                Compare Profit Margins
-              </Button>
-            </div>
+            {data.matched.length > 1 && (
+              <div className="w-full mt-4">
+                <Button variant="contained" onClick={handleCompare}>
+                  <MdOutlineCompareArrows className="compareIcon" /> Click Here
+                  to Compare Profit Margins
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* <Box

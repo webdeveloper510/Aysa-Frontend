@@ -194,7 +194,7 @@ export const TabTwo = () => {
         ceo_name: (row["CEO Name"] || "").trim(),
         ceo_total_compensation: (row["CEO Total Compensation"] || "").trim(),
         worker_salary: (row["Frontline Worker Salary"] || "").trim(),
-        pay_ratio: (row["Pay Ratio"] || "N/A").trim(),
+        pay_ratio: (row["Pay Ration"] || "N/A").trim(),
       }));
 
       console.log("Processed data:", data);

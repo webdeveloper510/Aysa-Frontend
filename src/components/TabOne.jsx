@@ -833,7 +833,7 @@ export const TabOne = ({
           </Box> */}
 
           {/* Only show the table and comparison heading when there are 2 or more products */}
-          {data.matched.length > 1 && showComparison && (
+          {data.matched.length > 0 && showComparison && (
             <>
               <div className="comparisonTable">
                 <Box sx={{ mt: 3 }}>

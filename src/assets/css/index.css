@@ -311,6 +311,22 @@ header.App-header label {
 div#mobile-inital-render {
   margin-top: 20px;
 }
+.mobileCompareGlobalSerach {
+  display: flex;
+  align-items: center;
+}
+.customGraphMobile {
+  position: relative;
+}
+.customGraphMobile::before {
+  content: "";
+  position: absolute;
+  border-left: 1px solid #ccc;
+  left: 0;
+  width: 65px;
+  height: 79px;
+  top: -18px;
+}
 /**************** responsive css ************/
 
 @media screen and (max-width: 1200px) {
@@ -364,6 +380,23 @@ div#mobile-inital-render {
 }
 
 @media screen and (max-width: 768px) {
+  .customWidthCeo {
+    width: 50%;
+  }
+  .comparisonTable,
+  .paygap_card,
+  .taxavoidance_card {
+    width: 100%;
+    margin: 20px auto;
+  }
+  .tab-buttons.hide {
+    display: none;
+  }
+  .serachedProduct {
+    width: 100%;
+    padding: 10px;
+    margin-top: 0px;
+  }
   .accordion-header {
     height: 145px;
     width: 145px;
@@ -385,7 +418,7 @@ div#mobile-inital-render {
   .outer-circle {
     height: auto;
     width: 100%;
-    padding: 10px 5px;
+    padding: 0px 10px;
   }
   .inner-circle {
     width: 9em;
@@ -400,10 +433,10 @@ div#mobile-inital-render {
     font-size: 15px;
   }
   .outer-circle span {
-    font-size: 18px;
+    font-size: 20px;
   }
   span.tabsIcons {
-    font-size: 30px;
+    font-size: 50px;
   }
 
   .about-row h1 {
@@ -418,11 +451,14 @@ div#mobile-inital-render {
   .meow {
     width: 100%;
     margin: 0 auto;
+    position: absolute;
+    top: -70px !important;
   }
 
   .tab-wrapper {
     width: 95%;
     margin: 15px auto;
+    margin-top: 90px;
   }
   .tab-content {
     margin: 0px 20px;

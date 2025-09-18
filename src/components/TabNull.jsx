@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Button from "@mui/material/Button";
-
+import { useMediaQuery } from "@mui/material";
 import {
   Box,
   Typography,
@@ -16,6 +16,7 @@ import { MdOutlineCompareArrows } from "react-icons/md";
 
 export const TabNull = ({
   searchLabel = "Search by brands, products or types",
+  onResults,
 }) => {
   const [data, setData] = useState({ matched: [], compared: [] });
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,9 +29,16 @@ export const TabNull = ({
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
 
+  const isDesktop = useMediaQuery("(min-width:768px)");
+
   const handleCompare = () => {
     setshowComparison((prev) => !prev);
   };
+
+  useEffect(() => {
+    // Notify Tabs whenever results change
+    onResults(!!data.matched.length);
+  }, [data.matched, onResults]);
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -500,6 +508,8 @@ export const TabNull = ({
     return <InitialLoadingComponent />;
   }
 
+  console.log("ceo_worker_data:", globalData?.ceo_worker_data);
+
   return (
     <>
       <div className="meow">
@@ -645,401 +655,717 @@ export const TabNull = ({
         </>
       )}
 
-      {!loading && data.matched.length > 0 && (
-        <>
-          <div className="serachedProduct">
-            <Typography
-              variant="h4"
-              align="center"
-              fontWeight="bold"
-              my={4}
-              sx={{ textTransform: "capitalize" }}
-            >
-              {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
-                /\b(\w+)\s+\1\b/gi,
-                "$1"
-              )}
-            </Typography>
-            <Grid
-              container
-              spacing={2}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start", // optional if you want top alignment
-              }}
-            >
-              {/* Left Column */}
-              <Grid item xs={12} md={6}>
-                <Box display="flex" flexWrap="wrap" justifyContent="center">
-                  <Box>
-                    {firstProduct.product_url ? (
-                      <Box textAlign="center">
-                        <img
-                          src={firstProduct.product_url}
-                          alt={`${firstProduct.brand} ${firstProduct.product_name}`}
-                          style={{
-                            width: "100%",
-                            maxWidth: "200px",
-                            height: "auto",
-                            borderRadius: "12px",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                          }}
-                          // onError={(e) => {
-                          //   e.target.style.display = "block";
-                          // }}
-
-                          onError={(e) => {
-                            e.currentTarget.src =
-                              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
-                            e.currentTarget.style.width = "200px"; // 👈 enforce width even on fallback
-                            e.currentTarget.style.height = "200px";
-                          }}
-                        />
-                      </Box>
-                    ) : (
-                      <Box
-                        sx={{
-                          width: "100%",
-                          height: "300px",
-                          backgroundColor: "#f5f5f5",
-                          borderRadius: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Typography color="text.disabled">
-                          No image available
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-              </Grid>
-
+      {!loading &&
+        data.matched.length > 0 &&
+        (isDesktop ? (
+          <>
+            <div className="serachedProduct">
+              <Typography
+                variant="h4"
+                align="center"
+                fontWeight="bold"
+                my={4}
+                sx={{ textTransform: "capitalize" }}
+              >
+                {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                  /\b(\w+)\s+\1\b/gi,
+                  "$1"
+                )}
+              </Typography>
               <Grid
-                item
-                xs={12}
-                md={6}
+                container
+                spacing={2}
                 sx={{
-                  minWidth: "260px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start", // optional if you want top alignment
                 }}
               >
-                <div className="w-full">
-                  {/* Label Row */}
-                  <div className="flex justify-between mb-1">
-                    <span className="text-md font-medium text-gray-700">
-                      Profit Margin
-                    </span>
-                    <span className="text-md font-medium text-gray-700">
-                      {globalData?.data[0]["Profit Margin"] || "N/A"}
-                    </span>
-                  </div>
+                {/* Left Column */}
+                <Grid item xs={12} md={6}>
+                  <Box display="flex" flexWrap="wrap" justifyContent="center">
+                    <Box>
+                      {firstProduct.product_url ? (
+                        <Box textAlign="center">
+                          <img
+                            src={firstProduct.product_url}
+                            alt={`${firstProduct.brand} ${firstProduct.product_name}`}
+                            style={{
+                              width: "100%",
+                              maxWidth: "200px",
+                              height: "auto",
+                              borderRadius: "12px",
+                              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            }}
+                            // onError={(e) => {
+                            //   e.target.style.display = "block";
+                            // }}
 
-                  {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div
-                      className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                      style={{
-                        width: `${globalData?.data[0]["Profit Margin"] || 0}`,
-                      }}
-                    />
-                  </div>
-                </div>
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                              e.currentTarget.style.width = "200px"; // 👈 enforce width even on fallback
+                              e.currentTarget.style.height = "200px";
+                            }}
+                          />
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{
+                            width: "100%",
+                            height: "300px",
+                            backgroundColor: "#f5f5f5",
+                            borderRadius: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Typography color="text.disabled">
+                            No image available
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                </Grid>
 
-                <div className="w-full mt-4">
-                  {/* Label Row */}
-                  <div className="flex justify-between mb-1">
-                    <span className="text-md font-medium text-gray-700">
-                      CEO-Worker Pay Gap
-                    </span>
-                    <span className="text-md font-medium text-gray-700">
-                      {globalData.ceo_worker_data.length > 0
-                        ? `${globalData.ceo_worker_data[0]["Pay Ration"]
-                            .toLowerCase()
-                            .replace("x", " x")} `
-                        : "$0"}
-                    </span>
-                  </div>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    minWidth: "260px",
+                  }}
+                >
+                  <div className="w-full">
+                    {/* Label Row */}
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        Profit Margin
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData?.data[0]["Profit Margin"] || "N/A"}
+                      </span>
+                    </div>
 
-                  {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    {globalData?.ceo_worker_data?.length > 0 && (
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-3">
                       <div
                         className="bg-blue-500 h-3 rounded-full transition-all duration-500"
                         style={{
-                          width: `${Math.min(
-                            parseFloat(
-                              globalData.ceo_worker_data[0]["Pay Ration"]
-                                .toLowerCase()
-                                .replace("x", "")
-                            ) || 0,
-                            100 // cap at 100%
-                          )}%`,
+                          width: `${globalData?.data[0]["Profit Margin"] || 0}`,
                         }}
                       />
-                    )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="w-full mt-4">
-                  <div className="flex justify-between mb-1">
-                    <h5 className="text-lg font-medium text-gray-700">
-                      Corporate Tax Avoidance
-                    </h5>
+                  <div className="w-full mt-4">
+                    {/* Label Row */}
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        CEO-Worker Pay Gap
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData.ceo_worker_data.length > 0
+                          ? `${globalData.ceo_worker_data[0]["Pay Ration"]
+                              // .toString()
+                              .toLowerCase()
+                              .replace("x", " x")} `
+                          : "$0"}
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      {globalData?.ceo_worker_data?.length > 0 && (
+                        <div
+                          className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.min(
+                              parseFloat(
+                                globalData.ceo_worker_data[0]["Pay Ration"]
+                                  //.toString()
+                                  .toLowerCase()
+                                  .replace("x", "")
+                              ) || 0,
+                              100 // cap at 100%
+                            )}%`,
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-md font-medium text-gray-700">
-                      Tax Paid :
-                    </span>
-                    <span className="text-md font-medium text-gray-700">
-                      {globalData.tax_data.length > 0
-                        ? `${globalData?.tax_data[0]["Taxes Paid"]}`
-                        : "$0"}
-                    </span>
+
+                  <div className="w-full mt-4">
+                    <div className="flex justify-between mb-1">
+                      <h5 className="text-lg font-medium text-gray-700">
+                        Corporate Tax Avoidance
+                      </h5>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        Tax Paid :
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData.tax_data.length > 0
+                          ? `${globalData?.tax_data[0]["Taxes Paid"]}`
+                          : "$0"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        Avoided :
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData.tax_data.length > 0
+                          ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
+                          : "$0"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-md font-medium text-gray-700">
-                      Avoided :
-                    </span>
-                    <span className="text-md font-medium text-gray-700">
-                      {globalData.tax_data.length > 0
-                        ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
-                        : "$0"}
-                    </span>
-                  </div>
-                </div>
+                </Grid>
               </Grid>
-            </Grid>
-            <div className="w-full mt-4">
-              <p>
-                {firstProduct.brand} makes{" "}
-                {globalData?.data[0]["Profit Margin"] || "N/A"} on a{" "}
-                {globalData?.data[0]["Release Price"]}{" "}
-                {firstProduct.product_name}{" "}
-                {globalData?.data[0]["Product Type"]} , and its CEO Pay Gap{" "}
-                {globalData?.ceo_worker_data.length > 0
-                  ? `${globalData.ceo_worker_data[0]["Pay Ration"]
-                      .toLowerCase()
-                      .replace("x", " x")}`
-                  : "$0"}{" "}
-                more than the average worker.
-              </p>
-            </div>
-            {data.matched.length > 1 && (
               <div className="w-full mt-4">
-                <Button variant="contained" onClick={handleCompare}>
-                  <MdOutlineCompareArrows className="compareIcon" /> Click Here
-                  to Compare Profit Margins
-                </Button>
+                <p>
+                  {firstProduct.brand} makes{" "}
+                  {globalData?.data[0]["Profit Margin"] || "N/A"} on a{" "}
+                  {globalData?.data[0]["Release Price"]}{" "}
+                  {firstProduct.product_name}{" "}
+                  {globalData?.data[0]["Product Type"]} , and its CEO Pay Gap{" "}
+                  {globalData?.ceo_worker_data.length > 0
+                    ? `${globalData.ceo_worker_data[0]["Pay Ration"]
+                        //.toString()
+                        .toLowerCase()
+                        .replace("x", " x")}`
+                    : "$0"}{" "}
+                  more than the average worker.
+                </p>
               </div>
-            )}
-          </div>
-
-          {/* <Box
-            display="flex"
-            flexWrap="wrap"
-            gap={3}
-            justifyContent="center"
-            my={4}
-          >
-            <Box flex={1} maxWidth="400px" minWidth="300px">
-              {firstProduct.product_url ? (
-                <Box textAlign="center">
-                  <img
-                    src={firstProduct.product_url}
-                    alt={`${firstProduct.brand} ${firstProduct.product_name}`}
-                    style={{
-                      width: "100%",
-                      maxWidth: "300px",
-                      height: "auto",
-                      borderRadius: "12px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />
-                </Box>
-              ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "300px",
-                    backgroundColor: "#f5f5f5",
-                    borderRadius: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Typography color="text.disabled">
-                    No image available
-                  </Typography>
-                </Box>
+              {data.matched.length > 1 && (
+                <div className="w-full mt-4">
+                  <Button variant="contained" onClick={handleCompare}>
+                    <MdOutlineCompareArrows className="compareIcon" /> Click
+                    Here to Compare Profit Margins
+                  </Button>
+                </div>
               )}
-            </Box>
+            </div>
 
-            {/* Chart Section */}
-          {/*  <Box flex={1} maxWidth="45%" height={300} className="profit-graph">
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mb={1}
-              >
-                <Typography variant="subtitle1" fontWeight="bold" mr={0.5}>
-                  Profit Margin: {firstProduct.profit_margin || "N/A"}
-                </Typography>
-                <Tooltip title="An estimate" arrow>
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontWeight: "bold",
-                      fontSize: "1.1rem",
-                      Color: "#000",
-                    }}
-                  >
-                    (*)
-                  </Typography>
-                </Tooltip>
-              </Box>
-              {chartData && <Bar data={chartData} options={chartOptions} />}
-            </Box>
-          </Box> */}
+            {/* Only show the table and comparison heading when there are 2 or more products */}
 
-          {/* Only show the table and comparison heading when there are 2 or more products */}
-          {globalData.data.length > 1 && showComparison && (
-            <>
-              <div className="comparisonTable">
-                <Box sx={{ mt: 3 }}>
-                  <Typography
-                    variant="h4"
-                    align="center"
-                    sx={{ fontWeight: "bold", mb: 3 }}
-                  >
-                    Comparing Profit Margins
-                  </Typography>
+            {globalData.data.length > 1 && showComparison && (
+              <>
+                <div className="comparisonTable">
+                  <Box sx={{ mt: 3 }}>
+                    <Typography
+                      variant="h4"
+                      align="center"
+                      sx={{ fontWeight: "bold", mb: 3 }}
+                    >
+                      Comparing Profit Margins
+                    </Typography>
 
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fit, minmax(200px, 1fr))",
-                      gap: 3,
-                    }}
-                  >
-                    {globalData.data.map((row, i) => (
-                      <Card
-                        key={row.id}
-                        elevation={3}
-                        sx={{
-                          p: 2,
-                          textAlign: "center",
-                          borderRadius: 3,
-                        }}
-                      >
-                        {/* Product Image */}
-                        <Box sx={{ mb: 2 }}>
-                          {row["Link to Product Pictures"] ? (
-                            <img
-                              src={row["Link to Product Pictures"]}
-                              alt={`${row.brand} ${row.product_name}`}
-                              style={{
-                                width: "100%",
-                                maxHeight: 150,
-                                objectFit: "contain",
-                                borderRadius: "8px",
-                              }}
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
-                              }}
-                            />
-                          ) : (
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fit, minmax(200px, 1fr))",
+                        gap: 3,
+                      }}
+                    >
+                      {globalData.data.map((row, i) => (
+                        <Card
+                          key={row.id}
+                          elevation={3}
+                          sx={{
+                            p: 2,
+                            textAlign: "center",
+                            borderRadius: 3,
+                          }}
+                        >
+                          {/* Product Image */}
+                          <Box sx={{ mb: 2 }}>
+                            {row["Link to Product Pictures"] ? (
+                              <img
+                                src={row["Link to Product Pictures"]}
+                                alt={`${row.brand} ${row.product_name}`}
+                                style={{
+                                  width: "100%",
+                                  maxHeight: 150,
+                                  objectFit: "contain",
+                                  borderRadius: "8px",
+                                }}
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                                }}
+                              />
+                            ) : (
+                              <Box
+                                sx={{
+                                  width: "100%",
+                                  height: 150,
+                                  backgroundColor: "#f0f0f0",
+                                  borderRadius: "8px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="text.disabled"
+                                >
+                                  No Image
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: "bold", mb: 1 }}
+                          >
+                            {row.Brand} {row["Product Name"]}{" "}
+                            {row["Product Type"]}
+                          </Typography>
+
+                          <Box sx={{ width: "100%", mb: 1 }}>
                             <Box
                               sx={{
                                 width: "100%",
-                                height: 150,
-                                backgroundColor: "#f0f0f0",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
+                                height: 12,
+                                backgroundColor: "#e0e0e0",
+                                borderRadius: 2,
+                                overflow: "hidden",
                               }}
                             >
-                              <Typography
-                                variant="caption"
-                                color="text.disabled"
-                              >
-                                No Image
-                              </Typography>
+                              <Box
+                                sx={{
+                                  height: "100%",
+                                  backgroundColor: "#2196f3",
+                                  borderRadius: 2,
+                                  transition: "width 0.5s ease",
+                                  width: `${row["Profit Margin"] || "0%"}`,
+                                }}
+                              />
                             </Box>
-                          )}
-                        </Box>
-
-                        <Typography
-                          variant="h6"
-                          sx={{ fontWeight: "bold", mb: 1 }}
-                        >
-                          {row.Brand} {row["Product Name"]}{" "}
-                          {row["Product Type"]}
-                        </Typography>
-
-                        <Box sx={{ width: "100%", mb: 1 }}>
-                          <Box
-                            sx={{
-                              width: "100%",
-                              height: 12,
-                              backgroundColor: "#e0e0e0",
-                              borderRadius: 2,
-                              overflow: "hidden",
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                height: "100%",
-                                backgroundColor: "#2196f3",
-                                borderRadius: 2,
-                                transition: "width 0.5s ease",
-                                width: `${row["Profit Margin"] || "0%"}`,
-                              }}
-                            />
                           </Box>
-                        </Box>
 
-                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                          {row["Profit Margin"] || "0%"}
-                        </Typography>
-
-                        {!loading && i === 0 && (
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 1 }}
-                          >
-                            {row.Brand} makes {row["Profit Margin"]} on a{" "}
-                            {row["Release Price"]} {firstProduct.product_name}{" "}
-                            {globalData?.data[0]["Product Type"]}
-                            {row.product_type} , and its CEO earns{" "}
-                            {globalData?.ceo_worker_data.length > 0
-                              ? `${globalData.ceo_worker_data[0]["Pay Ration"]
-                                  .toLowerCase()
-                                  .replace("x", "")}`
-                              : "$0"}{" "}
-                            times more than the average worker.
+                          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            {row["Profit Margin"] || "0%"}
                           </Typography>
-                        )}
-                      </Card>
-                    ))}
+
+                          {!loading && i === 0 && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mt: 1 }}
+                            >
+                              {row.Brand} makes {row["Profit Margin"]} on a{" "}
+                              {row["Release Price"]} {firstProduct.product_name}{" "}
+                              {globalData?.data[0]["Product Type"]}
+                              {row.product_type} , and its CEO earns{" "}
+                              {globalData?.ceo_worker_data.length > 0
+                                ? `${globalData.ceo_worker_data[0]["Pay Ration"]
+                                    //.toString()
+                                    .toLowerCase()
+                                    .replace("x", "")}`
+                                : "$0"}{" "}
+                              times more than the average worker.
+                            </Typography>
+                          )}
+                        </Card>
+                      ))}
+                    </Box>
                   </Box>
-                </Box>
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Only show the table and comparison heading on mobile view */}
+
+            <div className="serachedProduct">
+              <Typography
+                variant="h4"
+                align="center"
+                fontWeight="bold"
+                my={4}
+                sx={{ textTransform: "capitalize" }}
+              >
+                {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                  /\b(\w+)\s+\1\b/gi,
+                  "$1"
+                )}
+              </Typography>
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start", // optional if you want top alignment
+                }}
+              >
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    minWidth: "100%",
+                  }}
+                >
+                  <div className="w-full">
+                    {/* Label Row */}
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        Profit Margin
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData?.data[0]["Profit Margin"] || "N/A"}
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${globalData?.data[0]["Profit Margin"] || 0}`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="w-full mt-4">
+                    {/* Label Row */}
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        CEO-Worker Pay Gap
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData.ceo_worker_data.length > 0
+                          ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
+                              //.toString()
+                              .toLowerCase()
+                              .replace("x", " x")} `
+                          : "$0"}
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      {globalData?.ceo_worker_data?.length > 0 && (
+                        <div
+                          className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.min(
+                              parseFloat(
+                                globalData.ceo_worker_data[0]["Pay Ratio"]
+                                  //.toString()
+                                  .toLowerCase()
+                                  .replace("x", "")
+                              ) || 0,
+                              100 // cap at 100%
+                            )}%`,
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="w-full mt-4">
+                    <div className="flex justify-between mb-1">
+                      <h5 className="text-lg font-medium text-gray-700">
+                        Corporate Tax Avoidance
+                      </h5>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        Tax Paid :
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData.tax_data.length > 0
+                          ? `${globalData?.tax_data[0]["Taxes Paid"]}`
+                          : "$0"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-md font-medium text-gray-700">
+                        Avoided :
+                      </span>
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData.tax_data.length > 0
+                          ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
+                          : "$0"}
+                      </span>
+                    </div>
+                  </div>
+                </Grid>
+              </Grid>
+              <div className="w-full mt-4">
+                <p class="text-left">
+                  {firstProduct.brand} makes{" "}
+                  {globalData?.data[0]["Profit Margin"] || "N/A"} on a{" "}
+                  {globalData?.data[0]["Release Price"]}{" "}
+                  {firstProduct.product_name}{" "}
+                  {globalData?.data[0]["Product Type"]} , and its CEO Pay Gap{" "}
+                  {globalData?.ceo_worker_data.length > 0
+                    ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
+                        //.toString()
+                        .toLowerCase()
+                        .replace("x", " x")}`
+                    : "$0"}{" "}
+                  more than the average worker.
+                </p>
               </div>
-            </>
-          )}
-        </>
-      )}
+              {data.matched.length > 1 && (
+                <div className="w-full mt-4">
+                  <Button variant="contained" onClick={handleCompare}>
+                    {/* <MdOutlineCompareArrows className="compareIcon" /> Click */}
+                    Click Here to Compare Profit Margins
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Only show the table and comparison heading when there are 2 or more products in mobile view */}
+            
+            {globalData.data.length > 1 && showComparison && (
+              <>
+                <div className="comparisonTable">
+                  <Box sx={{ mt: 3 }}>
+                    {/* <Typography
+                      variant="h4"
+                      align="center"
+                      sx={{ fontWeight: "bold", mb: 3 }}
+                    >
+                      Comparing Profit Margins
+                    </Typography> */}
+                    <Typography
+                      variant="h4"
+                      align="center"
+                      fontWeight="bold"
+                      my={4}
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                      {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                        /\b(\w+)\s+\1\b/gi,
+                        "$1"
+                      )}
+                    </Typography>
+
+                    <Grid
+                      container
+                      spacing={2}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box
+                        display="flex"
+                        flexWrap="wrap"
+                        justifyContent="space-between"
+                        sx={{
+                          width: "100%;",
+                        }}
+                      >
+                        <Card
+                          elevation={3}
+                          sx={{
+                            p: 2,
+                            textAlign: "center",
+                            borderRadius: 3,
+                            width: "40%;",
+                          }}
+                        >
+                          <Box
+                            display="flex"
+                            flexWrap="wrap"
+                            justifyContent="center"
+                          >
+                            <Box>
+                              {firstProduct.product_url ? (
+                                <Box textAlign="center">
+                                  <img
+                                    src={firstProduct.product_url}
+                                    alt={`${firstProduct.brand} ${firstProduct.product_name}`}
+                                    style={{
+                                      width: "100%",
+                                      maxWidth: "100px",
+                                      height: "auto",
+                                      borderRadius: "12px",
+                                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                    }}
+                                    // onError={(e) => {
+                                    //   e.target.style.display = "block";
+                                    // }}
+
+                                    onError={(e) => {
+                                      e.currentTarget.src =
+                                        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNGNUY1RjUiLz48cGF0aCBkPSJNMjAgMjBINDBWNDBIMjBWMjBaIiBmaWxsPSIjRERERERFIi8+PC9zdmc+";
+                                      e.currentTarget.style.width = "200px"; // 👈 enforce width even on fallback
+                                      e.currentTarget.style.height = "200px";
+                                    }}
+                                  />
+                                  <Typography
+                                    variant="h6"
+                                    align="left"
+                                    fontWeight="bold"
+                                    my={1}
+                                    sx={{
+                                      textTransform: "capitalize",
+                                      fontSize: "16px",
+                                    }}
+                                  >
+                                    {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                                      /\b(\w+)\s+\1\b/gi,
+                                      "$1"
+                                    )}
+                                  </Typography>
+                                </Box>
+                              ) : (
+                                <Box
+                                  sx={{
+                                    width: "100%",
+                                    height: "100px",
+                                    backgroundColor: "#f5f5f5",
+                                    borderRadius: "12px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  <Typography
+                                    variant="h6"
+                                    align="left"
+                                    fontWeight="bold"
+                                    my={1}
+                                    sx={{
+                                      textTransform: "capitalize",
+                                      fontSize: "16px",
+                                    }}
+                                  >
+                                    {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                                      /\b(\w+)\s+\1\b/gi,
+                                      "$1"
+                                    )}
+                                  </Typography>
+                                  <Typography color="text.disabled">
+                                    No image available
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
+                          </Box>
+                        </Card>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            width: "60%",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                            paddingLeft: "18px",
+                          }}
+                        >
+                          {globalData.data.map((row, i) => {
+                            // Clean value
+                            const rawValue = (row["Profit Margin"] || "0%")
+                              .replace(/\s/g, "")
+                              .replace("%", "");
+                            const numericValue = parseFloat(rawValue) || 0;
+
+                            // Cap at 100%
+                            const cappedValue = Math.min(numericValue, 100);
+
+                            // Final width
+                            const profitMargin = `${cappedValue}%`;
+
+                            return (
+                              <div
+                                key={i}
+                                className="mobileCompareGlobalSerach"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  paddingBottom: "5px",
+                                }}
+                              >
+                                {/* Brand Label */}
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: "bold",
+                                    fontSize: "16px",
+                                    width: "80px",
+                                  }}
+                                >
+                                  {row.Brand}
+                                </Typography>
+
+                                {/* Bar Container */}
+                                <Box sx={{ flex: 1, ml: 1 }}>
+                                  <Box
+                                    className="customGraphMobile"
+                                    sx={{
+                                      width: "100%",
+                                      height: 40,
+                                      //backgroundColor: "#e0e0e0",
+                                      borderRadius: 0,
+                                      borderLeft: "1px solid #ccc",
+                                    }}
+                                  >
+                                    <Box
+                                      sx={{
+                                        height: "100%",
+                                        backgroundColor:
+                                          i === 0
+                                            ? "#42a5f5"
+                                            : i === 1
+                                            ? "#1e88e5"
+                                            : "#1565c0",
+                                        borderRadius: 0,
+                                        transition: "width 0.5s ease",
+                                        width: profitMargin, // e.g. "60%"
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                              </div>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    </Grid>
+                  </Box>
+                  {globalData.data.map(
+                    (row, i) =>
+                      !loading &&
+                      i === 0 && (
+                        <Typography
+                          key={i}
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 2, color: "#000", fontSize: "16px;" }}
+                        >
+                          {row.Brand} makes – {row["Profit Margin"]} profit on a{" "}
+                          {row["Release Price"]} {firstProduct.product_name} —
+                          lower than {globalData?.data[1]?.Brand} (
+                          {globalData?.data[1]?.["Profit Margin"]}) but higher
+                          than {globalData?.data[2]?.Brand} (
+                          {globalData?.data[2]?.["Profit Margin"]}).
+                        </Typography>
+                      )
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        ))}
     </>
   );
 };

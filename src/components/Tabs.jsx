@@ -7,6 +7,7 @@ import { RiUser2Fill } from "react-icons/ri";
 import { TbBuildingBank } from "react-icons/tb";
 import React from "react";
 import { TabNull } from "./TabNull";
+import { useMediaQuery } from "@mui/material";
 
 const tabs = [
   {
@@ -27,7 +28,10 @@ const tabs = [
 ];
 
 export const Tabs = () => {
+  const [hideTabsOnMobile, setHideTabsOnMobile] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
+  const isDesktop = useMediaQuery("(min-width:768px)");
+  const isMobile = !isDesktop;
 
   const getSearchLabel = () => {
     if (activeTab === 0) {
@@ -44,26 +48,35 @@ export const Tabs = () => {
   return (
     <div className="tab-wrapper">
       <>
-        <div className="tab-buttons">
+        {/* Tab Buttons */}
+        <div
+          className={`tab-buttons ${
+            isMobile && hideTabsOnMobile ? "hide" : ""
+          }`}
+        >
           {tabs.map((tab, index) => (
             <div
               key={index}
               className={`outer-circle ${activeTab === index ? "active" : ""}`}
               onClick={() => setActiveTab(index)}
             >
-              <span className="tabsIcons"> {tab.icon} </span>
+              <span className="tabsIcons">{tab.icon}</span>
               <span>{tab.label}</span>
             </div>
           ))}
         </div>
 
+        {/* Tab Content */}
         <div className="tab-content" id="below-render-search">
           {activeTab !== null ? (
             React.cloneElement(tabs[activeTab].content, {
               searchLabel: getSearchLabel(),
             })
           ) : (
-            <TabNull searchLabel={getSearchLabel()} />
+            <TabNull
+              searchLabel={getSearchLabel()}
+              onResults={setHideTabsOnMobile} // 👈 callback from TabNull
+            />
           )}
         </div>
       </>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useMediaQuery } from "@mui/material";
 import {
   Box,
   Typography,
@@ -33,6 +34,7 @@ export const TabTwo = () => {
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
   const [deviceType, setDeviceType] = useState("desktop");
+  const isDesktop = useMediaQuery("(min-width:768px)");
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -194,7 +196,8 @@ export const TabTwo = () => {
         ceo_name: (row["CEO Name"] || "").trim(),
         ceo_total_compensation: (row["CEO Total Compensation"] || "").trim(),
         worker_salary: (row["Frontline Worker Salary"] || "").trim(),
-        pay_ratio: (row["Pay Ration"] || "N/A").trim(),
+        pay_ration: (row["Pay Ration"] || "N/A").trim(),
+        pay_ratio: (row["Pay Ratio"] || "N/A").trim(),
       }));
 
       console.log("Processed data:", data);
@@ -429,112 +432,226 @@ export const TabTwo = () => {
         />
       )}
 
-      {!!filteredData.length && (
-        <div className="paygap_card">
-          {filteredData.map((row, index) => (
-            <>
-              <Card
-                elevation={3}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  mb: 2,
-                }}
-              >
-                <Grid
-                  container
-                  spacing={2}
+      {!!filteredData.length &&
+        (isDesktop ? (
+          <div className="paygap_card">
+            {filteredData.map((row, index) => (
+              <>
+                <Card
+                  elevation={3}
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start", // optional if you want top alignment
+                    p: 2,
+                    borderRadius: 3,
+                    mb: 2,
                   }}
                 >
-                  {/* Left Column */}
-                  <Grid item xs={12} md={6} className="customWidthCeo">
-                    <CardContent sx={{ p: 0 }}>
-                      <Typography
-                        variant="h4"
-                        align="left"
-                        sx={{ fontWeight: "bold", mb: 3 }}
-                      >
-                        {row.company_name} ({row.year})
-                      </Typography>
+                  <Grid
+                    container
+                    spacing={2}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start", // optional if you want top alignment
+                    }}
+                  >
+                    {/* Left Column */}
+                    <Grid item xs={12} md={6} className="customWidthCeo">
+                      <CardContent sx={{ p: 0 }}>
+                        <Typography
+                          variant="h4"
+                          align="left"
+                          sx={{ fontWeight: "bold", mb: 3 }}
+                        >
+                          {row.company_name} ({row.year})
+                        </Typography>
 
-                      {/* Progress Bar */}
-                      <Box sx={{ mt: 1, mb: 1 }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={row.worker_salary} // adjust dynamically
+                        {/* Progress Bar */}
+                        <Box sx={{ mt: 1, mb: 1 }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={row.worker_salary} // adjust dynamically
+                            sx={{
+                              height: 12,
+                              borderRadius: 2,
+                              backgroundColor: "#e0e0e0",
+                              "& .MuiLinearProgress-bar": {
+                                backgroundColor: "#1976d2",
+                              },
+                            }}
+                          />
+                        </Box>
+
+                        {/* CEO vs Worker info */}
+                        <Typography
+                          align="left"
+                          variant="h6"
+                          sx={{ color: "#000" }}
+                        >
+                          {row.ceo_name} –{" "}
+                          <strong>{row.ceo_total_compensation}</strong> vs
+                          Worker <strong>{row.worker_salary}</strong>
+                        </Typography>
+
+                        <Typography
+                          align="left"
+                          variant="h6"
+                          sx={{ color: "#000" }}
+                        >
+                          {`(${row["pay_ration"]
+                            .toLowerCase()
+                            .replace("x", " ×")} Gap)`}
+                        </Typography>
+                      </CardContent>
+                    </Grid>
+
+                    {/* Right Column */}
+                    <Grid item xs={12} md={6}>
+                      <CardContent
+                        sx={{ p: 0, display: "flex", justifyContent: "center" }}
+                      >
+                        <Box
                           sx={{
-                            height: 12,
-                            borderRadius: 2,
-                            backgroundColor: "#e0e0e0",
-                            "& .MuiLinearProgress-bar": {
-                              backgroundColor: "#1976d2",
-                            },
+                            minWidth: 120,
+                            minHeight: 120,
+                            borderRadius: "50%",
+                            backgroundColor: "#18A677",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "2rem",
                           }}
-                        />
-                      </Box>
-
-                      {/* CEO vs Worker info */}
-                      <Typography
-                        align="left"
-                        variant="h6"
-                        sx={{ color: "#000" }}
-                      >
-                        {row.ceo_name} –{" "}
-                        <strong>{row.ceo_total_compensation}</strong> vs Worker{" "}
-                        <strong>{row.worker_salary}</strong>
-                      </Typography>
-
-                      <Typography
-                        align="left"
-                        variant="h6"
-                        sx={{ color: "#000" }}
-                      >
-                        {`(${row["pay_ratio"]
-                          .toLowerCase()
-                          .replace("x", " ×")} Gap)`}
-                      </Typography>
-                    </CardContent>
+                        >
+                          {`${row["pay_ration"]
+                            .toLowerCase()
+                            .replace("x", " ×")}`}
+                        </Box>
+                      </CardContent>
+                    </Grid>
                   </Grid>
 
-                  {/* Right Column */}
-                  <Grid item xs={12} md={6}>
-                    <CardContent
-                      sx={{ p: 0, display: "flex", justifyContent: "center" }}
-                    >
-                      <Box
-                        sx={{
-                          minWidth: 120,
-                          minHeight: 120,
-                          borderRadius: "50%",
-                          backgroundColor: "#18A677",
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                          fontSize: "2rem",
-                        }}
-                      >
-                        {`${row["pay_ratio"].toLowerCase().replace("x", " ×")}`}
-                      </Box>
-                    </CardContent>
-                  </Grid>
-                </Grid>
+                  <Typography variant="h6" mt="10px">
+                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs.
+                    worker {row.worker_salary}.That’s{" "}
+                    {row["pay_ration"]?.toLowerCase().replace("x", "")} times
+                    more.
+                  </Typography>
+                </Card>
+              </>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Only show data for mobile view */}
 
-                <Typography variant="h6" mt="10px">
-                  CEO {row.ceo_name} made {row.ceo_total_compensation} vs.
-                  worker {row.worker_salary}.That’s{" "}
-                  {row["pay_ratio"]?.toLowerCase().replace("x", "")} times more.
-                </Typography>
-              </Card>
-            </>
-          ))}
-        </div>
-      )}
+            <div className="paygap_card">
+              {filteredData.map((row, index) => (
+                <Card
+                  elevation={3}
+                  sx={{
+                    p: 2,
+                    borderRadius: 3,
+                    mb: 2,
+                  }}
+                >
+                  <Grid
+                    container
+                    spacing={2}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start", // optional if you want top alignment
+                    }}
+                  >
+                    {/* Left Column */}
+                    <Grid item xs={12} md={6} className="customWidthCeo">
+                      <CardContent sx={{ p: 0 }}>
+                        <Typography
+                          variant="h4"
+                          align="left"
+                          sx={{ fontWeight: "bold", mb: 3 }}
+                        >
+                          {row.company_name} ({row.year})
+                        </Typography>
+
+                        {/* Progress Bar */}
+                        <Box sx={{ mt: 1, mb: 1 }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={row.worker_salary} // adjust dynamically
+                            sx={{
+                              height: 12,
+                              borderRadius: 2,
+                              backgroundColor: "#e0e0e0",
+                              "& .MuiLinearProgress-bar": {
+                                backgroundColor: "#1976d2",
+                              },
+                            }}
+                          />
+                        </Box>
+
+                        {/* CEO vs Worker info */}
+                        <Typography
+                          align="left"
+                          variant="h6"
+                          sx={{ color: "#000" }}
+                        >
+                          {row.ceo_name} –{" "}
+                          <strong>{row.ceo_total_compensation}</strong> vs
+                          Worker <strong>{row.worker_salary}</strong>
+                        </Typography>
+
+                        <Typography
+                          align="left"
+                          variant="h6"
+                          sx={{ color: "#000" }}
+                        >
+                          {`(${row["pay_ratio"]
+                            .toLowerCase()
+                            .replace("x", " ×")} Gap)`}
+                        </Typography>
+                      </CardContent>
+                    </Grid>
+
+                    {/* Right Column */}
+                    <Grid item xs={12} md={6}>
+                      <CardContent
+                        sx={{ p: 0, display: "flex", justifyContent: "center" }}
+                      >
+                        <Box
+                          sx={{
+                            minWidth: 120,
+                            minHeight: 120,
+                            borderRadius: "50%",
+                            backgroundColor: "#18A677",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "2rem",
+                          }}
+                        >
+                          {`${row["pay_ratio"]
+                            .toLowerCase()
+                            .replace("x", " ×")}`}
+                        </Box>
+                      </CardContent>
+                    </Grid>
+                  </Grid>
+
+                  <Typography variant="h6" mt="10px">
+                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs.
+                    worker {row.worker_salary}.That’s{" "}
+                    {row["pay_ratio"]?.toLowerCase().replace("x", "")} times
+                    more.
+                  </Typography>
+                </Card>
+              ))}
+            </div>
+          </>
+        ))}
     </>
   );
 };

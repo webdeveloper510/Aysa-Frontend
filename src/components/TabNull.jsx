@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 //import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
-import { MdOutlineCompareArrows } from "react-icons/md";
 
 export const TabNull = ({
   searchLabel = "Search by brands, products or types",
@@ -815,7 +814,7 @@ export const TabNull = ({
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-md font-medium text-gray-700">
-                        Avoided :
+                        Tax Avoided :
                       </span>
                       <span className="text-md font-medium text-gray-700">
                         {globalData.tax_data.length > 0
@@ -842,19 +841,19 @@ export const TabNull = ({
                   more than the average worker.
                 </p>
               </div>
-              {data.matched.length > 1 && (
+              {/* data.matched.length > 1 && (
                 <div className="w-full mt-4">
                   <Button variant="contained" onClick={handleCompare}>
                     <MdOutlineCompareArrows className="compareIcon" /> Click
                     Here to Compare Profit Margins
                   </Button>
                 </div>
-              )}
+              )*/}
             </div>
 
             {/* Only show the table and comparison heading when there are 2 or more products */}
 
-            {globalData.data.length > 1 && showComparison && (
+            {globalData.data.length > 1 && (
               <>
                 <div className="comparisonTable">
                   <Box sx={{ mt: 3 }}>
@@ -947,14 +946,18 @@ export const TabNull = ({
                                   backgroundColor: "#2196f3",
                                   borderRadius: 2,
                                   transition: "width 0.5s ease",
-                                  width: `${row["Profit Margin"] || "0%"}`,
+                                  width: `${(row["Profit Margin"] || "0%")
+                                    .toString()
+                                    .replace(/\s+/g, "")}`,
                                 }}
                               />
                             </Box>
                           </Box>
 
                           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                            {row["Profit Margin"] || "0%"}
+                            {(row["Profit Margin"] || "0%")
+                              .toString()
+                              .replace(/\s+/g, "")}
                           </Typography>
 
                           {!loading && i === 0 && (
@@ -1095,7 +1098,7 @@ export const TabNull = ({
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-md font-medium text-gray-700">
-                        Avoided :
+                        Tax Avoided :
                       </span>
                       <span className="text-md font-medium text-gray-700">
                         {globalData.tax_data.length > 0
@@ -1125,7 +1128,6 @@ export const TabNull = ({
               {data.matched.length > 1 && (
                 <div className="w-full mt-4">
                   <Button variant="contained" onClick={handleCompare}>
-                    {/* <MdOutlineCompareArrows className="compareIcon" /> Click */}
                     Click Here to Compare Profit Margins
                   </Button>
                 </div>
@@ -1133,7 +1135,7 @@ export const TabNull = ({
             </div>
 
             {/* Only show the table and comparison heading when there are 2 or more products in mobile view */}
-            
+
             {globalData.data.length > 1 && showComparison && (
               <>
                 <div className="comparisonTable">
@@ -1177,10 +1179,10 @@ export const TabNull = ({
                         <Card
                           elevation={3}
                           sx={{
-                            p: 2,
+                            p: 1,
                             textAlign: "center",
                             borderRadius: 3,
-                            width: "40%;",
+                            width: "35%;",
                           }}
                         >
                           <Box
@@ -1196,7 +1198,7 @@ export const TabNull = ({
                                     alt={`${firstProduct.brand} ${firstProduct.product_name}`}
                                     style={{
                                       width: "100%",
-                                      maxWidth: "100px",
+                                      maxWidth: "120px",
                                       height: "auto",
                                       borderRadius: "12px",
                                       boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -1219,7 +1221,7 @@ export const TabNull = ({
                                     my={1}
                                     sx={{
                                       textTransform: "capitalize",
-                                      fontSize: "16px",
+                                      fontSize: "14px",
                                     }}
                                   >
                                     {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
@@ -1247,7 +1249,7 @@ export const TabNull = ({
                                     my={1}
                                     sx={{
                                       textTransform: "capitalize",
-                                      fontSize: "16px",
+                                      fontSize: "14px",
                                     }}
                                   >
                                     {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
@@ -1266,10 +1268,10 @@ export const TabNull = ({
                         <Box
                           sx={{
                             display: "flex",
-                            width: "60%",
+                            width: "65%",
                             justifyContent: "center",
                             flexDirection: "column",
-                            paddingLeft: "18px",
+                            paddingLeft: "5px",
                           }}
                         >
                           {globalData.data.map((row, i) => {
@@ -1292,31 +1294,81 @@ export const TabNull = ({
                                 style={{
                                   display: "flex",
                                   alignItems: "center",
-                                  paddingBottom: "5px",
+                                  paddingBottom: "10px",
                                 }}
                               >
                                 {/* Brand Label */}
+                                {/* <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: "bold",
+                                    fontSize: "13px",
+                                    width: "80px",
+                                    wordWrap: "break-word",
+                                    marginRight: "5px",
+                                    textAlign: "right",
+                                  }}
+                                >
+                                  {row.Brand}{" "}
+                                  {row["Product Name"]
+                                    ? row["Product Name"]
+                                        .split(" ")
+                                        .slice(0, 3)
+                                        .join(" ")
+                                    : ""}
+                                </Typography> */}
+
                                 <Typography
                                   variant="h6"
                                   sx={{
                                     fontWeight: "bold",
-                                    fontSize: "16px",
+                                    fontSize: "13px",
                                     width: "80px",
+                                    wordWrap: "break-word",
+                                    marginRight: "5px",
+                                    textAlign: "right",
+                                    lineHeight: "18px;",
                                   }}
                                 >
-                                  {row.Brand}
+                                  {(() => {
+                                    const brand = row.Brand?.trim() || "";
+                                    const productName =
+                                      row["Product Name"]?.trim() || "";
+
+                                    // Take only first 3 words of product name
+                                    const productShort = productName
+                                      .split(" ")
+                                      .slice(0, 3)
+                                      .join(" ");
+
+                                    // Check if product name starts with brand
+                                    const showName = productName
+                                      .toLowerCase()
+                                      .startsWith(brand.toLowerCase())
+                                      ? productShort
+                                      : `${brand} ${productShort}`;
+
+                                    return showName;
+                                  })()}
                                 </Typography>
 
                                 {/* Bar Container */}
-                                <Box sx={{ flex: 1, ml: 1 }}>
+                                <Box
+                                  sx={{
+                                    flex: 1,
+                                    ml: 0,
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
                                   <Box
                                     className="customGraphMobile"
                                     sx={{
-                                      width: "100%",
+                                      flex: 1,
                                       height: 40,
-                                      //backgroundColor: "#e0e0e0",
                                       borderRadius: 0,
                                       borderLeft: "1px solid #ccc",
+                                      position: "relative",
                                     }}
                                   >
                                     <Box
@@ -1333,6 +1385,9 @@ export const TabNull = ({
                                         width: profitMargin, // e.g. "60%"
                                       }}
                                     />
+                                    <span className="ml-1">
+                                      {row["Profit Margin"] || "N/A"}
+                                    </span>
                                   </Box>
                                 </Box>
                               </div>
@@ -1350,14 +1405,34 @@ export const TabNull = ({
                           key={i}
                           variant="body2"
                           color="text.secondary"
-                          sx={{ mt: 2, color: "#000", fontSize: "16px;" }}
+                          sx={{ mt: 2, color: "#000", fontSize: "16px" }}
                         >
-                          {row.Brand} makes – {row["Profit Margin"]} profit on a{" "}
-                          {row["Release Price"]} {firstProduct.product_name} —
-                          lower than {globalData?.data[1]?.Brand} (
-                          {globalData?.data[1]?.["Profit Margin"]}) but higher
-                          than {globalData?.data[2]?.Brand} (
-                          {globalData?.data[2]?.["Profit Margin"]}).
+                          {(() => {
+                            const mainProfit = parseFloat(row["Profit Margin"]);
+                            const compareOne = parseFloat(
+                              globalData?.data[1]?.["Profit Margin"]
+                            );
+                            const compareTwo = parseFloat(
+                              globalData?.data[2]?.["Profit Margin"]
+                            );
+
+                            const compareOneWord =
+                              mainProfit > compareOne ? "higher" : "lower";
+                            const compareTwoWord =
+                              mainProfit > compareTwo ? "higher" : "lower";
+
+                            return `${row.Brand} makes – ${mainProfit.toFixed(
+                              2
+                            )}% profit on a ${row["Release Price"]} ${
+                              firstProduct.product_name
+                            } — ${compareOneWord} than ${
+                              globalData?.data[1]?.Brand
+                            } (${compareOne.toFixed(
+                              2
+                            )}%) and ${compareTwoWord} than ${
+                              globalData?.data[2]?.Brand
+                            } (${compareTwo.toFixed(2)}%).`;
+                          })()}
                         </Typography>
                       )
                   )}

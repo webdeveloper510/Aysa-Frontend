@@ -317,6 +317,11 @@ div#mobile-inital-render {
 }
 .customGraphMobile {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+.customGraphMobile span {
+  font-size: 12px !important;
 }
 .customGraphMobile::before {
   content: "";
@@ -324,7 +329,7 @@ div#mobile-inital-render {
   border-left: 1px solid #ccc;
   left: 0;
   width: 65px;
-  height: 79px;
+  height: 85px;
   top: -18px;
 }
 /**************** responsive css ************/
@@ -476,6 +481,7 @@ div#mobile-inital-render {
   }
   .nopadding {
     padding: 0px;
+    margin: 0px !important;
   }
 }
 

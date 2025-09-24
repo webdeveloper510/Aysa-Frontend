@@ -489,17 +489,11 @@ export const TabTwo = () => {
                         >
                           {row.ceo_name} –{" "}
                           <strong>{row.ceo_total_compensation}</strong> vs
-                          Worker <strong>{row.worker_salary}</strong>
-                        </Typography>
-
-                        <Typography
-                          align="left"
-                          variant="h6"
-                          sx={{ color: "#000" }}
-                        >
+                          Worker <strong>{row.worker_salary}</strong>{" "}
                           {`(${row["pay_ration"]
                             .toLowerCase()
                             .replace("x", " ×")} Gap)`}
+                          .
                         </Typography>
                       </CardContent>
                     </Grid>
@@ -600,17 +594,11 @@ export const TabTwo = () => {
                         >
                           {row.ceo_name} –{" "}
                           <strong>{row.ceo_total_compensation}</strong> vs
-                          Worker <strong>{row.worker_salary}</strong>
-                        </Typography>
-
-                        <Typography
-                          align="left"
-                          variant="h6"
-                          sx={{ color: "#000" }}
-                        >
+                          Worker <strong>{row.worker_salary}</strong>{" "}
                           {`(${row["pay_ratio"]
                             .toLowerCase()
                             .replace("x", " ×")} Gap)`}
+                          .
                         </Typography>
                       </CardContent>
                     </Grid>

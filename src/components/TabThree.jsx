@@ -413,15 +413,15 @@ export const TabThree = () => {
                     key={`${row.company_name}-${row.year}-${index}`}
                     className="tablebody"
                     sx={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(1, 1fr)",
-                      gap: 0,
+                      display: "flex",
                     }}
                   >
                     <Box
                       sx={{
                         backgroundColor: "#E9E7CA",
                         color: "#0C7E57",
+                        width: "50%",
+                        borderRight: "1px solid #000",
                       }}
                     >
                       <Typography variant="h6">
@@ -433,6 +433,7 @@ export const TabThree = () => {
                       sx={{
                         backgroundColor: "#FEC7C7",
                         color: "#EC4137",
+                        width: "50%",
                       }}
                     >
                       <Typography variant="h6">

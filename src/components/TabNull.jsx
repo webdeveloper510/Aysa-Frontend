@@ -804,7 +804,7 @@ export const TabNull = ({
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-md font-medium text-gray-700">
-                        Tax Paid :
+                        Tax Paid:
                       </span>
                       <span className="text-md font-medium text-gray-700">
                         {globalData?.tax_data?.["Taxes Paid"] || "$0"}
@@ -812,7 +812,7 @@ export const TabNull = ({
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-md font-medium text-gray-700">
-                        Tax Avoided :
+                        Tax Avoided:
                       </span>
                       <span className="text-md font-medium text-gray-700">
                         {globalData?.tax_data?.["Taxes Avoided"] || "$0"}
@@ -826,7 +826,7 @@ export const TabNull = ({
                   {firstProduct.brand} makes{" "}
                   {globalData?.data[0]["Profit Made"] || "N/A"} on a{" "}
                   {globalData?.data[0]["Release Price"]}{" "}
-                  {firstProduct.product_name} , and its CEO earns{" "}
+                  {firstProduct.product_name}, and its CEO earns{" "}
                   {globalData?.ceo_worker_data.length > 0
                     ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                         //.toString()
@@ -958,7 +958,7 @@ export const TabNull = ({
                               .replace(/\s+/g, "")}
                           </Typography>
 
-                          {!loading && i === 0 && (
+                          {/* {!loading && i === 0 && (
                             <Typography
                               variant="body2"
                               color="text.secondary"
@@ -976,7 +976,7 @@ export const TabNull = ({
                                 : "0"}{" "}
                               times more than the average worker.
                             </Typography>
-                          )}
+                          )} */}
                         </Card>
                       ))}
                     </Box>
@@ -1086,7 +1086,7 @@ export const TabNull = ({
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-md font-medium text-gray-700">
-                        Tax Paid :
+                        Tax Paid:
                       </span>
                       <span className="text-md font-medium text-gray-700">
                         {globalData?.tax_data?.["Taxes Paid"] || "$0"}
@@ -1094,7 +1094,7 @@ export const TabNull = ({
                     </div>
                     <div className="flex justify-between mb-1">
                       <span className="text-md font-medium text-gray-700">
-                        Tax Avoided :
+                        Tax Avoided:
                       </span>
                       <span className="text-md font-medium text-gray-700">
                         {globalData?.tax_data?.["Taxes Avoided"] || "$0"}
@@ -1109,7 +1109,7 @@ export const TabNull = ({
                   {globalData?.data[0]["Profit Made"] || "N/A"} on a{" "}
                   {globalData?.data[0]["Release Price"]}{" "}
                   {firstProduct.product_name}{" "}
-                  {globalData?.data[0]["Product Type"]} , and its CEO earns{" "}
+                  {globalData?.data[0]["Product Type"]}, and its CEO earns{" "}
                   {globalData?.ceo_worker_data.length > 0
                     ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
                         //.toString()
@@ -1218,7 +1218,7 @@ export const TabNull = ({
                                       fontSize: "14px",
                                     }}
                                   >
-                                    {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                                    {`${firstProduct.brand} ${firstProduct.product_name} (${firstProduct.production_year})`.replace(
                                       /\b(\w+)\s+\1\b/gi,
                                       "$1"
                                     )}
@@ -1317,7 +1317,7 @@ export const TabNull = ({
                                   sx={{
                                     fontWeight: "bold",
                                     fontSize: "13px",
-                                    width: "80px",
+                                    width: "120px",
                                     wordWrap: "break-word",
                                     marginRight: "5px",
                                     textAlign: "right",
@@ -1380,7 +1380,11 @@ export const TabNull = ({
                                       }}
                                     />
                                     <span className="ml-1">
-                                      {row["Profit Margin"] || "N/A"}
+                                      {row["Profit Margin"]
+                                        ? `${parseFloat(
+                                            row["Profit Margin"]
+                                          ).toFixed(2)}%`
+                                        : "N/A"}
                                     </span>
                                   </Box>
                                 </Box>
@@ -1397,24 +1401,17 @@ export const TabNull = ({
                       i === 0 && (
                         <Typography
                           key={i}
-                          align="left"
                           variant="body2"
                           color="text.secondary"
                           sx={{ mt: 2, color: "#000", fontSize: "16px" }}
                         >
                           {(() => {
-                            // Parse "Profit Made" into numbers
-                            const parseProfit = (value) =>
-                              parseFloat(
-                                value.replace("$", "").replace(",", "")
-                              );
-
-                            const mainProfit = parseProfit(row["Profit Made"]);
-                            const compareOne = parseProfit(
-                              globalData?.data[1]?.["Profit Made"]
+                            const mainProfit = parseFloat(row["Profit Margin"]);
+                            const compareOne = parseFloat(
+                              globalData?.data[1]?.["Profit Margin"] || 0
                             );
-                            const compareTwo = parseProfit(
-                              globalData?.data[2]?.["Profit Made"]
+                            const compareTwo = parseFloat(
+                              globalData?.data[2]?.["Profit Margin"] || 0
                             );
 
                             const compareOneWord =
@@ -1422,17 +1419,17 @@ export const TabNull = ({
                             const compareTwoWord =
                               mainProfit > compareTwo ? "higher" : "lower";
 
-                            return `${row.Brand} makes – $${mainProfit.toFixed(
+                            return `${row.Brand} makes ${mainProfit.toFixed(
                               2
-                            )} profit on a ${row["Release Price"]} ${
+                            )}% profit on a ${row["Release Price"]} ${
                               firstProduct.product_name
                             } — ${compareOneWord} than ${
                               globalData?.data[1]?.Brand
-                            } ($${compareOne.toFixed(
+                            } (${compareOne.toFixed(
                               2
-                            )}) and ${compareTwoWord} than ${
+                            )}%) and ${compareTwoWord} than ${
                               globalData?.data[2]?.Brand
-                            } ($${compareTwo.toFixed(2)}).`;
+                            } (${compareTwo.toFixed(2)}%).`;
                           })()}
                         </Typography>
                       )

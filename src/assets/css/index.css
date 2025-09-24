@@ -175,14 +175,18 @@ section.about-section {
 .nopadding {
   padding-bottom: 0px !important;
 }
+.tablebody .MuiBox-root h6 span {
+  width: 100%;
+  float: left;
+}
 .tablebody .MuiBox-root h6 {
   font-family: "Antonio", sans-serif;
   font-size: 40px;
   font-weight: 700;
   line-height: 122%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+  display: block;
+  width: 100%;
+  float: left;
 }
 .tablebody .MuiBox-root h6 span {
   font-size: 30px;
@@ -390,7 +394,7 @@ div#mobile-inital-render {
 
 @media screen and (max-width: 768px) {
   .customWidthCeo {
-    width: 50%;
+    width: 60%;
   }
   .comparisonTable,
   .paygap_card,
@@ -496,5 +500,8 @@ div#mobile-inital-render {
   }
   .profit-graph {
     max-width: 100% !important;
+  }
+  .customWidthCeo {
+    width: 55%;
   }
 }

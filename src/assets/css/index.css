@@ -321,7 +321,7 @@ div#mobile-inital-render {
   align-items: center;
 }
 .customGraphMobile span {
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 .customGraphMobile::before {
   content: "";
@@ -331,6 +331,10 @@ div#mobile-inital-render {
   width: 65px;
   height: 85px;
   top: -18px;
+}
+
+.textleft {
+  text-align: left;
 }
 /**************** responsive css ************/
 
@@ -467,7 +471,7 @@ div#mobile-inital-render {
   }
   .tab-content {
     margin: 0px 20px;
-    width: 95%;
+    width: 100%;
   }
   .table-heading {
     font-size: 19px;

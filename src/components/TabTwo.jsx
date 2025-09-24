@@ -531,9 +531,9 @@ export const TabTwo = () => {
                     </Grid>
                   </Grid>
 
-                  <Typography variant="h6" mt="10px">
-                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs.
-                    worker {row.worker_salary}.That’s{" "}
+                  <Typography variant="h6" mt="10px" align="left">
+                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs. the
+                    average worker making {row.worker_salary}.That’s{" "}
                     {row["pay_ration"]?.toLowerCase().replace("x", "")} times
                     more.
                   </Typography>
@@ -641,9 +641,9 @@ export const TabTwo = () => {
                     </Grid>
                   </Grid>
 
-                  <Typography variant="h6" mt="10px">
-                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs.
-                    worker {row.worker_salary}.That’s{" "}
+                  <Typography variant="h6" mt="10px" align="left">
+                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs. the
+                    average worker making {row.worker_salary}.That’s{" "}
                     {row["pay_ratio"]?.toLowerCase().replace("x", "")} times
                     more.
                   </Typography>

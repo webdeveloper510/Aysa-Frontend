@@ -441,9 +441,10 @@ export const TabThree = () => {
                       </Typography>
                     </Box>
                   </Box>
-                  <Typography variant="h6" mt="10px">
-                    {row.company_name} paid {row.tax_paid} but avoided{" "}
-                    {row.tax_avoid} in {row.year} by exploiting tax loopholes.
+                  <Typography variant="h6" mt="10px" align="left">
+                    {row.company_name} paid {row.tax_paid} but avoided an
+                    estimate of {row.tax_avoid} in taxes in {row.year} by
+                    exploiting tax loopholes.
                   </Typography>
                 </CardContent>
               </Card>

@@ -826,19 +826,18 @@ export const TabNull = ({
                 </Grid>
               </Grid>
               <div className="w-full mt-4">
-                <p>
+                <p className="textleft">
                   {firstProduct.brand} makes{" "}
-                  {globalData?.data[0]["Profit Margin"] || "N/A"} on a{" "}
+                  {globalData?.data[0]["Profit Made"] || "N/A"} on a{" "}
                   {globalData?.data[0]["Release Price"]}{" "}
-                  {firstProduct.product_name}{" "}
-                  {globalData?.data[0]["Product Type"]} , and its CEO Pay Gap{" "}
+                  {firstProduct.product_name} , and its CEO earns{" "}
                   {globalData?.ceo_worker_data.length > 0
                     ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                         //.toString()
                         .toLowerCase()
-                        .replace("x", " x")}`
-                    : "$0"}{" "}
-                  more than the average worker.
+                        .replace("x", " ")}`
+                    : "0"}{" "}
+                  times more than the average worker.
                 </p>
               </div>
               {/* data.matched.length > 1 && (
@@ -954,7 +953,11 @@ export const TabNull = ({
                             </Box>
                           </Box>
 
-                          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: "bold" }}
+                            align="left"
+                          >
                             {(row["Profit Margin"] || "0%")
                               .toString()
                               .replace(/\s+/g, "")}
@@ -964,18 +967,18 @@ export const TabNull = ({
                             <Typography
                               variant="body2"
                               color="text.secondary"
+                              align="left"
                               sx={{ mt: 1 }}
                             >
                               {row.Brand} makes {row["Profit Margin"]} on a{" "}
                               {row["Release Price"]} {firstProduct.product_name}{" "}
-                              {globalData?.data[0]["Product Type"]}
                               {row.product_type} , and its CEO earns{" "}
                               {globalData?.ceo_worker_data.length > 0
                                 ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                                     //.toString()
                                     .toLowerCase()
                                     .replace("x", "")}`
-                                : "$0"}{" "}
+                                : "0"}{" "}
                               times more than the average worker.
                             </Typography>
                           )}
@@ -1112,15 +1115,15 @@ export const TabNull = ({
               <div className="w-full mt-4">
                 <p class="text-left">
                   {firstProduct.brand} makes{" "}
-                  {globalData?.data[0]["Profit Margin"] || "N/A"} on a{" "}
+                  {globalData?.data[0]["Profit Made"] || "N/A"} on a{" "}
                   {globalData?.data[0]["Release Price"]}{" "}
                   {firstProduct.product_name}{" "}
-                  {globalData?.data[0]["Product Type"]} , and its CEO Pay Gap{" "}
+                  {globalData?.data[0]["Product Type"]} , and its CEO earns{" "}
                   {globalData?.ceo_worker_data.length > 0
                     ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
                         //.toString()
                         .toLowerCase()
-                        .replace("x", " x")}`
+                        .replace("x", " ")}`
                     : "$0"}{" "}
                   more than the average worker.
                 </p>
@@ -1403,17 +1406,24 @@ export const TabNull = ({
                       i === 0 && (
                         <Typography
                           key={i}
+                          align="left"
                           variant="body2"
                           color="text.secondary"
                           sx={{ mt: 2, color: "#000", fontSize: "16px" }}
                         >
                           {(() => {
-                            const mainProfit = parseFloat(row["Profit Margin"]);
-                            const compareOne = parseFloat(
-                              globalData?.data[1]?.["Profit Margin"]
+                            // Parse "Profit Made" into numbers
+                            const parseProfit = (value) =>
+                              parseFloat(
+                                value.replace("$", "").replace(",", "")
+                              );
+
+                            const mainProfit = parseProfit(row["Profit Made"]);
+                            const compareOne = parseProfit(
+                              globalData?.data[1]?.["Profit Made"]
                             );
-                            const compareTwo = parseFloat(
-                              globalData?.data[2]?.["Profit Margin"]
+                            const compareTwo = parseProfit(
+                              globalData?.data[2]?.["Profit Made"]
                             );
 
                             const compareOneWord =
@@ -1421,17 +1431,17 @@ export const TabNull = ({
                             const compareTwoWord =
                               mainProfit > compareTwo ? "higher" : "lower";
 
-                            return `${row.Brand} makes – ${mainProfit.toFixed(
+                            return `${row.Brand} makes – $${mainProfit.toFixed(
                               2
-                            )}% profit on a ${row["Release Price"]} ${
+                            )} profit on a ${row["Release Price"]} ${
                               firstProduct.product_name
                             } — ${compareOneWord} than ${
                               globalData?.data[1]?.Brand
-                            } (${compareOne.toFixed(
+                            } ($${compareOne.toFixed(
                               2
-                            )}%) and ${compareTwoWord} than ${
+                            )}) and ${compareTwoWord} than ${
                               globalData?.data[2]?.Brand
-                            } (${compareTwo.toFixed(2)}%).`;
+                            } ($${compareTwo.toFixed(2)}).`;
                           })()}
                         </Typography>
                       )

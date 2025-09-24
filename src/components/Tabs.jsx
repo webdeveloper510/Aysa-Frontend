@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { TabOne } from "./TabOne";
 import { TabTwo } from "./TabTwo";
 import { TabThree } from "./TabThree";
 import { AiFillDollarCircle } from "react-icons/ai";
@@ -11,7 +10,7 @@ import { useMediaQuery } from "@mui/material";
 
 export const Tabs = () => {
   const [hideTabsOnMobile, setHideTabsOnMobile] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(null); // 👈 no active tab at first
   const isDesktop = useMediaQuery("(min-width:768px)");
   const isMobile = !isDesktop;
 
@@ -29,7 +28,6 @@ export const Tabs = () => {
     }
   };
 
-  // ✅ Move tabs inside so we can inject onResults
   const tabs = [
     {
       label: "Profit Margin",
@@ -62,7 +60,9 @@ export const Tabs = () => {
         {tabs.map((tab, index) => (
           <div
             key={index}
-            className={`outer-circle ${activeTab === index ? "active" : ""}`}
+            className={`outer-circle ${
+              activeTab !== null && activeTab === index ? "active" : ""
+            }`}
             onClick={() => setActiveTab(index)}
           >
             <span className="tabsIcons">{tab.icon}</span>
@@ -73,7 +73,14 @@ export const Tabs = () => {
 
       {/* Tab Content */}
       <div className="tab-content" id="below-render-search">
-        {tabs[activeTab].content}
+        {activeTab === null ? (
+          <TabNull
+            searchLabel={getSearchLabel()}
+            onResults={setHideTabsOnMobile}
+          />
+        ) : (
+          tabs[activeTab].content
+        )}
       </div>
     </div>
   );

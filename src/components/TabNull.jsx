@@ -666,7 +666,7 @@ export const TabNull = ({
                 my={4}
                 sx={{ textTransform: "capitalize" }}
               >
-                {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                {`${firstProduct.brand} ${firstProduct.product_name} (${firstProduct.production_year})`.replace(
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
@@ -922,7 +922,6 @@ export const TabNull = ({
                             sx={{ fontWeight: "bold", mb: 1 }}
                           >
                             {row.Brand} {row["Product Name"]}{" "}
-                            {row["Product Type"]}
                           </Typography>
 
                           <Box sx={{ width: "100%", mb: 1 }}>
@@ -998,7 +997,7 @@ export const TabNull = ({
                 my={4}
                 sx={{ textTransform: "capitalize" }}
               >
-                {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                {`${firstProduct.brand} ${firstProduct.product_name} (${firstProduct.production_year})`.replace(
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
@@ -1149,7 +1148,7 @@ export const TabNull = ({
                       my={4}
                       sx={{ textTransform: "capitalize" }}
                     >
-                      {`${firstProduct.brand} ${firstProduct.product_name} ${firstProduct.product_type} (${firstProduct.production_year})`.replace(
+                      {`${firstProduct.brand} ${firstProduct.product_name} (${firstProduct.production_year})`.replace(
                         /\b(\w+)\s+\1\b/gi,
                         "$1"
                       )}

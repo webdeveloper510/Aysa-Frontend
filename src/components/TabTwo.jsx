@@ -532,8 +532,9 @@ export const TabTwo = () => {
                   </Grid>
 
                   <Typography variant="h6" mt="10px" align="left">
-                    CEO {row.ceo_name} made {row.ceo_total_compensation} vs. the
-                    average worker making {row.worker_salary}.That’s{" "}
+                    CEO {row.ceo_name} made an estimate of{" "}
+                    {row.ceo_total_compensation} vs. the average worker making{" "}
+                    {row.worker_salary}.That’s{" "}
                     {row["pay_ration"]?.toLowerCase().replace("x", "")} times
                     more.
                   </Typography>

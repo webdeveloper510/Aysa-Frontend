@@ -807,9 +807,7 @@ export const TabNull = ({
                         Tax Paid :
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData.tax_data.length > 0
-                          ? `${globalData?.tax_data[0]["Taxes Paid"]}`
-                          : "$0"}
+                        {globalData?.tax_data?.["Taxes Paid"] || "$0"}
                       </span>
                     </div>
                     <div className="flex justify-between mb-1">
@@ -817,9 +815,7 @@ export const TabNull = ({
                         Tax Avoided :
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData.tax_data.length > 0
-                          ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
-                          : "$0"}
+                        {globalData?.tax_data?.["Taxes Avoided"] || "$0"}
                       </span>
                     </div>
                   </div>
@@ -970,7 +966,7 @@ export const TabNull = ({
                               align="left"
                               sx={{ mt: 1 }}
                             >
-                              {row.Brand} makes {row["Profit Margin"]} on a{" "}
+                              {row.Brand} makes {row["Profit Made"]} on a{" "}
                               {row["Release Price"]} {firstProduct.product_name}{" "}
                               {row.product_type} , and its CEO earns{" "}
                               {globalData?.ceo_worker_data.length > 0
@@ -1094,9 +1090,7 @@ export const TabNull = ({
                         Tax Paid :
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData.tax_data.length > 0
-                          ? `${globalData?.tax_data[0]["Taxes Paid"]}`
-                          : "$0"}
+                        {globalData?.tax_data?.["Taxes Paid"] || "$0"}
                       </span>
                     </div>
                     <div className="flex justify-between mb-1">
@@ -1104,9 +1098,7 @@ export const TabNull = ({
                         Tax Avoided :
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData.tax_data.length > 0
-                          ? `${globalData?.tax_data[0]["Taxes Avoided"]}`
-                          : "$0"}
+                        {globalData?.tax_data?.["Taxes Avoided"] || "$0"}
                       </span>
                     </div>
                   </div>

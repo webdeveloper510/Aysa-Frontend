@@ -8,6 +8,8 @@ import {
   Card,
   CardContent,
   LinearProgress,
+  Tooltip,
+  useMediaQuery,
 } from "@mui/material";
 import axios from "axios";
 
@@ -31,6 +33,9 @@ export const TabThree = () => {
   const [initialDataLoading, setInitialDataLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [open, setopen] = useState(false);
+
+  const isDesktop = useMediaQuery("(min-width:768px)");
 
   useEffect(() => {
     const fetchAllTaxData = async () => {
@@ -408,6 +413,24 @@ export const TabThree = () => {
                     sx={{ fontWeight: "bold", mb: 3 }}
                   >
                     {row.company_name} ({row.year})
+                    {!isDesktop ? (
+                      <Tooltip
+                        title="An estimate"
+                        placement="top"
+                        open={open}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        <span onClick={() => setopen(!open)}>*</span>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip
+                        title="An estimate"
+                        placement="top"
+                        sx={{ cursor: "pointer" }}
+                      >
+                        *
+                      </Tooltip>
+                    )}
                   </Typography>
                   <Box
                     key={`${row.company_name}-${row.year}-${index}`}

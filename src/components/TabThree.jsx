@@ -425,7 +425,9 @@ export const TabThree = () => {
                       }}
                     >
                       <Typography variant="h6">
-                        <span>Tax Paid</span>
+                        <span className="border-b-2 border-[#0C7E57]">
+                          Tax Paid
+                        </span>
                         {row.tax_paid}
                       </Typography>
                     </Box>
@@ -437,7 +439,9 @@ export const TabThree = () => {
                       }}
                     >
                       <Typography variant="h6">
-                        <span>Tax Avoided</span>
+                        <span className="border-b-2 border-[#EC4137]">
+                          Tax Avoided
+                        </span>
                         {row.tax_avoid}
                       </Typography>
                     </Box>

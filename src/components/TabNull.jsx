@@ -66,7 +66,6 @@ export const TabNull = ({
         }
 
         const result = await response.json();
-        console.log("Initial data fetch result:", result);
         const apiData = result.data || [];
 
         const formattedData = apiData.map((item, index) => ({
@@ -302,8 +301,6 @@ export const TabNull = ({
     setError("");
 
     try {
-      console.log("Making search request for:", query);
-
       const response = await fetch(" https://api.the-aysa.com/global-search", {
         method: "POST",
         headers: {
@@ -317,9 +314,7 @@ export const TabNull = ({
       }
 
       const result = await response.json();
-      console.log(result.status);
       setglobalData(result);
-      console.log(result);
 
       setStatus(result.status);
       const searchData = result.data || [];
@@ -335,9 +330,9 @@ export const TabNull = ({
             item["Profit Margin"] || item["Profit Margin "] || "0%"
           );
           const profitMade =
-            item["Profit Made"] || item["Profit Made "] || "$0";
+            item["Profit Made"] || item["Profit Made "] || "N/A";
           const releasePrice =
-            item["Release Price"] || item["Release Price "] || "$0";
+            item["Release Price"] || item["Release Price "] || "N/A";
           const productionYear =
             item["Production Year"] || item["Production Year "] || 0;
 
@@ -506,8 +501,6 @@ export const TabNull = ({
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }
-
-  console.log("ceo_worker_data:", globalData?.ceo_worker_data);
 
   return (
     <>
@@ -771,7 +764,7 @@ export const TabNull = ({
                               // .toString()
                               .toLowerCase()
                               .replace("x", " x")} `
-                          : "$0"}
+                          : "N/A"}
                       </span>
                     </div>
 
@@ -807,7 +800,7 @@ export const TabNull = ({
                         Tax Paid:
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData?.tax_data?.["Taxes Paid"] || "$0"}
+                        {globalData?.tax_data?.["Taxes Paid"] || "N/A"}
                       </span>
                     </div>
                     <div className="flex justify-between mb-1">
@@ -815,7 +808,7 @@ export const TabNull = ({
                         Tax Avoided:
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData?.tax_data?.["Taxes Avoided"] || "$0"}
+                        {globalData?.tax_data?.["Taxes Avoided"] || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -1053,7 +1046,7 @@ export const TabNull = ({
                               //.toString()
                               .toLowerCase()
                               .replace("x", " x")} `
-                          : "$0"}
+                          : "N/A"}
                       </span>
                     </div>
 
@@ -1089,7 +1082,7 @@ export const TabNull = ({
                         Tax Paid:
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData?.tax_data?.["Taxes Paid"] || "$0"}
+                        {globalData?.tax_data?.["Taxes Paid"] || "N/A"}
                       </span>
                     </div>
                     <div className="flex justify-between mb-1">
@@ -1097,7 +1090,7 @@ export const TabNull = ({
                         Tax Avoided:
                       </span>
                       <span className="text-md font-medium text-gray-700">
-                        {globalData?.tax_data?.["Taxes Avoided"] || "$0"}
+                        {globalData?.tax_data?.["Taxes Avoided"] || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -1115,7 +1108,7 @@ export const TabNull = ({
                         //.toString()
                         .toLowerCase()
                         .replace("x", " ")}`
-                    : "$0"}{" "}
+                    : "N/A"}{" "}
                   more than the average worker.
                 </p>
               </div>

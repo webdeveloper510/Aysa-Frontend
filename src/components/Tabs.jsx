@@ -50,6 +50,7 @@ export const Tabs = () => {
       content: <TabThree />,
     },
   ];
+  console.log(activeTab);
 
   return (
     <div className="tab-wrapper">

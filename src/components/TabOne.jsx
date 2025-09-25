@@ -33,8 +33,6 @@ export const TabOne = ({
     setshowComparison((prev) => !prev);
   };
 
-  console.log("All Products Data:", data);
-
   useEffect(() => {
     const ua = navigator.userAgent;
     if (/Mobi|Android|iPhone|iPod|iPad/i.test(ua)) {
@@ -62,7 +60,6 @@ export const TabOne = ({
         }
 
         const result = await response.json();
-        console.log("Initial data fetch result:", result);
         const apiData = result.data || [];
 
         const formattedData = apiData.map((item, index) => ({
@@ -298,8 +295,6 @@ export const TabOne = ({
     setError("");
 
     try {
-      console.log("Making search request for:", query);
-
       const response = await fetch(
         "https://api.the-aysa.com/product-semantic-search",
         {
@@ -320,7 +315,6 @@ export const TabOne = ({
       }
 
       const result = await response.json();
-      console.log(result.status);
       setglobalData(result);
 
       setStatus(result.status);
@@ -337,9 +331,9 @@ export const TabOne = ({
             item["Profit Margin"] || item["Profit Margin "] || "0%"
           );
           const profitMade =
-            item["Profit Made"] || item["Profit Made "] || "$0";
+            item["Profit Made"] || item["Profit Made "] || "N/A";
           const releasePrice =
-            item["Release Price"] || item["Release Price "] || "$0";
+            item["Release Price"] || item["Release Price "] || "N/A";
           const productionYear =
             item["Production Year"] || item["Production Year "] || 0;
 
@@ -514,8 +508,7 @@ export const TabOne = ({
   if (initialDataLoading) {
     return <InitialLoadingComponent />;
   }
-  console.log(data.matched);
-
+  alert("hi there");
   return (
     <>
       <div className="meow">
@@ -862,7 +855,7 @@ export const TabOne = ({
                                     ]
                                       .toLowerCase()
                                       .replace("x", "")}`
-                                  : "$0"}{" "}
+                                  : "N/A"}{" "}
                                 more than the average worker.
                               </Typography>
                             )}

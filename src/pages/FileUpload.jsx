@@ -47,9 +47,10 @@ const FileUpload = () => {
         ? "profit"
         : selectedCategory === "Tax_Avoidance.csv"
         ? "tax"
-        : selectedCategory === "Phone_Tablet.csv" ||
-          selectedCategory === "Website.csv"
-        ? "ceo-worker"
+        : selectedCategory === "Phone_Tablet.csv"
+        ? "phone"
+        : selectedCategory === "Website.csv"
+        ? "desktop"
         : "";
     formData.append("tab_type", tabType);
     formData.append("file", selectedFile);

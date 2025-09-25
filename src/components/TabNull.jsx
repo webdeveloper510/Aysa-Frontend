@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Button from "@mui/material/Button";
 import { useMediaQuery } from "@mui/material";
+
 import {
   Box,
   Typography,
@@ -9,6 +10,7 @@ import {
   CircularProgress,
   Grid,
   Card,
+  Tooltip,
 } from "@mui/material";
 //import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
@@ -27,6 +29,7 @@ export const TabNull = ({
   const [showComparison, setshowComparison] = useState(false);
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
+  const [open, setopen] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width:768px)");
 
@@ -663,6 +666,13 @@ export const TabNull = ({
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
+                <Tooltip
+                  title="An estimate"
+                  placement="top"
+                  sx={{ cursor: "pointer" }}
+                >
+                  *
+                </Tooltip>
               </Typography>
               <Grid
                 container
@@ -994,6 +1004,14 @@ export const TabNull = ({
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
+                <Tooltip
+                  title="An estimate"
+                  placement="top"
+                  open={open}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <span onClick={() => setopen(!open)}>*</span>
+                </Tooltip>
               </Typography>
               <Grid
                 container

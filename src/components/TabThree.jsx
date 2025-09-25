@@ -421,14 +421,14 @@ export const TabThree = () => {
                         backgroundColor: "#E9E7CA",
                         color: "#0C7E57",
                         width: "50%",
-                        borderRight: "1px solid #000",
+                        borderRight: "1px solid gray",
                       }}
                     >
                       <Typography variant="h6">
-                        <span className="border-b-2 border-[#0C7E57]">
+                        <span className="border-b-2 border-[#0C7E57] TaxTitle">
                           Tax Paid
                         </span>
-                        {row.tax_paid}
+                        <span className="TaxValue">{row.tax_paid}</span>
                       </Typography>
                     </Box>
                     <Box
@@ -439,10 +439,10 @@ export const TabThree = () => {
                       }}
                     >
                       <Typography variant="h6">
-                        <span className="border-b-2 border-[#EC4137]">
+                        <span className="border-b-2 border-[#EC4137] TaxTitle">
                           Tax Avoided
                         </span>
-                        {row.tax_avoid}
+                        <span className="TaxValue">{row.tax_avoid}</span>
                       </Typography>
                     </Box>
                   </Box>

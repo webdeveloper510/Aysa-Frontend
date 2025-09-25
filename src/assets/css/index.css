@@ -340,6 +340,13 @@ div#mobile-inital-render {
 .textleft {
   text-align: left;
 }
+.TaxTitle {
+  padding-bottom: 15px;
+}
+.TaxValue {
+  padding-top: 15px;
+  font-size: 40px !important;
+}
 /**************** responsive css ************/
 
 @media screen and (max-width: 1200px) {
@@ -455,9 +462,7 @@ div#mobile-inital-render {
   .about-row h1 {
     font-size: 30px;
   }
-  .tab-content h4 {
-    font-size: 27px;
-  }
+
   .nomargin {
     margin: 0px 0px 10px 0px !important;
   }

@@ -564,16 +564,16 @@ export const TabNull = ({
                     <Typography variant="body2" fontWeight="bold">
                       <span style={{ color: "#1976d2" }}>{option.brand}</span>{" "}
                       {option.productName}
-                      <span style={{ color: "#666", fontWeight: "normal" }}>
+                      {/* <span style={{ color: "#666", fontWeight: "normal" }}>
                         {" "}
                         - {option.type}
-                      </span>
-                      {option.category && (
+                      </span> */}
+                      {/* {option.category && (
                         <span style={{ color: "#999", fontWeight: "normal" }}>
                           {" "}
                           • {option.category}
                         </span>
-                      )}
+                      )} */}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {option.profitMargin} margin • {option.productionYear}
@@ -763,7 +763,7 @@ export const TabNull = ({
                           ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                               // .toString()
                               .toLowerCase()
-                              .replace("x", " x")} `
+                              .replace("x", "x")} `
                           : "N/A"}
                       </span>
                     </div>
@@ -1045,7 +1045,7 @@ export const TabNull = ({
                           ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
                               //.toString()
                               .toLowerCase()
-                              .replace("x", " x")} `
+                              .replace("x", "x")} `
                           : "N/A"}
                       </span>
                     </div>

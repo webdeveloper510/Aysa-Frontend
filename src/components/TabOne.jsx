@@ -713,7 +713,7 @@ export const TabOne = ({
                 <Typography variant="subtitle1" fontWeight="bold" mr={0.5}>
                   Profit Margin: {firstProduct.profit_margin || "N/A"}
                 </Typography>
-                <Tooltip title="An estimate" arrow>
+                <Tooltip title="an estimate based on public fillings and 3rd party methodology" arrow>
                   <Typography
                     component="span"
                     sx={{

@@ -415,7 +415,7 @@ export const TabThree = () => {
                     {row.company_name} ({row.year})
                     {!isDesktop ? (
                       <Tooltip
-                        title="An estimate"
+                        title="an estimate based on public fillings and 3rd party methodology"
                         placement="top"
                         open={open}
                         sx={{ cursor: "pointer" }}
@@ -424,7 +424,7 @@ export const TabThree = () => {
                       </Tooltip>
                     ) : (
                       <Tooltip
-                        title="An estimate"
+                        title="an estimate based on public fillings and 3rd party methodology"
                         placement="top"
                         sx={{ cursor: "pointer" }}
                       >

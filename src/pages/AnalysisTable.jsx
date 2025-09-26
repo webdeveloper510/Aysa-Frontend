@@ -56,7 +56,7 @@ const AnalysisTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="text-center py-4 text-gray-500">
+                <td colSpan="4" className="text-center py-4 text-gray-500">
                   No Data Available
                 </td>
               </tr>

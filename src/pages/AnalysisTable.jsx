@@ -36,6 +36,7 @@ const AnalysisTable = () => {
         <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
+              <th className="text-center py-3 px-4">Brand Name</th>
               <th className="text-center py-3 px-4">Name</th>
               <th className="text-center py-3 px-4">Tab Type</th>
               <th className="text-center py-3 px-4">Search Count</th>
@@ -45,6 +46,7 @@ const AnalysisTable = () => {
             {data.length > 0 ? (
               data.map((item) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
+                  <td className="py-2 px-4 text-center">{item.brand_name}</td>
                   <td className="py-2 px-4 text-center">{item.product_name}</td>
                   <td className="py-2 px-4 text-center capitalize">
                     {item.tab_type}

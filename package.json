@@ -34,6 +34,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:staging": "env-cmd -f .env.staging react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -58,6 +59,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "ajv": "^7.2.4",
+    "env-cmd": "^11.0.0",
     "tailwindcss": "^3.4.17"
   }
 }

@@ -14,7 +14,7 @@ const AnalysisTable = () => {
 
       try {
         const res = await axios.get(
-          `https://api.the-aysa.com/count-value?date=${year}-${month}-${day}`,
+          `${process.env.REACT_APP_API_URL}/count-value?date=${year}-${month}-${day}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

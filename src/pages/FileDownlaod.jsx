@@ -10,7 +10,9 @@ const FileDownload = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get("https://api.the-aysa.com/get-data-files");
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/get-data-files`
+        );
         setsupportedFiles(res?.data?.files || []);
       } catch (error) {
         console.error("Failed to fetch files:", error);

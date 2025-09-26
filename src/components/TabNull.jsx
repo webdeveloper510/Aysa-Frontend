@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Button from "@mui/material/Button";
-import { useMediaQuery } from "@mui/material";
+import { Tooltip, useMediaQuery } from "@mui/material";
 import {
   Box,
   Typography,
@@ -27,6 +27,7 @@ export const TabNull = ({
   const [showComparison, setshowComparison] = useState(false);
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
+  const [open, setopen] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width:768px)");
 
@@ -53,7 +54,7 @@ export const TabNull = ({
       setInitialDataLoading(true);
       try {
         const response = await fetch(
-          "https://api.the-aysa.com/get-profit-margin-data",
+          `${process.env.REACT_APP_API_URL}/get-profit-margin-data`,
           {
             method: "GET",
             headers: {
@@ -300,13 +301,16 @@ export const TabNull = ({
     setError("");
 
     try {
-      const response = await fetch(" https://api.the-aysa.com/global-search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, device_type: deviceType }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/global-search`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query, device_type: deviceType }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -662,6 +666,13 @@ export const TabNull = ({
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
+                <Tooltip
+                  title="an estimate based on public fillings and 3rd party methodology"
+                  placement="top"
+                  sx={{ cursor: "pointer" }}
+                >
+                  *
+                </Tooltip>
               </Typography>
               <Grid
                 container
@@ -1001,6 +1012,14 @@ export const TabNull = ({
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
+                <Tooltip
+                  title="an estimate based on public fillings and 3rd party methodology"
+                  placement="top"
+                  open={open}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <span onClick={() => setopen(!open)}>*</span>
+                </Tooltip>
               </Typography>
               <Grid
                 container

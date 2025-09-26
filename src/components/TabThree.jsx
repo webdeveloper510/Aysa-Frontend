@@ -41,12 +41,15 @@ export const TabThree = () => {
     const fetchAllTaxData = async () => {
       setInitialDataLoading(true);
       try {
-        const response = await fetch("https://api.the-aysa.com/get-tax-data", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/get-tax-data`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -145,7 +148,7 @@ export const TabThree = () => {
       console.log("Making search request for:", query);
 
       const res = await axios.post(
-        "https://api.the-aysa.com/tax-semantic-search",
+        `${process.env.REACT_APP_API_URL}/tax-semantic-search`,
         {
           query: query,
           tab_type: "tax",

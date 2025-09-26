@@ -18,7 +18,7 @@ function App() {
       }
 
       axios.post(
-        `https://api.the-aysa.com/create-visitor-value`,
+        `${process.env.REACT_APP_API_URL}/create-visitor-value`,
         { browser_id: id },
         {
           headers: {

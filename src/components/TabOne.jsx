@@ -47,7 +47,7 @@ export const TabOne = ({
       setInitialDataLoading(true);
       try {
         const response = await fetch(
-          "https://api.the-aysa.com/get-profit-margin-data",
+          `${process.env.REACT_APP_API_URL}/get-profit-margin-data`,
           {
             method: "GET",
             headers: {
@@ -296,7 +296,7 @@ export const TabOne = ({
 
     try {
       const response = await fetch(
-        "https://api.the-aysa.com/product-semantic-search",
+        `${process.env.REACT_APP_API_URL}/product-semantic-search`,
         {
           method: "POST",
           headers: {

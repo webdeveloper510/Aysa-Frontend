@@ -16,7 +16,7 @@ export function useCardscount() {
 
       try {
         const res = await axios.get(
-          `https://api.the-aysa.com/count-value?date=${year}-${month}-${day}`,
+          `${process.env.REACT_APP_API_URL}/count-value?date=${year}-${month}-${day}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -27,7 +27,7 @@ export function useCardscount() {
         const today = new Date().toISOString().split("T")[0];
 
         const count = await axios.get(
-          `https://api.the-aysa.com/get-visitor?date_str=${today}`,
+          `${process.env.REACT_APP_API_URL}/get-visitor?date_str=${today}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

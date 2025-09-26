@@ -11,10 +11,13 @@ const Login = () => {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post("https://api.the-aysa.com/admin-login", { password });
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/admin-login`,
+        { password }
+      );
       if (res.data.status === 200) {
         navigate("/dashboard", { replace: true });
-        localStorage.setItem("token",res.data.token)
+        localStorage.setItem("token", res.data.token);
       } else {
         setError(res.data.message);
       }

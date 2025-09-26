@@ -12,7 +12,9 @@ const FileUpload = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get("https://api.the-aysa.com/get-data-files");
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/get-data-files`
+        );
         setuploadCategories(res?.data?.files || []);
         console.log(res.data.files);
       } catch (error) {
@@ -59,7 +61,7 @@ const FileUpload = () => {
 
     try {
       const res = await axios.post(
-        "https://api.the-aysa.com/train-model",
+        `${process.env.REACT_APP_API_URL}/train-model`,
         formData,
         {
           headers: {

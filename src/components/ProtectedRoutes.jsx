@@ -16,11 +16,14 @@ const ProtectedRoutes = () => {
         setIsAuthenticated(true);
 
         try {
-          const res = await axios.get("https://api.the-aysa.com/auth-check", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const res = await axios.get(
+            `${process.env.REACT_APP_API_URL}/auth-check`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           if (res.status === 202) {
             setIsLoading(false);

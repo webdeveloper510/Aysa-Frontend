@@ -51,7 +51,7 @@ export const TabTwo = () => {
       setInitialDataLoading(true);
       try {
         const response = await fetch(
-          "https://api.the-aysa.com/get-ceo-worker-data",
+          `${process.env.REACT_APP_API_URL}/get-ceo-worker-data`,
           {
             method: "GET",
             headers: {
@@ -182,7 +182,7 @@ export const TabTwo = () => {
     try {
       console.log("Making CEO-Worker search request for:", value);
       const res = await axios.post(
-        "https://api.the-aysa.com/ceo-worker-semantic-search",
+        `${process.env.REACT_APP_API_URL}/ceo-worker-semantic-search`,
         { query: value, tab_type: "ceo-worker", device_type: deviceType }
       );
 

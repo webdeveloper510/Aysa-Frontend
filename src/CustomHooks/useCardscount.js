@@ -1,0 +1,49 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
+export function useCardscount() {
+  const [todaysVisitors, setTodaysVisitors] = useState(0);
+  const [todaysSearchedProducts, setTodaysSearchedProducts] = useState(0);
+
+  useEffect(() => {
+    async function getData() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const token = localStorage.getItem("token");
+
+      try {
+        const res = await axios.get(
+          `https://api.the-aysa.com/count-value?date=${year}-${month}-${day}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const today = new Date().toISOString().split("T")[0];
+
+        const count = await axios.get(
+          `https://api.the-aysa.com/get-visitor?date_str=${today}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setTodaysVisitors(count.data.total_visit_count);
+
+        setTodaysSearchedProducts(res?.data?.data?.length || 0);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    getData();
+  }, []);
+
+  return { todaysSearchedProducts, todaysVisitors };
+}

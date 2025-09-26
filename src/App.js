@@ -1,20 +1,40 @@
 import "./App.css";
 import { Footer } from "./components/Footer";
 import { Router } from "./Router";
-
-const test = () => {
-  window.location.assign("/");
-};
-
+import { useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import { Link, useLocation } from "react-router-dom";
 
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.pathname.startsWith("/dashboard")) {
+      let id = localStorage.getItem("browserId");
+      if (!id) {
+        id = uuidv4();
+        localStorage.setItem("browserId", id);
+      }
+
+      axios.post(
+        `https://api.the-aysa.com/create-visitor-value`,
+        { browser_id: id },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+    }
+  }, [location.pathname]);
 
   return (
     <>
       <div className="App">
         <header className="App-header">
-          <p className="header" onClick={test}>
-            Aysa
+          <p className="header">
+            <Link to={"/"}>Aysa</Link>
           </p>
           <label>
             See what brands don’t want you to know — profit margins, pay gaps,
@@ -22,7 +42,6 @@ function App() {
           </label>
         </header>
         <Router />
-
         <Footer />
       </div>
     </>
@@ -30,7 +49,3 @@ function App() {
 }
 
 export default App;
-
-// profit
-// tax
-// ceo-worker

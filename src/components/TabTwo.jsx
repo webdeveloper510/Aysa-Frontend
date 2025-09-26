@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useMediaQuery } from "@mui/material";
+import { Tooltip, useMediaQuery } from "@mui/material";
 import {
   Box,
   Typography,
@@ -35,6 +35,7 @@ export const TabTwo = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [deviceType, setDeviceType] = useState("desktop");
   const isDesktop = useMediaQuery("(min-width:768px)");
+  const [open, setopen] = useState(null);
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -463,6 +464,13 @@ export const TabTwo = () => {
                           sx={{ fontWeight: "bold", mb: 3 }}
                         >
                           {row.company_name} ({row.year})
+                          <Tooltip
+                            title="an estimate based on public fillings and 3rd party methodology"
+                            placement="right"
+                            sx={{ cursor: "pointer" }}
+                          >
+                            *
+                          </Tooltip>
                         </Typography>
 
                         {/* Progress Bar */}
@@ -526,9 +534,9 @@ export const TabTwo = () => {
                   </Grid>
 
                   <Typography variant="h6" mt="10px" align="left">
-                    CEO {row.ceo_name} made an estimate based on public fillings
-                    and 3rd party methodology of {row.ceo_total_compensation}{" "}
-                    vs. the average worker making {row.worker_salary}.That’s{" "}
+                    CEO {row.ceo_name} made an estimate of{" "}
+                    {row.ceo_total_compensation} vs. the average worker making{" "}
+                    {row.worker_salary}. That’s{" "}
                     {row["pay_ration"]?.toLowerCase().replace("x", "")} times
                     more.
                   </Typography>
@@ -568,6 +576,14 @@ export const TabTwo = () => {
                           sx={{ fontWeight: "bold", mb: 3 }}
                         >
                           {row.company_name} ({row.year})
+                          <Tooltip
+                            title="an estimate based on public fillings and 3rd party methodology"
+                            placement="right"
+                            open={open === index}
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <span onClick={() => setopen(index)}>*</span>
+                          </Tooltip>
                         </Typography>
 
                         {/* Progress Bar */}

@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Button from "@mui/material/Button";
 import { useMediaQuery } from "@mui/material";
-
 import {
   Box,
   Typography,
@@ -10,7 +9,6 @@ import {
   CircularProgress,
   Grid,
   Card,
-  Tooltip,
 } from "@mui/material";
 //import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
@@ -29,7 +27,6 @@ export const TabNull = ({
   const [showComparison, setshowComparison] = useState(false);
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
-  const [open, setopen] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width:768px)");
 
@@ -176,7 +173,6 @@ export const TabNull = ({
           term.includes(` ${query}`) ||
           term.includes(`${query} `)
       );
-
       // For multi-word queries, ensure all words are present in the item
       const matchesAllWords =
         queryWords.length > 1
@@ -567,16 +563,16 @@ export const TabNull = ({
                     <Typography variant="body2" fontWeight="bold">
                       <span style={{ color: "#1976d2" }}>{option.brand}</span>{" "}
                       {option.productName}
-                      {/* <span style={{ color: "#666", fontWeight: "normal" }}>
+                      <span style={{ color: "#666", fontWeight: "normal" }}>
                         {" "}
                         - {option.type}
-                      </span> */}
-                      {/* {option.category && (
+                      </span>
+                      {option.category && (
                         <span style={{ color: "#999", fontWeight: "normal" }}>
                           {" "}
                           • {option.category}
                         </span>
-                      )} */}
+                      )}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {option.profitMargin} margin • {option.productionYear}
@@ -666,13 +662,6 @@ export const TabNull = ({
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
-                <Tooltip
-                  title="an estimate based on public fillings and 3rd party methodology"
-                  placement="top"
-                  sx={{ cursor: "pointer" }}
-                >
-                  *
-                </Tooltip>
               </Typography>
               <Grid
                 container
@@ -756,7 +745,15 @@ export const TabNull = ({
                       <div
                         className="bg-blue-500 h-3 rounded-full transition-all duration-500"
                         style={{
-                          width: `${globalData?.data[0]["Profit Margin"] || 0}`,
+                          width: `${Math.min(
+                            100,
+                            Number(
+                              globalData?.data[0]["Profit Margin"]?.replace(
+                                "%",
+                                ""
+                              )
+                            ) || 0
+                          )}%`,
                         }}
                       />
                     </div>
@@ -773,7 +770,7 @@ export const TabNull = ({
                           ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                               // .toString()
                               .toLowerCase()
-                              .replace("x", "x")} `
+                              .replace("x", " x")} `
                           : "N/A"}
                       </span>
                     </div>
@@ -1004,14 +1001,6 @@ export const TabNull = ({
                   /\b(\w+)\s+\1\b/gi,
                   "$1"
                 )}
-                <Tooltip
-                  title="an estimate based on public fillings and 3rd party methodology"
-                  placement="top"
-                  open={open}
-                  sx={{ cursor: "pointer" }}
-                >
-                  <span onClick={() => setopen(!open)}>*</span>
-                </Tooltip>
               </Typography>
               <Grid
                 container
@@ -1046,7 +1035,9 @@ export const TabNull = ({
                       <div
                         className="bg-blue-500 h-3 rounded-full transition-all duration-500"
                         style={{
-                          width: `${globalData?.data[0]["Profit Margin"] || 0}`,
+                          width: `${
+                            globalData?.data[0]["Profit Margin"] || 0
+                          }%`,
                         }}
                       />
                     </div>
@@ -1063,7 +1054,7 @@ export const TabNull = ({
                           ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
                               //.toString()
                               .toLowerCase()
-                              .replace("x", "x")} `
+                              .replace("x", " x")} `
                           : "N/A"}
                       </span>
                     </div>

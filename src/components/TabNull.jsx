@@ -780,7 +780,7 @@ export const TabNull = ({
                         {globalData.ceo_worker_data.length > 0
                           ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                               // .toString()
-                              .toLowerCase()
+                              ?.toLowerCase()
                               .replace("x", " x")} `
                           : "N/A"}
                       </span>
@@ -796,7 +796,7 @@ export const TabNull = ({
                               parseFloat(
                                 globalData.ceo_worker_data[0]["Pay Ration"]
                                   //.toString()
-                                  .toLowerCase()
+                                  ?.toLowerCase()
                                   .replace("x", "")
                               ) || 0,
                               100 // cap at 100%
@@ -841,7 +841,7 @@ export const TabNull = ({
                   {globalData?.ceo_worker_data.length > 0
                     ? `${globalData.ceo_worker_data[0]["Pay Ration"]
                         //.toString()
-                        .toLowerCase()
+                        ?.toLowerCase()
                         .replace("x", " ")}`
                     : "0"}{" "}
                   times more than the average worker.
@@ -1068,13 +1068,51 @@ export const TabNull = ({
                       <span className="text-md font-medium text-gray-700">
                         CEO-Worker Pay Gap
                       </span>
+                      {/* <span className="text-md font-medium text-gray-700">
+                        {globalData.ceo_worker_data.length > 0 ? (
+                          deviceType === "desktop" ? (
+                            <>
+                              `$
+                              {globalData.ceo_worker_data[0]["Pay Ration"]
+                                //.toString()
+                                ?.toLowerCase()
+                                .replace("x", " x")}{" "}
+                              `
+                            </>
+                          ) : (
+                            <>
+                              `$
+                              {globalData.ceo_worker_data[0]["Pay Ratio"]
+                                //.toString()
+                                ?.toLowerCase()
+                                .replace("x", " x")}{" "}
+                              `
+                            </>
+                          )
+                        ) : (
+                          "N/A"
+                        )}
+                      </span> */}
                       <span className="text-md font-medium text-gray-700">
-                        {globalData.ceo_worker_data.length > 0
-                          ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
-                              //.toString()
-                              .toLowerCase()
-                              .replace("x", " x")} `
-                          : "N/A"}
+                        {globalData?.ceo_worker_data?.length > 0 ? (
+                          deviceType === "desktop" ? (
+                            <>
+                              {globalData.ceo_worker_data[0]["Pay Ration"]
+                                ?.toString()
+                                .toLowerCase()
+                                .replace("x", " x")}
+                            </>
+                          ) : (
+                            <>
+                              {globalData.ceo_worker_data[0]["Pay Ratio"]
+                                ?.toString()
+                                .toLowerCase()
+                                .replace("x", " x")}
+                            </>
+                          )
+                        ) : (
+                          "N/A"
+                        )}
                       </span>
                     </div>
 
@@ -1088,7 +1126,7 @@ export const TabNull = ({
                               parseFloat(
                                 globalData.ceo_worker_data[0]["Pay Ratio"]
                                   //.toString()
-                                  .toLowerCase()
+                                  ?.toLowerCase()
                                   .replace("x", "")
                               ) || 0,
                               100 // cap at 100%
@@ -1134,7 +1172,7 @@ export const TabNull = ({
                   {globalData?.ceo_worker_data.length > 0
                     ? `${globalData.ceo_worker_data[0]["Pay Ratio"]
                         //.toString()
-                        .toLowerCase()
+                        ?.toLowerCase()
                         .replace("x", " ")}`
                     : "N/A"}{" "}
                   more than the average worker.
@@ -1358,8 +1396,8 @@ export const TabNull = ({
 
                                     // Check if product name starts with brand
                                     const showName = productName
-                                      .toLowerCase()
-                                      .startsWith(brand.toLowerCase())
+                                      ?.toLowerCase()
+                                      .startsWith(brand?.toLowerCase())
                                       ? productShort
                                       : `${brand} ${productShort}`;
 

@@ -500,7 +500,7 @@ export const TabTwo = () => {
                           Worker <strong>{row.worker_salary}</strong>{" "}
                           {`(${row["pay_ration"]
                             .toLowerCase()
-                            .replace("x", " ×")} Gap)`}
+                            .replace("x", " ×")})`}
                           .
                         </Typography>
                       </CardContent>
@@ -622,7 +622,7 @@ export const TabTwo = () => {
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: "bold",
-                            fontSize: "2rem",
+                            fontSize: "1.5rem",
                           }}
                         >
                           {`${row["pay_ratio"]
@@ -640,7 +640,7 @@ export const TabTwo = () => {
                     <strong>{row.worker_salary}</strong>{" "}
                     {`(${row["pay_ratio"]
                       .toLowerCase()
-                      .replace("x", " ×")} Gap)`}
+                      .replace("x", " ×")})`}
                     .
                   </Typography>
 

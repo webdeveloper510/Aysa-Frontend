@@ -50,12 +50,12 @@ export const About = () => {
         {/* The Team */}
         <Box mt={5} mb={0}>
           <Typography variant="h4" gutterBottom>
-            The Team Bios:
+            The Team:
           </Typography>
 
           <Grid item xs={12} mb={4}>
             <Typography variant="h6">
-              Mohy Omer - Founder and CEOMohy Omer – Founder and CEO
+              Mohy Omer - Founder and CEO
             </Typography>
             <Typography variant="body2">
               After nearly a decade working with the U.S. government and
@@ -66,6 +66,7 @@ export const About = () => {
               the products they buy, how much tax corporations avoid each year,
               and the size of the CEO–frontline worker pay gap.
             </Typography>
+            <br></br>
             <Typography variant="body2">
               That insight sparked Aysa. Drawing on his research background and
               technical skills, Mohy spent years building methods to collect,
@@ -73,6 +74,7 @@ export const About = () => {
               use. Once he proved the concept, he invited his then-girlfriend
               and a close friend to join him in turning Aysa into a reality.
             </Typography>
+            <br></br>
             <Typography variant="body2">
               A former refugee from Sudan, Mohy’s life has been defined by
               resilience and purpose. He is deeply committed to information
@@ -94,6 +96,7 @@ export const About = () => {
               companies and academic departments alike—tackling complex
               technical problems with calm rigor and a builder’s curiosity.
             </Typography>
+            <br></br>
             <Typography variant="body2">
               A passionate educator, Andreas has taught and supervised students
               across computer science disciplines, sharing practical lessons in
@@ -101,6 +104,7 @@ export const About = () => {
               classrooms and code reviews alike focus on clarity, craftsmanship,
               and helping people grow.
             </Typography>
+            <br></br>
             <Typography variant="body2">
               Driven by a belief in transparency and consumer empowerment,
               Andreas is committed to giving people the information they need to
@@ -120,6 +124,7 @@ export const About = () => {
               and advanced computational methods, she brings a wealth of
               knowledge to her work.
             </Typography>
+            <br></br>
             <Typography variant="body2">
               Throughout her career, Qi has specialized in developing and
               fitting robust statistical models, ensuring data accuracy, and
@@ -127,6 +132,7 @@ export const About = () => {
               Her meticulous approach and deep understanding of statistical
               theory and application make her a valuable asset to any project.
             </Typography>
+            <br></br>
             <Typography variant="body2">
               At Aysa, Qi provides critical statistical support, ensuring the
               integrity and reliability of the models used to process and
@@ -152,6 +158,7 @@ export const About = () => {
                 is implied.
               </i>
             </Typography>
+            <br></br>
             <Typography variant="body2">
               Aysa is a data-driven platform that aggregates and analyzes
               publicly available information about companies and products.

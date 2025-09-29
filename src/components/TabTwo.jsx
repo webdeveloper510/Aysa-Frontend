@@ -569,11 +569,11 @@ export const TabTwo = () => {
                   >
                     {/* Left Column */}
                     <Grid item xs={12} md={6} className="customWidthCeo">
-                      <CardContent sx={{ p: 0 }}>
+                      <CardContent sx={{ p: 0 }} className="nopadding">
                         <Typography
                           variant="h4"
                           align="left"
-                          sx={{ fontWeight: "bold", mb: 3 }}
+                          sx={{ fontWeight: "bold", mb: 2 }}
                         >
                           {row.company_name} ({row.year})
                           <Tooltip
@@ -601,21 +601,6 @@ export const TabTwo = () => {
                             }}
                           />
                         </Box>
-
-                        {/* CEO vs Worker info */}
-                        <Typography
-                          align="left"
-                          variant="h6"
-                          sx={{ color: "#000" }}
-                        >
-                          {row.ceo_name} –{" "}
-                          <strong>{row.ceo_total_compensation}</strong> vs
-                          Worker <strong>{row.worker_salary}</strong>{" "}
-                          {`(${row["pay_ratio"]
-                            .toLowerCase()
-                            .replace("x", " ×")} Gap)`}
-                          .
-                        </Typography>
                       </CardContent>
                     </Grid>
 
@@ -623,8 +608,10 @@ export const TabTwo = () => {
                     <Grid item xs={12} md={6}>
                       <CardContent
                         sx={{ p: 0, display: "flex", justifyContent: "center" }}
+                        className="nopadding"
                       >
                         <Box
+                          className="RatioMobile"
                           sx={{
                             minWidth: 120,
                             minHeight: 120,
@@ -645,6 +632,17 @@ export const TabTwo = () => {
                       </CardContent>
                     </Grid>
                   </Grid>
+
+                  {/* CEO vs Worker info */}
+                  <Typography align="left" variant="h6" sx={{ color: "#000" }}>
+                    {row.ceo_name} –{" "}
+                    <strong>{row.ceo_total_compensation}</strong> vs Worker{" "}
+                    <strong>{row.worker_salary}</strong>{" "}
+                    {`(${row["pay_ratio"]
+                      .toLowerCase()
+                      .replace("x", " ×")} Gap)`}
+                    .
+                  </Typography>
 
                   <Typography variant="h6" mt="10px" align="left">
                     CEO {row.ceo_name} made {row.ceo_total_compensation} vs. the

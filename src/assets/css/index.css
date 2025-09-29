@@ -137,6 +137,7 @@ span.tabsIcons {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  text-align: left;
 }
 .title {
   float: left;
@@ -346,6 +347,15 @@ div#mobile-inital-render {
 .TaxValue {
   padding-top: 15px;
   font-size: 40px !important;
+}
+ul.aboutlgealList li {
+  margin: 17px 0px;
+}
+
+ul.aboutlgealList {
+  text-align: left;
+  list-style: disc;
+  padding-left: 50px;
 }
 /**************** responsive css ************/
 

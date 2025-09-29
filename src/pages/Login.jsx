@@ -10,6 +10,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/admin-login`,

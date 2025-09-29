@@ -11,21 +11,24 @@ function App() {
 
   useEffect(() => {
     if (!location.pathname.startsWith("/dashboard")) {
-      let id = localStorage.getItem("browserId");
-      if (!id) {
-        id = uuidv4();
-        localStorage.setItem("browserId", id);
-      }
+      let id = localStorage.getItem("browserId") || uuidv4();
+      localStorage.setItem("browserId", id);
 
-      axios.post(
-        `${process.env.REACT_APP_API_URL}/create-visitor-value`,
-        { browser_id: id },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      axios
+        .post(
+          `${process.env.REACT_APP_API_URL}/create-visitor-value`,
+          { browser_id: id },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        )
+        .then((res) => console.log("Visitor API response:", res.data))
+        .catch((err) =>
+          console.error("Visitor API error:", err.response?.data || err.message)
+        );
     }
   }, [location.pathname]);
 

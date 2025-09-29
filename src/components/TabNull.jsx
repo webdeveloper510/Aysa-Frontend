@@ -1068,7 +1068,7 @@ export const TabNull = ({
                       <span className="text-md font-medium text-gray-700">
                         CEO-Worker Pay Gap
                       </span>
-                      <span className="text-md font-medium text-gray-700">
+                      {/* <span className="text-md font-medium text-gray-700">
                         {globalData.ceo_worker_data.length > 0 ? (
                           deviceType === "desktop" ? (
                             <>
@@ -1087,6 +1087,27 @@ export const TabNull = ({
                                 ?.toLowerCase()
                                 .replace("x", " x")}{" "}
                               `
+                            </>
+                          )
+                        ) : (
+                          "N/A"
+                        )}
+                      </span> */}
+                      <span className="text-md font-medium text-gray-700">
+                        {globalData?.ceo_worker_data?.length > 0 ? (
+                          deviceType === "desktop" ? (
+                            <>
+                              {globalData.ceo_worker_data[0]["Pay Ration"]
+                                ?.toString()
+                                .toLowerCase()
+                                .replace("x", " x")}
+                            </>
+                          ) : (
+                            <>
+                              {globalData.ceo_worker_data[0]["Pay Ratio"]
+                                ?.toString()
+                                .toLowerCase()
+                                .replace("x", " x")}
                             </>
                           )
                         ) : (

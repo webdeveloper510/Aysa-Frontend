@@ -50,13 +50,11 @@ export const About = () => {
         {/* The Team */}
         <Box mt={5} mb={0}>
           <Typography variant="h4" gutterBottom>
-            The Team:
+            The Team Bios:
           </Typography>
 
           <Grid item xs={12} mb={4}>
-            <Typography variant="h6">
-              Mohy Omer - Founder and CEO
-            </Typography>
+            <Typography variant="h6">Mohy Omer - Founder and CEO</Typography>
             <Typography variant="body2">
               After nearly a decade working with the U.S. government and
               international organizations on development and human rights, Mohy
@@ -174,15 +172,15 @@ export const About = () => {
                 accounting, or legal advice.
               </li>
               <li>
-                <b>Estimation.</b>Aysa’s content is for Where values are
-                modeled, we disclose assumptions and may show ranges. Different
-                reasonable assumptions may yield different results.
+                <b>Estimation.</b>Where values are modeled, we disclose
+                assumptions and may show ranges. Different reasonable
+                assumptions may yield different results.
               </li>
               <li>
                 <b>No Allegations of Illegality.</b>References to “tax
-                avoidance” mean <b>lawful</b> reduction of tax liability using
+                avoidance” mean <b>lawful</b> rreduction of tax liability using
                 deductions, deferrals, credits, and jurisdictional rules. We do
-                not allege “tax evasion” or unlawful conduct.
+                <b>not allege</b> “tax evasion” or unlawful conduct.
               </li>
               <li>
                 <b>Trademarks & Copyright.</b>Company names and logos may appear

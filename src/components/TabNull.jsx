@@ -667,7 +667,7 @@ export const TabNull = ({
                   "$1"
                 )}
                 <Tooltip
-                  title="an estimate based on public fillings and 3rd party methodology"
+                  title="an estimate"
                   placement="top"
                   sx={{ cursor: "pointer" }}
                 >
@@ -1013,7 +1013,7 @@ export const TabNull = ({
                   "$1"
                 )}
                 <Tooltip
-                  title="an estimate based on public fillings and 3rd party methodology"
+                  title="an estimate"
                   placement="top"
                   open={open}
                   sx={{ cursor: "pointer" }}

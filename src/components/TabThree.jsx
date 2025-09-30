@@ -7,7 +7,6 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  LinearProgress,
   Tooltip,
   useMediaQuery,
 } from "@mui/material";

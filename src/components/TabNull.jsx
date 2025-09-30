@@ -10,7 +10,6 @@ import {
   Grid,
   Card,
 } from "@mui/material";
-//import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
 export const TabNull = ({

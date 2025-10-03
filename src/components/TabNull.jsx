@@ -366,9 +366,10 @@ export const TabNull = ({
         matched: formattedData,
         compared: [],
       });
+      setError("");
     } catch (err) {
       console.error("Search failed:", err);
-      setError(`Product Not Matched with: ${searchQuery}.`);
+      setError(`Product Not Matched with: ${query}.`);
       setData({ matched: [], compared: [] });
     } finally {
       setLoading(false);

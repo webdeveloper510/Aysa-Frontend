@@ -201,15 +201,21 @@ export const TabThree = () => {
 
       console.log("Final filtered data:", topFourYears);
       setFilteredData(topFourYears);
+      setError("");
     } catch (err) {
+      setFilteredData([]);
       console.error("Tax search failed:", err);
-      setError(`Tax data Not Matched with: ${searchQuery}.`);
+      setError(`Tax data Not Matched with: ${query}.`);
 
       // setError(`Failed to load data: ${err.message}. Please try again.`);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log(filteredData);
+  }, [filteredData, setFilteredData]);
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
@@ -383,7 +389,7 @@ export const TabThree = () => {
         />
       )}
 
-      {!!filteredData.length && (
+      {!!filteredData.length && !error && (
         <div className="taxavoidance_card">
           {/* Body */}
           {filteredData.map((row, index) => (

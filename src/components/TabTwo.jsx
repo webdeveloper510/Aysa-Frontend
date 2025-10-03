@@ -237,11 +237,12 @@ export const TabTwo = () => {
       const topFourYears = sorted.slice(0, 4);
 
       console.log("Final filtered data:", topFourYears);
-
+      setError("");
       setFilteredData(topFourYears);
     } catch (err) {
+      setFilteredData([]);
       console.error("CEO-Worker search failed:", err);
-      setError(`CEO-Worker Not found: ${searchQuery}.`);
+      setError(`CEO-Worker Not found for: ${value}.`);
       // setError(`Failed to load data: ${err.message}. Please try again.`);
     } finally {
       setLoading(false);
@@ -434,6 +435,7 @@ export const TabTwo = () => {
       )}
 
       {!!filteredData.length &&
+        !error &&
         (isDesktop ? (
           <div className="paygap_card">
             {filteredData.map((row, index) => (

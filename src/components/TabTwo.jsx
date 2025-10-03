@@ -465,7 +465,7 @@ export const TabTwo = () => {
                         >
                           {row.company_name} ({row.year})
                           <Tooltip
-                            title="an estimate based on public fillings and 3rd party methodology"
+                            title="an estimate"
                             placement="right"
                             sx={{ cursor: "pointer" }}
                           >
@@ -577,7 +577,7 @@ export const TabTwo = () => {
                         >
                           {row.company_name} ({row.year})
                           <Tooltip
-                            title="an estimate based on public fillings and 3rd party methodology"
+                            title="an estimate"
                             placement="right"
                             open={open === index}
                             sx={{ cursor: "pointer" }}
@@ -638,10 +638,7 @@ export const TabTwo = () => {
                     {row.ceo_name} –{" "}
                     <strong>{row.ceo_total_compensation}</strong> vs Worker{" "}
                     <strong>{row.worker_salary}</strong>{" "}
-                    {`(${row["pay_ratio"]
-                      .toLowerCase()
-                      .replace("x", " ×")})`}
-                    .
+                    {`(${row["pay_ratio"].toLowerCase().replace("x", " ×")})`}.
                   </Typography>
 
                   <Typography variant="h6" mt="10px" align="left">

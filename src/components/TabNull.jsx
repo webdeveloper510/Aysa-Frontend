@@ -10,7 +10,6 @@ import {
   Grid,
   Card,
 } from "@mui/material";
-//import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 
 export const TabNull = ({
@@ -667,7 +666,7 @@ export const TabNull = ({
                   "$1"
                 )}
                 <Tooltip
-                  title="an estimate based on public fillings and 3rd party methodology"
+                  title="an estimate"
                   placement="top"
                   sx={{ cursor: "pointer" }}
                 >
@@ -1013,7 +1012,7 @@ export const TabNull = ({
                   "$1"
                 )}
                 <Tooltip
-                  title="an estimate based on public fillings and 3rd party methodology"
+                  title="an estimate"
                   placement="top"
                   open={open}
                   sx={{ cursor: "pointer" }}

@@ -7,7 +7,6 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  LinearProgress,
   Tooltip,
   useMediaQuery,
 } from "@mui/material";
@@ -418,7 +417,7 @@ export const TabThree = () => {
                     {row.company_name} ({row.year})
                     {!isDesktop ? (
                       <Tooltip
-                        title="an estimate based on public fillings and 3rd party methodology"
+                        title="an estimate"
                         placement="top"
                         open={open}
                         sx={{ cursor: "pointer" }}
@@ -427,7 +426,7 @@ export const TabThree = () => {
                       </Tooltip>
                     ) : (
                       <Tooltip
-                        title="an estimate based on public fillings and 3rd party methodology"
+                        title="an estimate"
                         placement="top"
                         sx={{ cursor: "pointer" }}
                       >
@@ -447,7 +446,7 @@ export const TabThree = () => {
                         backgroundColor: "#E9E7CA",
                         color: "#0C7E57",
                         width: "50%",
-                        borderRight: "1px solid gray",
+                        // borderRight: "1px solid gray",
                       }}
                     >
                       <Typography variant="h6">

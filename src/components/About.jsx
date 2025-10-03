@@ -12,7 +12,7 @@ export const About = () => {
 
       <Container maxWidth="md" sx={{ mt: 3, mb: 4 }}>
         {/* Mission */}
-        <Box my={4}>
+        <Box my={4} textAlign="center">
           <Typography variant="h4" gutterBottom>
             Our Mission
           </Typography>
@@ -24,7 +24,7 @@ export const About = () => {
         </Box>
 
         {/* Our Visiom */}
-        <Box my={5}>
+        <Box my={5} textAlign="center">
           <Typography variant="h4" gutterBottom>
             Our Vision
           </Typography>
@@ -36,14 +36,14 @@ export const About = () => {
         </Box>
 
         {/* Who We Are */}
-        <Box my={5}>
+        <Box my={5} textAlign="center">
           <Typography variant="h4" gutterBottom>
             Who We Are
           </Typography>
           <Typography variant="body1">
-            <b>Aysa is a platform that</b> empowers you to know what you’re
-            really paying for by revealing product profit margins, CEO–worker
-            gaps, and corporate taxes.
+            Aysa is a transparency platform for shoppers that empowers you to
+            see what you’re really paying for—revealing product profit margins,
+            CEO–worker pay gaps, and corporate tax avoidance.
           </Typography>
         </Box>
 
@@ -54,9 +54,7 @@ export const About = () => {
           </Typography>
 
           <Grid item xs={12} mb={4}>
-            <Typography variant="h6">
-              Mohy Omer - Founder and CEO
-            </Typography>
+            <Typography variant="h6">Mohy Omer - Founder and CEO</Typography>
             <Typography variant="body2">
               After nearly a decade working with the U.S. government and
               international organizations on development and human rights, Mohy
@@ -149,14 +147,12 @@ export const About = () => {
               Aysa Legal Disclaimer
             </Typography>
             <Typography variant="body2">
-              <i>
-                Aysa provides informational content for education and research.
-                Some figures are estimates based on public sources that are
-                mathematically and statistically modeled. Nothing here is
-                investment, tax, or legal advice. Company names and trademarks
-                are used for identification only; no affiliation or endorsement
-                is implied.
-              </i>
+              Aysa provides informational content for education and research.
+              Some figures are estimates based on public sources that are
+              mathematically and statistically modeled. Nothing here is
+              investment, tax, or legal advice. Company names and trademarks are
+              used for identification only; no affiliation or endorsement is
+              implied.
             </Typography>
             <br></br>
             <Typography variant="body2">
@@ -164,40 +160,40 @@ export const About = () => {
               publicly available information about companies and products.
               Unless expressly labeled “reported,” figures are modeled and
               derived from disclosed facts and stated assumptions. We regularly
-              update our models to capture the latest reported data.
+              update our models to capture the latest reported data. Our
+              platform precisely highlights the following:
             </Typography>
             <ul className="aboutlgealList">
               <li>
-                <b>No Professional Advice.</b>Aysa’s content is for{" "}
-                <b>informational and educational</b>
-                purposes only and does not constitute investment, tax,
-                accounting, or legal advice.
+                <b>No Professional Advice.</b> Aysa’s content is for{" "}
+                <b>informational and educational</b> purposes only and does not
+                constitute investment, tax, accounting, or legal advice.
               </li>
               <li>
-                <b>Estimation.</b>Aysa’s content is for Where values are
-                modeled, we disclose assumptions and may show ranges. Different
-                reasonable assumptions may yield different results.
+                <b>Estimation.</b> Where values are modeled, we disclose
+                assumptions and may show ranges. Different reasonable
+                assumptions may yield different results.
               </li>
               <li>
-                <b>No Allegations of Illegality.</b>References to “tax
+                <b>No Allegations of Illegality.</b> References to “tax
                 avoidance” mean <b>lawful</b> reduction of tax liability using
                 deductions, deferrals, credits, and jurisdictional rules. We do
-                not allege “tax evasion” or unlawful conduct.
+                <b>not </b> allege “tax evasion” or unlawful conduct.
               </li>
               <li>
-                <b>Trademarks & Copyright.</b>Company names and logos may appear
-                under<b>nominative fair use</b> to identify brands; appearance
-                does not imply sponsorship or endorsement. All other materials
-                remain the property of their respective owners.
+                <b>Trademarks & Copyright.</b> Company names and logos may
+                appear under<b>nominative fair use</b> to identify brands;
+                appearance does not imply sponsorship or endorsement. All other
+                materials remain the property of their respective owners.
               </li>
               <li>
-                <b>Errors & Corrections.</b>If you believe any content is
+                <b>Errors & Corrections.</b> If you believe any content is
                 inaccurate, please use the “Report an issue” link. We will
                 review submissions and, where warranted, correct or clarify
                 content and note changes in our <b>Corrections Log.</b>
               </li>
               <li>
-                <b>Jurisdiction.</b>Content is published by Aysa for a global
+                <b>Jurisdiction.</b> Content is published by Aysa for a global
                 audience. Laws differ by jurisdiction; users are responsible for
                 how they use our content.
               </li>

@@ -27,6 +27,7 @@ export const TabNull = ({
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
   const [open, setopen] = useState(false);
+  const [Targetedyear, setTargetedYear] = useState(0);
 
   const isDesktop = useMediaQuery("(min-width:768px)");
 
@@ -286,7 +287,7 @@ export const TabNull = ({
     return sortedSuggestions.slice(0, 15);
   }, [searchQuery, allProductsData]);
 
-  const handleSearch = async (query) => {
+  const handleSearch = async (query, year) => {
     if (!query.trim()) {
       setData({ matched: [], compared: [] });
       setSearchQuery("");
@@ -307,7 +308,11 @@ export const TabNull = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query, device_type: deviceType }),
+          body: JSON.stringify({
+            query,
+            device_type: deviceType,
+            target_year: year,
+          }),
         }
       );
 
@@ -389,12 +394,12 @@ export const TabNull = ({
       setSearchQuery(selectedQuery);
       setStatus(0);
 
-      handleSearch(selectedQuery);
+      handleSearch(selectedQuery, value?.productionYear);
     } else if (typeof value === "string") {
       setSearchQuery(value);
       setStatus(0);
 
-      handleSearch(value);
+      handleSearch(value, value?.productionYear);
     }
   };
 

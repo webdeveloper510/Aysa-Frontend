@@ -13,6 +13,7 @@
     "axios": "^1.7.7",
     "caniuse-lite": "^1.0.30001727",
     "chart.js": "^4.5.0",
+    "fuse.js": "^7.1.0",
     "highcharts": "^11.4.8",
     "highcharts-react-official": "^3.2.1",
     "lucide-react": "^0.542.0",
@@ -28,6 +29,7 @@
     "react-use": "^17.5.1",
     "recharts": "^3.1.2",
     "sass": "^1.81.0",
+    "string-similarity": "^4.0.4",
     "uuid": "^13.0.0",
     "web-vitals": "^4.2.4"
   },

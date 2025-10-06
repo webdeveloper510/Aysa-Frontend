@@ -11,6 +11,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import axios from "axios";
+import Fuse from "fuse.js";
+import stringSimilarity from "string-similarity";
 
 const cellStyle = {
   padding: "20px",
@@ -85,51 +87,70 @@ export const TabThree = () => {
   }, []);
 
   const suggestions = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 1 || allTaxData.length === 0) {
-      return [];
-    }
+    if (!searchQuery?.trim() || allTaxData.length === 0) return [];
 
     const query = searchQuery.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
 
-    const filteredSuggestions = allTaxData.filter((item) => {
-      const matchesFullQuery = item.searchText.some((text) =>
-        text.includes(query)
-      );
-      const matchesAllWords = queryWords.every((word) =>
-        item.searchText.some((text) => text.includes(word))
-      );
-      const companyName = item.companyName.toLowerCase();
-      const year = item.year.toString().toLowerCase();
+    // Split multi-word or mixed queries like "apple2023" → ["apple", "2023"]
+    const queryParts = query.match(/[a-z]+|\d+/gi) || [];
 
-      const matchesIndividualFields =
-        companyName.includes(query) ||
-        year.includes(query) ||
-        queryWords.some(
-          (word) => companyName.includes(word) || year.includes(word)
-        );
-
-      return matchesFullQuery || matchesAllWords || matchesIndividualFields;
+    // 🔹 1. Fuzzy engine setup
+    const fuse = new Fuse(allTaxData, {
+      keys: [
+        { name: "companyName", weight: 0.6 },
+        { name: "year", weight: 0.3 },
+        { name: "taxesPaid", weight: 0.05 },
+        { name: "taxesAvoided", weight: 0.05 },
+      ],
+      includeScore: true,
+      threshold: 0.35, // strict but typo-tolerant
+      minMatchCharLength: 2,
     });
 
-    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-      const aExactCompany = a.companyName.toLowerCase() === query;
-      const bExactCompany = b.companyName.toLowerCase() === query;
-      if (aExactCompany !== bExactCompany) return bExactCompany - aExactCompany;
-      const aCompanyStarts = a.companyName.toLowerCase().startsWith(query);
-      const bCompanyStarts = b.companyName.toLowerCase().startsWith(query);
-      if (aCompanyStarts !== bCompanyStarts)
-        return bCompanyStarts - aCompanyStarts;
-      const aYearMatch = a.year.toString() === query;
-      const bYearMatch = b.year.toString() === query;
-      if (aYearMatch !== bYearMatch) return bYearMatch - aYearMatch;
-      const companyCompare = a.companyName.localeCompare(b.companyName);
-      if (companyCompare !== 0) return companyCompare;
+    // 🔹 2. Primary fuzzy search
+    let fuzzyResults = fuse.search(query).map((r) => ({
+      ...r.item,
+      score: r.score,
+    }));
 
-      return parseInt(b.year) - parseInt(a.year);
+    // 🔹 3. Boost for direct field matches
+    fuzzyResults = fuzzyResults.map((item) => {
+      const company = item.companyName.toLowerCase();
+      const year = item.year.toString();
+
+      let boost = 0;
+      if (company === query) boost += 0.5;
+      if (company.startsWith(query)) boost += 0.3;
+      if (year === query) boost += 0.2;
+      if (queryParts.length > 1 && queryParts.every((p) => company.includes(p)))
+        boost += 0.25;
+
+      return { ...item, score: (item.score || 1) - boost };
     });
 
-    return sortedSuggestions.slice(0, 15);
+    // 🔹 4. Semantic similarity fallback
+    const semanticMatches = allTaxData
+      .map((item) => {
+        const text = `${item.companyName} ${item.year}`.toLowerCase();
+        const sim = stringSimilarity.compareTwoStrings(text, query);
+        return { ...item, score: 1 - sim * 0.5 }; // similarity → inverse score
+      })
+      .filter((i) => i.score < 0.7);
+
+    // 🔹 5. Combine + deduplicate + sort
+    const combined = [
+      ...fuzzyResults,
+      ...semanticMatches.filter(
+        (s) =>
+          !fuzzyResults.some(
+            (f) => f.companyName === s.companyName && f.year === s.year
+          )
+      ),
+    ];
+
+    const ranked = combined.sort((a, b) => a.score - b.score).slice(0, 20);
+
+    return ranked;
   }, [searchQuery, allTaxData]);
 
   const handleSearch = async (query) => {

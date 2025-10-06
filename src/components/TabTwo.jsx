@@ -11,8 +11,9 @@ import {
   Grid,
   LinearProgress,
 } from "@mui/material";
-
 import axios from "axios";
+import Fuse from "fuse.js";
+import stringSimilarity from "string-similarity";
 
 const cellStyle = {
   padding: "20px",
@@ -106,66 +107,73 @@ export const TabTwo = () => {
   }, []);
 
   const suggestions = useMemo(() => {
-    if (
-      !searchQuery ||
-      searchQuery.length < 1 ||
-      allCeoWorkerData.length === 0
-    ) {
-      return [];
-    }
+    if (!searchQuery?.trim() || allCeoWorkerData.length === 0) return [];
 
     const query = searchQuery.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
+    const queryParts = query.match(/[a-z]+|\d+/gi) || [];
 
-    const filteredSuggestions = allCeoWorkerData.filter((item) => {
-      const matchesFullQuery = item.searchText.some((text) =>
-        text.includes(query)
-      );
-      const matchesAllWords = queryWords.every((word) =>
-        item.searchText.some((text) => text.includes(word))
-      );
-      const companyName = item.companyName.toLowerCase();
-      const ceoName = item.ceoName.toLowerCase();
-      const year = item.year.toString().toLowerCase();
-
-      const matchesIndividualFields =
-        companyName.includes(query) ||
-        ceoName.includes(query) ||
-        year.includes(query) ||
-        queryWords.some(
-          (word) =>
-            companyName.includes(word) ||
-            ceoName.includes(word) ||
-            year.includes(word)
-        );
-
-      return matchesFullQuery || matchesAllWords || matchesIndividualFields;
+    const fuse = new Fuse(allCeoWorkerData, {
+      keys: [
+        { name: "companyName", weight: 0.5 },
+        { name: "ceoName", weight: 0.4 },
+        { name: "year", weight: 0.1 },
+      ],
+      includeScore: true,
+      threshold: 0.35,
+      distance: 120,
+      minMatchCharLength: 2,
     });
 
-    const sortedSuggestions = filteredSuggestions.sort((a, b) => {
-      const aExactCompany = a.companyName.toLowerCase() === query;
-      const bExactCompany = b.companyName.toLowerCase() === query;
-      if (aExactCompany !== bExactCompany) return bExactCompany - aExactCompany;
-      const aExactCeo = a.ceoName.toLowerCase() === query;
-      const bExactCeo = b.ceoName.toLowerCase() === query;
-      if (aExactCeo !== bExactCeo) return bExactCeo - aExactCeo;
-      const aCompanyStarts = a.companyName.toLowerCase().startsWith(query);
-      const bCompanyStarts = b.companyName.toLowerCase().startsWith(query);
-      if (aCompanyStarts !== bCompanyStarts)
-        return bCompanyStarts - aCompanyStarts;
-      const aCeoStarts = a.ceoName.toLowerCase().startsWith(query);
-      const bCeoStarts = b.ceoName.toLowerCase().startsWith(query);
-      if (aCeoStarts !== bCeoStarts) return bCeoStarts - aCeoStarts;
-      const aYearMatch = a.year.toString() === query;
-      const bYearMatch = b.year.toString() === query;
-      if (aYearMatch !== bYearMatch) return bYearMatch - aYearMatch;
-      const companyCompare = a.companyName.localeCompare(b.companyName);
-      if (companyCompare !== 0) return companyCompare;
+    let fuzzyResults = fuse.search(query).map((r) => ({
+      ...r.item,
+      score: r.score,
+    }));
 
-      return parseInt(b.year) - parseInt(a.year);
+    fuzzyResults = fuzzyResults.map((item) => {
+      const company = item.companyName.toLowerCase();
+      const ceo = item.ceoName.toLowerCase();
+      const year = item.year.toString();
+
+      let boost = 0;
+      if (company === query) boost += 0.5;
+      if (company.startsWith(query)) boost += 0.3;
+      if (ceo === query) boost += 0.4;
+      if (ceo.startsWith(query)) boost += 0.25;
+      if (year === query) boost += 0.2;
+      if (
+        queryParts.length > 1 &&
+        queryParts.every((p) => company.includes(p) || ceo.includes(p))
+      )
+        boost += 0.25;
+
+      return { ...item, score: (item.score || 1) - boost };
     });
 
-    return sortedSuggestions.slice(0, 15);
+    const semanticMatches = allCeoWorkerData
+      .map((item) => {
+        const text =
+          `${item.companyName} ${item.ceoName} ${item.year}`.toLowerCase();
+        const sim = stringSimilarity.compareTwoStrings(text, query);
+        return { ...item, score: 1 - sim * 0.5 };
+      })
+      .filter((i) => i.score < 0.7);
+
+    const combined = [
+      ...fuzzyResults,
+      ...semanticMatches.filter(
+        (s) =>
+          !fuzzyResults.some(
+            (f) =>
+              f.companyName === s.companyName &&
+              f.ceoName === s.ceoName &&
+              f.year === s.year
+          )
+      ),
+    ];
+
+    const ranked = combined.sort((a, b) => a.score - b.score).slice(0, 20);
+
+    return ranked;
   }, [searchQuery, allCeoWorkerData]);
 
   const handleSearch = async (value) => {

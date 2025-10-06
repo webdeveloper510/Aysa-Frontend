@@ -34,23 +34,10 @@ export function useCardscount() {
             },
           }
         );
-        setTodaysVisitors(count.data.total_visit_count);
-
+        setTodaysVisitors(count.data.total_todays_visit_counts);
         setTodaysSearchedProducts(res?.data?.data?.length || 0);
       } catch (err) {
         console.error(err);
-      }
-
-      try {
-        const count = await axios.get(
-          `${process.env.REACT_APP_API_URL}/get-visitor/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setTodaysVisitors(count.data.total_visit_count);
-      } catch (err) {
-        console.error("Error fetching visitors:", err);
       }
     }
 

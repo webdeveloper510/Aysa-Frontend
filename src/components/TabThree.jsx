@@ -237,9 +237,14 @@ export const TabThree = () => {
       const searchTerm = `${value.companyName} (${value.year})`;
       handleSearch(searchTerm);
     } else if (typeof value === "string") {
-      const cleanValue = value.replace(/\\/g, "").trim();
-      setSearchQuery(cleanValue);
-      handleSearch(cleanValue);
+      if (suggestions.length >= 1) {
+        handleSearch(suggestions[0].label);
+        setSearchQuery(suggestions[0].label);
+      } else {
+        const cleanValue = value.replace(/\\/g, "").trim();
+        setSearchQuery(cleanValue);
+        handleSearch(cleanValue);
+      }
     }
   };
 
@@ -299,7 +304,10 @@ export const TabThree = () => {
             inputValue={searchQuery}
             onBlur={(event) => {
               if (searchQuery.trim()) {
-                handleSearch(searchQuery.trim());
+                if (suggestions.length >= 1) {
+                  handleSearch(suggestions[0].label);
+                  setSearchQuery(suggestions[0].label);
+                } else handleSearch(searchQuery.trim());
               }
             }}
             onInputChange={(event, newInputValue) => {
@@ -313,7 +321,7 @@ export const TabThree = () => {
               setSearchQuery(newInputValue);
             }}
             onChange={handleSuggestionSelect}
-            onKeyDown={handleKeyPress}
+            // onKeyDown={handleKeyPress}
             noOptionsText={
               searchQuery.length < 1
                 ? "Start typing to search for companies or years..."

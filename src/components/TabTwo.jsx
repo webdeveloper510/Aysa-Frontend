@@ -278,8 +278,14 @@ export const TabTwo = () => {
     } else if (typeof value === "string") {
       // Clean the string to remove any extra formatting
       const cleanValue = value.replace(/\\/g, "").trim();
-      setSearchQuery(cleanValue);
-      handleSearch(cleanValue);
+      console.log(cleanValue);
+      if (suggestions.length >= 1) {
+        handleSearch(suggestions[0].label);
+        setSearchQuery(suggestions[0].label);
+      } else {
+        setSearchQuery(cleanValue);
+        handleSearch(cleanValue);
+      }
     }
   };
 
@@ -349,11 +355,14 @@ export const TabTwo = () => {
             }}
             onBlur={(event) => {
               if (searchQuery.trim()) {
-                handleSearch(searchQuery.trim());
+                if (suggestions.length >= 1) {
+                  setSearchQuery(suggestions[0].label);
+                  handleSearch(suggestions[0].label);
+                } else handleSearch(searchQuery.trim());
               }
             }}
             onChange={handleSuggestionSelect}
-            onKeyDown={handleKeyPress}
+            // onKeyDown={handleKeyPress}
             noOptionsText={
               searchQuery.length < 1
                 ? "Start typing to search for companies or CEOs..."

@@ -27,7 +27,7 @@ export const TabNull = ({
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
   const [open, setopen] = useState(false);
-  const [Targetedyear, setTargetedYear] = useState(0);
+  const [submitted, setsubmitted] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width:768px)");
 
@@ -48,6 +48,10 @@ export const TabNull = ({
       setDeviceType("desktop");
     }
   }, []);
+
+  useEffect(() => {
+    console.log(searchQuery);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchAllProductsData = async () => {
@@ -294,11 +298,12 @@ export const TabNull = ({
       setStatus(0);
       return;
     }
-
+    console.log(query);
     setSearchQuery(query);
     setStatus(0);
     setLoading(true);
     setError("");
+    setsubmitted(true);
 
     try {
       const response = await fetch(
@@ -392,15 +397,17 @@ export const TabNull = ({
     if (value && typeof value === "object") {
       const selectedQuery = value.value;
       setSearchQuery(selectedQuery);
-      setStatus(0);
-
       handleSearch(selectedQuery, value?.productionYear);
     } else if (typeof value === "string") {
-      setSearchQuery(value);
-      setStatus(0);
-
-      handleSearch(value, value?.productionYear);
+      if (suggestions.length >= 1) {
+        handleSearch(suggestions[0].label, suggestions[0].productionYear);
+        return;
+      } else {
+        setSearchQuery(value);
+        handleSearch(value);
+      }
     }
+    setStatus(0);
   };
 
   const firstProduct = data.matched?.[0] || {};
@@ -532,11 +539,13 @@ export const TabNull = ({
                 setshowComparison(false);
                 return;
               }
-              setSearchQuery(newInputValue);
+              if (submitted) {
+                setsubmitted(false);
+              } else setSearchQuery(newInputValue);
               setStatus(0);
             }}
             onChange={handleSuggestionSelect}
-            onKeyDown={handleKeyPress}
+            // onKeyDown={handleKeyPress}
             noOptionsText={
               searchQuery.length < 3
                 ? "Type at least 3 characters to search for brands, products, or types..."
@@ -613,9 +622,7 @@ export const TabNull = ({
           />
         </Box>
       </div>
-
       {loading && <LoadingComponent />}
-
       {error && (
         <Box textAlign="center" my={4}>
           <Typography color="error" variant="h6">
@@ -623,7 +630,6 @@ export const TabNull = ({
           </Typography>
         </Box>
       )}
-
       {!loading && searchQuery && !error && (
         <>
           {/* Case 1: API status 404 */}
@@ -654,7 +660,7 @@ export const TabNull = ({
           )}
         </>
       )}
-
+      ,
       {!loading &&
         data.matched.length > 0 &&
         (isDesktop ? (

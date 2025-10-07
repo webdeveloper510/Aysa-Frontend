@@ -34,7 +34,6 @@ export default function OrientationResults(props) {
   } else {
     number2 = item.price.substring(1, item.price.length).replaceAll(",", "");
   }
-  console.log(number2);
   let profit = Number(
     ((item.profitmargin / 100) * Number(number2.replaceAll("$", ""))).toFixed(2)
   );

@@ -25,7 +25,6 @@ function App() {
             },
           }
         )
-        .then((res) => console.log("Visitor API response:", res.data))
         .catch((err) =>
           console.error("Visitor API error:", err.response?.data || err.message)
         );

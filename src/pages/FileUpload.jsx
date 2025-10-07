@@ -16,7 +16,6 @@ const FileUpload = () => {
           `${process.env.REACT_APP_API_URL}/get-data-files`
         );
         setuploadCategories(res?.data?.files || []);
-        console.log(res.data.files);
       } catch (error) {
         console.error("Failed to fetch files:", error);
       }

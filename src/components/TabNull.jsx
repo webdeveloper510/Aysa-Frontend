@@ -50,10 +50,6 @@ export const TabNull = ({
   }, []);
 
   useEffect(() => {
-    console.log(searchQuery);
-  }, [searchQuery]);
-
-  useEffect(() => {
     const fetchAllProductsData = async () => {
       setInitialDataLoading(true);
       try {
@@ -298,7 +294,18 @@ export const TabNull = ({
       setStatus(0);
       return;
     }
-    console.log(query);
+
+    let words = query.trim().split(" ");
+    if (words.length >= 2) {
+      let last = words[words.length - 1];
+      let secondLast = words[words.length - 2];
+
+      if (last.toLowerCase() === secondLast.toLowerCase()) {
+        words.pop();
+      }
+    }
+
+    query = words.join(" ");
     setSearchQuery(query);
     setStatus(0);
     setLoading(true);

@@ -361,11 +361,6 @@ export const TabOne = ({
       };
 
       const formattedData = formatItems(searchData);
-      console.log(
-        formattedData,
-        "Here Getting the Datta ---------------------------->",
-        showComparison
-      );
       setData({
         matched: formattedData,
         compared: [],

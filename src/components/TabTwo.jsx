@@ -66,7 +66,6 @@ export const TabTwo = () => {
         }
 
         const result = await response.json();
-        console.log("Initial CEO-Worker data fetch result:", result);
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
@@ -188,13 +187,11 @@ export const TabTwo = () => {
     setError("");
 
     try {
-      console.log("Making CEO-Worker search request for:", value);
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/ceo-worker-semantic-search`,
         { query: value, tab_type: "ceo-worker", device_type: deviceType }
       );
 
-      console.log("CEO-Worker search API response:", res.data);
       const rawData = res.data?.data || [];
       const data = rawData.map((row, index) => ({
         id: `${(row["Company Name"] || "").trim()}-${(
@@ -208,8 +205,6 @@ export const TabTwo = () => {
         pay_ration: (row["Pay Ration"] || "N/A").trim(),
         pay_ratio: (row["Pay Ratio"] || "N/A").trim(),
       }));
-
-      console.log("Processed data:", data);
 
       setAllData(data);
 
@@ -236,15 +231,12 @@ export const TabTwo = () => {
         );
       });
 
-      console.log("Filtered data before sorting:", filtered);
-
       const sorted = [...filtered]
         .filter((row) => row.year)
         .sort((a, b) => parseInt(b.year) - parseInt(a.year));
 
       const topFourYears = sorted.slice(0, 4);
 
-      console.log("Final filtered data:", topFourYears);
       setError("");
       setFilteredData(topFourYears);
     } catch (err) {
@@ -275,8 +267,6 @@ export const TabTwo = () => {
         workerSalary: value.workerSalary,
       };
 
-      console.log("Selected suggestion payload:", payload);
-
       // Instead of using the formatted label, use just the company name
       // This avoids the double slash issue in the API call
       const searchTerm = value.companyName; // or value.ceoName if you prefer
@@ -286,7 +276,6 @@ export const TabTwo = () => {
     } else if (typeof value === "string") {
       // Clean the string to remove any extra formatting
       const cleanValue = value.replace(/\\/g, "").trim();
-      console.log(cleanValue);
       if (suggestions.length >= 1) {
         handleSearch(suggestions[0].label);
         setSearchQuery(suggestions[0].label);

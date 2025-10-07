@@ -57,7 +57,6 @@ export const TabThree = () => {
         }
 
         const result = await response.json();
-        console.log("Initial tax data fetch result:", result);
         const apiData = result.data || [];
         const formattedData = apiData.map((item, index) => ({
           id: index,
@@ -165,8 +164,6 @@ export const TabThree = () => {
     setError("");
 
     try {
-      console.log("Making search request for:", query);
-
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/tax-semantic-search`,
         {
@@ -175,10 +172,7 @@ export const TabThree = () => {
         }
       );
 
-      console.log("Tax search API response:", res.data);
       const rawRows = res.data?.data || [];
-
-      console.log("Raw rows from API:", rawRows);
 
       const rows = rawRows.map((row, index) => ({
         id: `${(row["Company Name"] || "").trim()}-${(row["Year"] || "")
@@ -190,29 +184,21 @@ export const TabThree = () => {
         tax_avoid: (row["Taxes Avoided"] || "").trim(),
       }));
 
-      console.log("Processed rows:", rows);
-
       // ✅ Split query into words + numbers (so Apple2024 → ["apple", "2024"])
       const searchTerms =
         query
           .toLowerCase()
           .trim()
           .match(/[a-z]+|\d+/g) || [];
-      console.log("searchTerms:", searchTerms);
 
       const filtered = rows.filter((row) => {
         const companyName = (row.company_name || "").toLowerCase();
         const year = (row.year || "").toString().toLowerCase();
 
-        console.log("company:", companyName);
-        console.log("year:", year);
-
         return searchTerms.some(
           (term) => companyName.includes(term) || year.includes(term)
         );
       });
-
-      console.log("Filtered data before sorting:", filtered);
 
       const sorted = [...filtered]
         .filter((row) => row.year)
@@ -220,7 +206,6 @@ export const TabThree = () => {
 
       const topFourYears = sorted.slice(0, 4);
 
-      console.log("Final filtered data:", topFourYears);
       setFilteredData(topFourYears);
       setError("");
     } catch (err) {
@@ -233,10 +218,6 @@ export const TabThree = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(filteredData);
-  }, [filteredData, setFilteredData]);
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {

@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 export function useCardscount() {
   const [todaysVisitors, setTodaysVisitors] = useState(0);
-  const [todaysSearchedProducts, setTodaysSearchedProducts] = useState(0);
+  const [TodaysProfitSearch, setTodaysProfitSearch] = useState(0);
+  const [TodaysTaxSearch, setTodaysTaxSearch] = useState(0);
+  const [TodaysCeoSearch, setTodaysCeoSearch] = useState(0);
 
   useEffect(() => {
     async function getData() {
@@ -35,7 +36,9 @@ export function useCardscount() {
           }
         );
         setTodaysVisitors(count.data.total_todays_visit_counts);
-        setTodaysSearchedProducts(res?.data?.data?.length || 0);
+        setTodaysProfitSearch(res?.data?.data?.profit?.search_count || 0);
+        setTodaysTaxSearch(res?.data?.data?.tax?.search_count || 0);
+        setTodaysCeoSearch(res?.data?.data["ceo-worker"]?.search_count || 0);
       } catch (err) {
         console.error(err);
       }
@@ -44,5 +47,10 @@ export function useCardscount() {
     getData();
   }, []);
 
-  return { todaysSearchedProducts, todaysVisitors };
+  return {
+    TodaysProfitSearch,
+    TodaysTaxSearch,
+    TodaysCeoSearch,
+    todaysVisitors,
+  };
 }

@@ -1,9 +1,20 @@
 import { Link } from "react-router-dom";
-import { Users, ShoppingCart } from "lucide-react";
+import {
+  Users,
+  ShoppingCart,
+  Briefcase,
+  DollarSign,
+  TrendingUp,
+} from "lucide-react";
 import { useCardscount } from "../CustomHooks/useCardscount";
 
 const DashBoard = () => {
-  const { todaysSearchedProducts, todaysVisitors } = useCardscount();
+  const {
+    TodaysProfitSearch,
+    TodaysTaxSearch,
+    TodaysCeoSearch,
+    todaysVisitors,
+  } = useCardscount();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 p-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
@@ -44,19 +55,39 @@ const DashBoard = () => {
       </div>
 
       {/* Today's Visitors & Today's Searched Products */}
-      <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center">
         {/* Today's Visitors */}
-        <div className="w-40 h-40 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition text-white">
-          <Users className="w-10 h-10 mb-2" />
+        <div className="w-40 h-40 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
+          <Users className="w-10 h-10 mb-2 text-blue-100" />
           <p className="text-sm font-medium">Today's Visitors</p>
           <p className="text-2xl font-bold">{todaysVisitors}</p>
         </div>
 
-        {/* Today's Searched Products */}
-        <div className="w-40 h-40 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex flex-col items-center justify-center shadow-lg transform hover:scale-105 transition text-white">
-          <ShoppingCart className="w-10 h-10 mb-2" />
-          <p className="text-sm font-medium">Today's Searched Products</p>
-          <p className="text-2xl font-bold">{todaysSearchedProducts}</p>
+        {/* Today's Profit Margin Search */}
+        <div className="w-40 h-40 bg-gradient-to-br from-emerald-400 to-green-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
+          <TrendingUp className="w-10 h-10 mb-2 text-emerald-100" />
+          <p className="text-sm font-medium text-center px-2">
+            Today's Profit Margin Search
+          </p>
+          <p className="text-2xl font-bold">{TodaysProfitSearch}</p>
+        </div>
+
+        {/* Today's Pay Gap Search */}
+        <div className="w-40 h-40 bg-gradient-to-br from-orange-400 to-amber-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
+          <Briefcase className="w-10 h-10 mb-2 text-amber-100" />
+          <p className="text-sm font-medium text-center px-2">
+            Today's Pay Gap Search
+          </p>
+          <p className="text-2xl font-bold">{TodaysCeoSearch}</p>
+        </div>
+
+        {/* Today's Tax Avoidance Search */}
+        <div className="w-40 h-40 bg-gradient-to-br from-rose-400 to-pink-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
+          <DollarSign className="w-10 h-10 mb-2 text-rose-100" />
+          <p className="text-sm font-medium text-center px-2">
+            Today's Tax Avoidance Search
+          </p>
+          <p className="text-2xl font-bold">{TodaysTaxSearch}</p>
         </div>
       </div>
     </div>

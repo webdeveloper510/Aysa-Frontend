@@ -660,7 +660,6 @@ export const TabNull = ({
           )}
         </>
       )}
-      ,
       {!loading &&
         data.matched.length > 0 &&
         (isDesktop ? (

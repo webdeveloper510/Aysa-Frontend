@@ -89,11 +89,8 @@ export const TabThree = () => {
     if (!searchQuery?.trim() || allTaxData.length === 0) return [];
 
     const query = searchQuery.toLowerCase().trim();
-
-    // Split multi-word or mixed queries like "apple2023" → ["apple", "2023"]
     const queryParts = query.match(/[a-z]+|\d+/gi) || [];
 
-    // 🔹 1. Fuzzy engine setup
     const fuse = new Fuse(allTaxData, {
       keys: [
         { name: "companyName", weight: 0.6 },
@@ -102,22 +99,22 @@ export const TabThree = () => {
         { name: "taxesAvoided", weight: 0.05 },
       ],
       includeScore: true,
-      threshold: 0.35, // strict but typo-tolerant
+      threshold: 0.35,
       minMatchCharLength: 2,
     });
 
-    // 🔹 2. Primary fuzzy search
+    // 🔹 1. Fuzzy search
     let fuzzyResults = fuse.search(query).map((r) => ({
       ...r.item,
       score: r.score,
     }));
 
-    // 🔹 3. Boost for direct field matches
+    // 🔹 2. Boosts for exact/partial matches
     fuzzyResults = fuzzyResults.map((item) => {
       const company = item.companyName.toLowerCase();
       const year = item.year.toString();
-
       let boost = 0;
+
       if (company === query) boost += 0.5;
       if (company.startsWith(query)) boost += 0.3;
       if (year === query) boost += 0.2;
@@ -127,16 +124,16 @@ export const TabThree = () => {
       return { ...item, score: (item.score || 1) - boost };
     });
 
-    // 🔹 4. Semantic similarity fallback
+    // 🔹 3. Semantic fallback
     const semanticMatches = allTaxData
       .map((item) => {
         const text = `${item.companyName} ${item.year}`.toLowerCase();
         const sim = stringSimilarity.compareTwoStrings(text, query);
-        return { ...item, score: 1 - sim * 0.5 }; // similarity → inverse score
+        return { ...item, score: 1 - sim * 0.5 };
       })
       .filter((i) => i.score < 0.7);
 
-    // 🔹 5. Combine + deduplicate + sort
+    // 🔹 4. Combine & deduplicate
     const combined = [
       ...fuzzyResults,
       ...semanticMatches.filter(
@@ -147,7 +144,43 @@ export const TabThree = () => {
       ),
     ];
 
-    const ranked = combined.sort((a, b) => a.score - b.score).slice(0, 20);
+    // 🔹 5. Initial ranking by relevance
+    let ranked = combined.sort((a, b) => a.score - b.score).slice(0, 50);
+
+    // 🔹 6. Extract query year if exists
+    const queryYearMatch = query.match(/\d{4}/);
+    const queryYear = queryYearMatch ? parseInt(queryYearMatch[0], 10) : null;
+
+    // 🔹 7. Separate exact year matches (if queryYear exists)
+    let yearMatches = [];
+    let otherMatches = [];
+
+    ranked.forEach((item) => {
+      if (queryYear && item.year === queryYear) {
+        yearMatches.push(item);
+      } else {
+        otherMatches.push(item);
+      }
+    });
+
+    // 🔹 8. Group remaining matches by company and sort each group by year descending
+    const grouped = otherMatches.reduce((acc, item) => {
+      const key = item.companyName.toLowerCase();
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
+
+    Object.values(grouped).forEach((group) => {
+      group.sort((a, b) => b.year - a.year);
+    });
+
+    const groupedSorted = Object.keys(grouped)
+      .map((key) => grouped[key])
+      .flat();
+
+    // 🔹 9. Combine exact year matches first, then grouped & sorted results
+    ranked = [...yearMatches, ...groupedSorted].slice(0, 20);
 
     return ranked;
   }, [searchQuery, allTaxData]);

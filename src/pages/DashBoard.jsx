@@ -14,6 +14,7 @@ const DashBoard = () => {
     TodaysTaxSearch,
     TodaysCeoSearch,
     todaysVisitors,
+    totalVisitors,
   } = useCardscount();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 p-6">
@@ -56,6 +57,13 @@ const DashBoard = () => {
 
       {/* Today's Visitors & Today's Searched Products */}
       <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center">
+        {/* Total Visitors */}
+        <div className="w-40 h-40 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
+          <Users className="w-10 h-10 mb-2 text-blue-100" />
+          <p className="text-sm font-medium">Total Visitors</p>
+          <p className="text-2xl font-bold">{totalVisitors}</p>
+        </div>
+
         {/* Today's Visitors */}
         <div className="w-40 h-40 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
           <Users className="w-10 h-10 mb-2 text-blue-100" />

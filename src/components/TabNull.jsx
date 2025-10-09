@@ -295,19 +295,19 @@ export const TabNull = ({
       return;
     }
 
-    let words = query.trim().split(" ");
-    if (words.length >= 2) {
-      let last = words[words.length - 1];
-      let secondLast = words[words.length - 2];
+    let words = query.trim().split(/\s+/);
 
-      if (last.toLowerCase() === secondLast.toLowerCase()) {
-        words.pop();
-      }
+    while (
+      words.length >= 2 &&
+      words[words.length - 1].toLowerCase() ===
+        words[words.length - 2].toLowerCase()
+    ) {
+      words.pop();
     }
 
     query = words.join(" ");
     setSearchQuery(query);
-    setStatus(0);
+
     setLoading(true);
     setError("");
     setsubmitted(true);
@@ -659,13 +659,13 @@ export const TabNull = ({
           )}
 
           {/* Case 3: No API hit, no suggestions */}
-          {status === 0 && suggestions.length === 0 && !data.matched.length && (
+          {/* {status === 0 && suggestions.length === 0 && !data.matched.length && (
             <Box textAlign="center" my={6}>
               <Typography variant="h6" color="text.secondary">
                 Product Not Matched with "<strong>{searchQuery}</strong>"
               </Typography>
             </Box>
-          )}
+          )} */}
         </>
       )}
       {!loading &&

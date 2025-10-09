@@ -10,6 +10,7 @@ import FileManipulation from "./pages/FileManipulation";
 import FileDownlaod from "./pages/FileDownlaod";
 import FileUpload from "./pages/FileUpload";
 import { ToastContainer } from "react-toastify";
+import NotFoundPage from "./pages/NotFoundPage";
 
 export const Router = () => {
   return (
@@ -50,6 +51,7 @@ export const Router = () => {
         <Route element={<PublicRoutes />}>
           <Route path="/login" element={<Login />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

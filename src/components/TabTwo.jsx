@@ -111,68 +111,41 @@ export const TabTwo = () => {
     const query = searchQuery.toLowerCase().trim();
     const queryParts = query.match(/[a-z]+|\d+/gi) || [];
 
-    const fuse = new Fuse(allCeoWorkerData, {
-      keys: [
-        { name: "companyName", weight: 0.5 },
-        { name: "ceoName", weight: 0.4 },
-        { name: "year", weight: 0.1 },
-      ],
-      includeScore: true,
-      threshold: 0.35,
-      distance: 120,
-      minMatchCharLength: 2,
-    });
-
-    let fuzzyResults = fuse.search(query).map((r) => ({
-      ...r.item,
-      score: r.score,
-    }));
-
-    fuzzyResults = fuzzyResults.map((item) => {
+    const results = allCeoWorkerData.map((item) => {
       const company = item.companyName.toLowerCase();
       const ceo = item.ceoName.toLowerCase();
       const year = item.year.toString();
 
-      let boost = 0;
-      if (company === query) boost += 0.5;
-      if (company.startsWith(query)) boost += 0.3;
-      if (ceo === query) boost += 0.4;
-      if (ceo.startsWith(query)) boost += 0.25;
-      if (year === query) boost += 0.2;
-      if (
-        queryParts.length > 1 &&
-        queryParts.every((p) => company.includes(p) || ceo.includes(p))
-      )
-        boost += 0.25;
+      let score = 1; // lower is better
 
-      return { ...item, score: (item.score || 1) - boost };
+      // Check how many query parts match any field
+      let matches = 0;
+      queryParts.forEach((p) => {
+        if (company.includes(p) || ceo.includes(p) || year.includes(p)) {
+          matches += 1;
+        }
+      });
+
+      // Partial year match boost
+      if (queryParts.some((p) => year.includes(p))) {
+        score -= 0.3;
+      }
+
+      // Exact or startsWith boost for company/CEO
+      if (company === query) score -= 0.5;
+      else if (company.startsWith(query)) score -= 0.3;
+
+      if (ceo === query) score -= 0.4;
+      else if (ceo.startsWith(query)) score -= 0.25;
+
+      // More matched parts = higher relevance
+      score -= matches * 0.1;
+
+      return { ...item, score };
     });
 
-    const semanticMatches = allCeoWorkerData
-      .map((item) => {
-        const text =
-          `${item.companyName} ${item.ceoName} ${item.year}`.toLowerCase();
-        const sim = stringSimilarity.compareTwoStrings(text, query);
-        return { ...item, score: 1 - sim * 0.5 };
-      })
-      .filter((i) => i.score < 0.7);
-
-    const combined = [
-      ...fuzzyResults,
-      ...semanticMatches.filter(
-        (s) =>
-          !fuzzyResults.some(
-            (f) =>
-              f.companyName === s.companyName &&
-              f.ceoName === s.ceoName &&
-              f.year === s.year
-          )
-      ),
-    ];
-
-    const ranked = combined.sort((a, b) => a.score - b.score).slice(0, 20);
-
-    return ranked;
+    // Sort by score ascending (lower = better) and take top 20
+    return results.sort((a, b) => a.score - b.score).slice(0, 20);
   }, [searchQuery, allCeoWorkerData]);
 
   const handleSearch = async (value) => {

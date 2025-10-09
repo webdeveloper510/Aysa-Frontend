@@ -538,6 +538,7 @@ export const TabNull = ({
             }}
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
+              newInputValue = newInputValue.replace(/\s+/g, " ");
               if (!newInputValue) {
                 setSearchQuery("");
                 setStatus(0);

@@ -488,7 +488,7 @@ export const TabTwo = () => {
                     </Grid>
 
                     {/* Right Column */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} className="customWidthCeoNumber">
                       <CardContent
                         sx={{ p: 0, display: "flex", justifyContent: "center" }}
                       >
@@ -503,7 +503,7 @@ export const TabTwo = () => {
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: "bold",
-                            fontSize: "2rem",
+                            fontSize: "20px",
                           }}
                         >
                           {`${row["pay_ration"]

@@ -89,81 +89,107 @@ export const TabThree = () => {
     if (!searchQuery?.trim() || allTaxData.length === 0) return [];
 
     const query = searchQuery.toLowerCase().trim();
-    const queryParts = query.match(/[a-z]+|\d+/gi) || [];
+    const queryParts = Array.from(new Set(query.match(/\w+/g) || []));
 
-    const fuse = new Fuse(allTaxData, {
-      keys: [
-        { name: "companyName", weight: 0.6 },
-        { name: "year", weight: 0.3 },
-        { name: "taxesPaid", weight: 0.05 },
-        { name: "taxesAvoided", weight: 0.05 },
-      ],
-      includeScore: true,
-      threshold: 0.35,
-      minMatchCharLength: 2,
-    });
+    // Levenshtein distance for fuzzy matching
+    const levenshtein = (a, b) => {
+      const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+        Array(b.length + 1).fill(0)
+      );
+      for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+      for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
+          else
+            dp[i][j] =
+              1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        }
+      }
+      return dp[a.length][b.length];
+    };
 
-    // 🔹 1. Fuzzy search
-    let fuzzyResults = fuse.search(query).map((r) => ({
-      ...r.item,
-      score: r.score,
-    }));
-
-    // 🔹 2. Boosts for exact/partial matches
-    fuzzyResults = fuzzyResults.map((item) => {
-      const company = item.companyName.toLowerCase();
-      const year = item.year.toString();
-      let boost = 0;
-
-      if (company === query) boost += 0.5;
-      if (company.startsWith(query)) boost += 0.3;
-      if (year === query) boost += 0.2;
-      if (queryParts.length > 1 && queryParts.every((p) => company.includes(p)))
-        boost += 0.25;
-
-      return { ...item, score: (item.score || 1) - boost };
-    });
-
-    // 🔹 3. Semantic fallback
-    const semanticMatches = allTaxData
+    const results = allTaxData
       .map((item) => {
-        const text = `${item.companyName} ${item.year}`.toLowerCase();
-        const sim = stringSimilarity.compareTwoStrings(text, query);
-        return { ...item, score: 1 - sim * 0.5 };
+        const company = item.companyName.toLowerCase();
+        const year = item.year.toString();
+        const taxesPaid = item.taxesPaid?.toString() || "";
+        const taxesAvoided = item.taxesAvoided?.toString() || "";
+
+        let matches = 0;
+        let multiFieldMatches = 0;
+        let partialMatches = 0;
+
+        queryParts.forEach((p) => {
+          const inCompany = company.includes(p);
+          const inYear = year.includes(p);
+          const inPaid = taxesPaid.includes(p);
+          const inAvoided = taxesAvoided.includes(p);
+
+          if (inCompany || inYear || inPaid || inAvoided) {
+            matches += 1;
+
+            // Multi-field match boost
+            const fieldsMatched = [inCompany, inYear, inPaid, inAvoided].filter(
+              Boolean
+            ).length;
+            if (fieldsMatched > 1) multiFieldMatches += 1;
+
+            // Partial matches (not exact or startsWith)
+            if (
+              (inCompany && company !== p && !company.startsWith(p)) ||
+              (inPaid && taxesPaid !== p) ||
+              (inAvoided && taxesAvoided !== p)
+            )
+              partialMatches += 1;
+          }
+        });
+
+        if (matches === 0) return null;
+
+        let score = 1; // lower = better
+
+        // Exact & startsWith boosts
+        if (company === query) score -= 0.6;
+        else if (company.startsWith(query)) score -= 0.4;
+
+        if (year === query) score -= 0.5;
+        else if (year.includes(query)) score -= 0.25;
+
+        // Multi-field match boost
+        score -= multiFieldMatches * 0.15;
+
+        // More matched words = higher relevance
+        score -= matches * 0.1;
+
+        // Partial match penalty
+        score += partialMatches * 0.05;
+
+        // Fuzzy matching for typos
+        const companyDist = levenshtein(query, company);
+        score += companyDist * 0.05;
+
+        return { ...item, score };
       })
-      .filter((i) => i.score < 0.7);
+      .filter(Boolean);
 
-    // 🔹 4. Combine & deduplicate
-    const combined = [
-      ...fuzzyResults,
-      ...semanticMatches.filter(
-        (s) =>
-          !fuzzyResults.some(
-            (f) => f.companyName === s.companyName && f.year === s.year
-          )
-      ),
-    ];
+    // Sort by score ascending (best first)
+    let ranked = results.sort((a, b) => a.score - b.score).slice(0, 50);
 
-    // 🔹 5. Initial ranking by relevance
-    let ranked = combined.sort((a, b) => a.score - b.score).slice(0, 50);
-
-    // 🔹 6. Extract query year if exists
+    // Extract year from query
     const queryYearMatch = query.match(/\d{4}/);
     const queryYear = queryYearMatch ? parseInt(queryYearMatch[0], 10) : null;
 
-    // 🔹 7. Separate exact year matches (if queryYear exists)
+    // Separate exact year matches
     let yearMatches = [];
     let otherMatches = [];
 
     ranked.forEach((item) => {
-      if (queryYear && item.year === queryYear) {
-        yearMatches.push(item);
-      } else {
-        otherMatches.push(item);
-      }
+      if (queryYear && item.year === queryYear) yearMatches.push(item);
+      else otherMatches.push(item);
     });
 
-    // 🔹 8. Group remaining matches by company and sort each group by year descending
+    // Group remaining by company and sort by year descending
     const grouped = otherMatches.reduce((acc, item) => {
       const key = item.companyName.toLowerCase();
       if (!acc[key]) acc[key] = [];
@@ -171,15 +197,15 @@ export const TabThree = () => {
       return acc;
     }, {});
 
-    Object.values(grouped).forEach((group) => {
-      group.sort((a, b) => b.year - a.year);
-    });
+    Object.values(grouped).forEach((group) =>
+      group.sort((a, b) => b.year - a.year)
+    );
 
     const groupedSorted = Object.keys(grouped)
       .map((key) => grouped[key])
       .flat();
 
-    // 🔹 9. Combine exact year matches first, then grouped & sorted results
+    // Combine exact year matches first, then grouped & sorted results
     ranked = [...yearMatches, ...groupedSorted].slice(0, 20);
 
     return ranked;
@@ -272,14 +298,14 @@ export const TabThree = () => {
       const searchTerm = `${value.companyName} (${value.year})`;
       handleSearch(searchTerm);
     } else if (typeof value === "string") {
-      if (suggestions.length >= 1) {
-        handleSearch(suggestions[0].label);
-        setSearchQuery(suggestions[0].label);
-      } else {
-        const cleanValue = value.replace(/\\/g, "").trim();
-        setSearchQuery(cleanValue);
-        handleSearch(cleanValue);
-      }
+      // if (suggestions.length >= 1) {
+      //   handleSearch(suggestions[0].label);
+      //   setSearchQuery(suggestions[0].label);
+      // } else {
+      const cleanValue = value.replace(/\\/g, "").trim();
+      setSearchQuery(cleanValue);
+      handleSearch(cleanValue);
+      // }
     }
   };
 

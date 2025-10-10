@@ -109,7 +109,25 @@ export const TabTwo = () => {
     if (!searchQuery?.trim() || allCeoWorkerData.length === 0) return [];
 
     const query = searchQuery.toLowerCase().trim();
-    const queryParts = query.match(/[a-z]+|\d+/gi) || [];
+    const queryParts = Array.from(new Set(query.match(/\w+/g) || [])); // remove duplicates
+
+    // Levenshtein distance for fuzzy matching
+    const levenshtein = (a, b) => {
+      const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+        Array(b.length + 1).fill(0)
+      );
+      for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+      for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
+          else
+            dp[i][j] =
+              1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        }
+      }
+      return dp[a.length][b.length];
+    };
 
     const results = allCeoWorkerData
       .map((item) => {
@@ -118,35 +136,66 @@ export const TabTwo = () => {
         const year = item.year.toString();
 
         let matches = 0;
+        let multiFieldMatches = 0;
+        let partialMatches = 0;
 
         queryParts.forEach((p) => {
-          if (company.includes(p) || ceo.includes(p) || year.includes(p)) {
+          const inCompany = company.includes(p);
+          const inCEO = ceo.includes(p);
+          const inYear = year.includes(p);
+
+          if (inCompany || inCEO || inYear) {
             matches += 1;
+
+            // Count if word appears in multiple fields
+            if (
+              (inCompany && inCEO) ||
+              (inCompany && inYear) ||
+              (inCEO && inYear)
+            )
+              multiFieldMatches += 1;
+
+            // Partial matches (not exact or startsWith)
+            if (
+              (inCompany && company !== p && !company.startsWith(p)) ||
+              (inCEO && ceo !== p && !ceo.startsWith(p))
+            )
+              partialMatches += 1;
           }
         });
 
-        if (matches === 0) return null; // <-- discard if no matches
+        if (matches === 0) return null;
 
         let score = 1; // lower = better
 
-        // Partial year match boost
-        if (queryParts.some((p) => year.includes(p))) score -= 0.3;
+        // Exact & startsWith boosts
+        if (company === query) score -= 0.7;
+        else if (company.startsWith(query)) score -= 0.4;
+        else score += partialMatches * 0.05;
 
-        // Exact or startsWith boost for company/CEO
-        if (company === query) score -= 0.5;
-        else if (company.startsWith(query)) score -= 0.3;
+        if (ceo === query) score -= 0.6;
+        else if (ceo.startsWith(query)) score -= 0.35;
 
-        if (ceo === query) score -= 0.4;
-        else if (ceo.startsWith(query)) score -= 0.25;
+        // Year matching: partial years get smaller boost
+        if (year === query) score -= 0.5;
+        else if (year.includes(query)) score -= 0.25;
 
-        // More matched parts = higher relevance
+        // Multi-field match boost
+        score -= multiFieldMatches * 0.15;
+
+        // More matched words = better
         score -= matches * 0.1;
+
+        // Fuzzy match for typos
+        const companyDist = levenshtein(query, company);
+        const ceoDist = levenshtein(query, ceo);
+        score += Math.min(companyDist, ceoDist) * 0.05;
 
         return { ...item, score };
       })
-      .filter(Boolean); // remove nulls
+      .filter(Boolean);
 
-    // Sort by score ascending (lower = better) and take top 20
+    // Sort by ascending score (best match first) and return top 20
     return results.sort((a, b) => a.score - b.score).slice(0, 20);
   }, [searchQuery, allCeoWorkerData]);
 
@@ -251,13 +300,13 @@ export const TabTwo = () => {
     } else if (typeof value === "string") {
       // Clean the string to remove any extra formatting
       const cleanValue = value.replace(/\\/g, "").trim();
-      if (suggestions.length >= 1) {
-        handleSearch(suggestions[0].label);
-        setSearchQuery(suggestions[0].label);
-      } else {
-        setSearchQuery(cleanValue);
-        handleSearch(cleanValue);
-      }
+      // if (suggestions.length >= 1) {
+      //   handleSearch(suggestions[0].label);
+      //   setSearchQuery(suggestions[0].label);
+      // } else {
+      setSearchQuery(cleanValue);
+      handleSearch(cleanValue);
+      // }
     }
   };
 

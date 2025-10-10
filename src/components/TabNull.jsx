@@ -295,18 +295,57 @@ export const TabNull = ({
       return;
     }
 
-    let words = query.trim().split(/\s+/);
+    const dedupeRepeatedPhrases = (input) => {
+      let tokens = input.trim().split(/\s+/);
+      if (tokens.length < 2) return input;
 
-    while (
-      words.length >= 2 &&
-      words[words.length - 1].toLowerCase() ===
-        words[words.length - 2].toLowerCase()
-    ) {
-      words.pop();
-    }
+      const normalize = (t) => t.toLowerCase().replace(/^[^\w]+|[^\w]+$/g, "");
 
-    query = words.join(" ");
+      let changed = true;
+      while (changed && tokens.length > 1) {
+        changed = false;
+        const norm = tokens.map(normalize);
+        const n = tokens.length;
+        const maxBlock = Math.floor(n / 2);
+
+        for (let blockLen = maxBlock; blockLen >= 1; blockLen--) {
+          // --- Check repeated at start ---
+          let startMatch = true;
+          for (let i = 0; i < blockLen; i++) {
+            if (norm[i] !== norm[blockLen + i]) {
+              startMatch = false;
+              break;
+            }
+          }
+          if (startMatch) {
+            tokens.splice(0, blockLen);
+            changed = true;
+            break;
+          }
+
+          // --- Check repeated at end ---
+          let endMatch = true;
+          for (let i = 0; i < blockLen; i++) {
+            if (norm[n - blockLen + i] !== norm[n - 2 * blockLen + i]) {
+              endMatch = false;
+              break;
+            }
+          }
+          if (endMatch) {
+            tokens.splice(n - blockLen, blockLen);
+            changed = true;
+            break;
+          }
+        }
+      }
+
+      return tokens.join(" ");
+    };
+
+    query = dedupeRepeatedPhrases(query);
     setSearchQuery(query);
+
+    console.log("After cleaning:", query);
 
     setLoading(true);
     setError("");
@@ -334,8 +373,8 @@ export const TabNull = ({
 
       const result = await response.json();
       setglobalData(result);
-
       setStatus(result.status);
+
       const searchData = result.data || [];
 
       const formatItems = (items) => {
@@ -359,7 +398,7 @@ export const TabNull = ({
             id: `${item["Brand"]}-${item["Product Name"]}-${index}`,
             brand: (item["Brand"] || "").trim(),
             product_name: (item["Product Name"] || "").trim(),
-            product_type: (item["Product Type"] || "").trim(), // Use 'Product Type' for search API
+            product_type: (item["Product Type"] || "").trim(),
             production_year: parseInt(productionYear) || 0,
             profit_margin: profitMargin,
             profit_made: profitMade,
@@ -650,13 +689,14 @@ export const TabNull = ({
           )}
 
           {/* Case 2: No API hit yet (status === 0), but suggestions exist */}
-          {status === 0 && suggestions.length > 0 && !data.matched.length && (
+
+          {/* {status === 0 && suggestions.length > 0 && !data.matched.length && (
             <Box textAlign="center" my={6}>
               <Typography variant="h6" color="text.secondary">
                 Product Not Matched with "<strong>{searchQuery}</strong>"
               </Typography>
             </Box>
-          )}
+          )} */}
 
           {/* Case 3: No API hit, no suggestions */}
           {/* {status === 0 && suggestions.length === 0 && !data.matched.length && (

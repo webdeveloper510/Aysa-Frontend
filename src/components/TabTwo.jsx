@@ -111,38 +111,40 @@ export const TabTwo = () => {
     const query = searchQuery.toLowerCase().trim();
     const queryParts = query.match(/[a-z]+|\d+/gi) || [];
 
-    const results = allCeoWorkerData.map((item) => {
-      const company = item.companyName.toLowerCase();
-      const ceo = item.ceoName.toLowerCase();
-      const year = item.year.toString();
+    const results = allCeoWorkerData
+      .map((item) => {
+        const company = item.companyName.toLowerCase();
+        const ceo = item.ceoName.toLowerCase();
+        const year = item.year.toString();
 
-      let score = 1; // lower is better
+        let matches = 0;
 
-      // Check how many query parts match any field
-      let matches = 0;
-      queryParts.forEach((p) => {
-        if (company.includes(p) || ceo.includes(p) || year.includes(p)) {
-          matches += 1;
-        }
-      });
+        queryParts.forEach((p) => {
+          if (company.includes(p) || ceo.includes(p) || year.includes(p)) {
+            matches += 1;
+          }
+        });
 
-      // Partial year match boost
-      if (queryParts.some((p) => year.includes(p))) {
-        score -= 0.3;
-      }
+        if (matches === 0) return null; // <-- discard if no matches
 
-      // Exact or startsWith boost for company/CEO
-      if (company === query) score -= 0.5;
-      else if (company.startsWith(query)) score -= 0.3;
+        let score = 1; // lower = better
 
-      if (ceo === query) score -= 0.4;
-      else if (ceo.startsWith(query)) score -= 0.25;
+        // Partial year match boost
+        if (queryParts.some((p) => year.includes(p))) score -= 0.3;
 
-      // More matched parts = higher relevance
-      score -= matches * 0.1;
+        // Exact or startsWith boost for company/CEO
+        if (company === query) score -= 0.5;
+        else if (company.startsWith(query)) score -= 0.3;
 
-      return { ...item, score };
-    });
+        if (ceo === query) score -= 0.4;
+        else if (ceo.startsWith(query)) score -= 0.25;
+
+        // More matched parts = higher relevance
+        score -= matches * 0.1;
+
+        return { ...item, score };
+      })
+      .filter(Boolean); // remove nulls
 
     // Sort by score ascending (lower = better) and take top 20
     return results.sort((a, b) => a.score - b.score).slice(0, 20);
@@ -315,6 +317,7 @@ export const TabTwo = () => {
             inputValue={searchQuery}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
+                setError("");
                 setSelectedOption(null);
                 setSearchQuery("");
                 setFilteredData([]);
@@ -399,6 +402,7 @@ export const TabTwo = () => {
         </Typography>
       )}
 
+      {/* <>
       {!loading && searchQuery && filteredData.length === 0 && !error && (
         <Typography
           align="center"
@@ -410,8 +414,9 @@ export const TabTwo = () => {
               .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
               .join(" ")}</strong>`,
           }}
-        />
-      )}
+          />
+        )}
+        </> */}
 
       {!!filteredData.length &&
         !error &&

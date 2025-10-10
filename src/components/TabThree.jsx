@@ -347,6 +347,7 @@ export const TabThree = () => {
             }}
             onInputChange={(event, newInputValue) => {
               if (!newInputValue) {
+                setError("");
                 setSearchQuery("");
                 setSelectedOption(null);
                 setFilteredData([]);
@@ -418,19 +419,21 @@ export const TabThree = () => {
         </Typography>
       )}
 
+      {/* <>
       {!loading && searchQuery && filteredData.length === 0 && !error && (
         <Typography
-          align="center"
-          color="textSecondary"
-          my={4}
+        align="center"
+        color="textSecondary"
+        my={4}
           dangerouslySetInnerHTML={{
             __html: `No Match found for <strong>${searchQuery
               .split(" ")
               .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
               .join(" ")}</strong>`,
-          }}
-        />
-      )}
+            }}
+            />
+          )}
+          </> */}
 
       {!!filteredData.length && !error && (
         <div className="taxavoidance_card">

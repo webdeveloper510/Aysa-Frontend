@@ -377,10 +377,7 @@ export const TabTwo = () => {
             }}
             onBlur={(event) => {
               if (searchQuery.trim()) {
-                if (suggestions.length >= 1) {
-                  setSearchQuery(suggestions[0].label);
-                  handleSearch(suggestions[0].label);
-                } else handleSearch(searchQuery.trim());
+                handleSearch(searchQuery.trim());
               }
             }}
             onChange={handleSuggestionSelect}

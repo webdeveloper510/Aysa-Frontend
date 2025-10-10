@@ -365,10 +365,7 @@ export const TabThree = () => {
             inputValue={searchQuery}
             onBlur={(event) => {
               if (searchQuery.trim()) {
-                if (suggestions.length >= 1) {
-                  handleSearch(suggestions[0].label);
-                  setSearchQuery(suggestions[0].label);
-                } else handleSearch(searchQuery.trim());
+                handleSearch(searchQuery.trim());
               }
             }}
             onInputChange={(event, newInputValue) => {
@@ -379,6 +376,7 @@ export const TabThree = () => {
                 setFilteredData([]);
                 return;
               }
+              setError("");
               setSelectedOption(null);
               setSearchQuery(newInputValue);
             }}

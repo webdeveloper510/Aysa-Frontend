@@ -109,6 +109,7 @@ export const TabThree = () => {
       return dp[a.length][b.length];
     };
 
+    // Build initial results with scoring
     const results = allTaxData
       .map((item) => {
         const company = item.companyName.toLowerCase();
@@ -180,33 +181,27 @@ export const TabThree = () => {
     const queryYearMatch = query.match(/\d{4}/);
     const queryYear = queryYearMatch ? parseInt(queryYearMatch[0], 10) : null;
 
-    // Separate exact year matches
-    let yearMatches = [];
-    let otherMatches = [];
+    if (queryYear) {
+      // Strict year match if user typed a year
+      ranked = ranked.filter((item) => item.year === queryYear);
+    } else {
+      // No year in query, fallback to original grouping & sorting
+      const grouped = ranked.reduce((acc, item) => {
+        const key = item.companyName.toLowerCase();
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(item);
+        return acc;
+      }, {});
 
-    ranked.forEach((item) => {
-      if (queryYear && item.year === queryYear) yearMatches.push(item);
-      else otherMatches.push(item);
-    });
+      Object.values(grouped).forEach((group) =>
+        group.sort((a, b) => b.year - a.year)
+      );
 
-    // Group remaining by company and sort by year descending
-    const grouped = otherMatches.reduce((acc, item) => {
-      const key = item.companyName.toLowerCase();
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {});
-
-    Object.values(grouped).forEach((group) =>
-      group.sort((a, b) => b.year - a.year)
-    );
-
-    const groupedSorted = Object.keys(grouped)
-      .map((key) => grouped[key])
-      .flat();
-
-    // Combine exact year matches first, then grouped & sorted results
-    ranked = [...yearMatches, ...groupedSorted].slice(0, 20);
+      ranked = Object.keys(grouped)
+        .map((key) => grouped[key])
+        .flat()
+        .slice(0, 20);
+    }
 
     return ranked;
   }, [searchQuery, allTaxData]);

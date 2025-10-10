@@ -111,6 +111,10 @@ export const TabTwo = () => {
     const query = searchQuery.toLowerCase().trim();
     const queryParts = Array.from(new Set(query.match(/\w+/g) || [])); // remove duplicates
 
+    // Extract full 4-digit year if present
+    const queryYearMatch = query.match(/\b\d{4}\b/);
+    const queryYear = queryYearMatch ? parseInt(queryYearMatch[0], 10) : null;
+
     // Levenshtein distance for fuzzy matching
     const levenshtein = (a, b) => {
       const dp = Array.from({ length: a.length + 1 }, (_, i) =>
@@ -133,7 +137,10 @@ export const TabTwo = () => {
       .map((item) => {
         const company = item.companyName.toLowerCase();
         const ceo = item.ceoName.toLowerCase();
-        const year = item.year.toString();
+        const year = item.year;
+
+        // If strict year exists and does not match, skip immediately
+        if (queryYear && year !== queryYear) return null;
 
         let matches = 0;
         let multiFieldMatches = 0;
@@ -142,12 +149,11 @@ export const TabTwo = () => {
         queryParts.forEach((p) => {
           const inCompany = company.includes(p);
           const inCEO = ceo.includes(p);
-          const inYear = year.includes(p);
+          const inYear = year.toString().includes(p);
 
           if (inCompany || inCEO || inYear) {
             matches += 1;
 
-            // Count if word appears in multiple fields
             if (
               (inCompany && inCEO) ||
               (inCompany && inYear) ||
@@ -155,7 +161,6 @@ export const TabTwo = () => {
             )
               multiFieldMatches += 1;
 
-            // Partial matches (not exact or startsWith)
             if (
               (inCompany && company !== p && !company.startsWith(p)) ||
               (inCEO && ceo !== p && !ceo.startsWith(p))
@@ -168,7 +173,6 @@ export const TabTwo = () => {
 
         let score = 1; // lower = better
 
-        // Exact & startsWith boosts
         if (company === query) score -= 0.7;
         else if (company.startsWith(query)) score -= 0.4;
         else score += partialMatches * 0.05;
@@ -176,17 +180,12 @@ export const TabTwo = () => {
         if (ceo === query) score -= 0.6;
         else if (ceo.startsWith(query)) score -= 0.35;
 
-        // Year matching: partial years get smaller boost
-        if (year === query) score -= 0.5;
-        else if (year.includes(query)) score -= 0.25;
+        if (year.toString() === query) score -= 0.5;
+        else if (year.toString().includes(query)) score -= 0.25;
 
-        // Multi-field match boost
         score -= multiFieldMatches * 0.15;
-
-        // More matched words = better
         score -= matches * 0.1;
 
-        // Fuzzy match for typos
         const companyDist = levenshtein(query, company);
         const ceoDist = levenshtein(query, ceo);
         score += Math.min(companyDist, ceoDist) * 0.05;
@@ -195,7 +194,6 @@ export const TabTwo = () => {
       })
       .filter(Boolean);
 
-    // Sort by ascending score (best match first) and return top 20
     return results.sort((a, b) => a.score - b.score).slice(0, 20);
   }, [searchQuery, allCeoWorkerData]);
 

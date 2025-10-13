@@ -287,7 +287,7 @@ export const TabNull = ({
     return sortedSuggestions.slice(0, 15);
   }, [searchQuery, allProductsData]);
 
-  const handleSearch = async (query, year = 2025) => {
+  const handleSearch = async (query, year = "null") => {
     if (!query.trim()) {
       setData({ matched: [], compared: [] });
       setSearchQuery("");

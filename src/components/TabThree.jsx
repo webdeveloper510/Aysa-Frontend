@@ -91,7 +91,16 @@ export const TabThree = () => {
     const query = searchQuery.toLowerCase().trim();
     const queryParts = Array.from(new Set(query.match(/\w+/g) || []));
 
-    // Levenshtein distance for fuzzy matching
+    // Extract year from query
+    const queryYearMatch = query.match(/\d{4}/);
+    const queryYear = queryYearMatch ? parseInt(queryYearMatch[0], 10) : null;
+
+    // Remove the year from queryParts for company matching
+    const companyParts = queryParts.filter(
+      (p) => p !== (queryYear?.toString() ?? "")
+    );
+
+    // Levenshtein distance
     const levenshtein = (a, b) => {
       const dp = Array.from({ length: a.length + 1 }, (_, i) =>
         Array(b.length + 1).fill(0)
@@ -109,101 +118,40 @@ export const TabThree = () => {
       return dp[a.length][b.length];
     };
 
-    // Build initial results with scoring
     const results = allTaxData
+      .filter((item) => {
+        // strict year match if year is present
+        if (queryYear && item.year !== queryYear) return false;
+
+        // if companyParts exist, at least one must match company
+        if (companyParts.length > 0) {
+          const company = item.companyName.toLowerCase();
+          const matches = companyParts.some((p) => company.includes(p));
+          if (!matches) return false;
+        }
+
+        return true;
+      })
       .map((item) => {
         const company = item.companyName.toLowerCase();
         const year = item.year.toString();
-        const taxesPaid = item.taxesPaid?.toString() || "";
-        const taxesAvoided = item.taxesAvoided?.toString() || "";
+        let score = 1;
 
-        let matches = 0;
-        let multiFieldMatches = 0;
-        let partialMatches = 0;
+        // exact / startsWith boosts
+        if (company === companyParts.join(" ")) score -= 0.6;
+        else if (company.startsWith(companyParts.join(" "))) score -= 0.4;
+        if (year === queryYear?.toString()) score -= 0.5;
 
-        queryParts.forEach((p) => {
-          const inCompany = company.includes(p);
-          const inYear = year.includes(p);
-          const inPaid = taxesPaid.includes(p);
-          const inAvoided = taxesAvoided.includes(p);
-
-          if (inCompany || inYear || inPaid || inAvoided) {
-            matches += 1;
-
-            // Multi-field match boost
-            const fieldsMatched = [inCompany, inYear, inPaid, inAvoided].filter(
-              Boolean
-            ).length;
-            if (fieldsMatched > 1) multiFieldMatches += 1;
-
-            // Partial matches (not exact or startsWith)
-            if (
-              (inCompany && company !== p && !company.startsWith(p)) ||
-              (inPaid && taxesPaid !== p) ||
-              (inAvoided && taxesAvoided !== p)
-            )
-              partialMatches += 1;
-          }
-        });
-
-        if (matches === 0) return null;
-
-        let score = 1; // lower = better
-
-        // Exact & startsWith boosts
-        if (company === query) score -= 0.6;
-        else if (company.startsWith(query)) score -= 0.4;
-
-        if (year === query) score -= 0.5;
-        else if (year.includes(query)) score -= 0.25;
-
-        // Multi-field match boost
-        score -= multiFieldMatches * 0.15;
-
-        // More matched words = higher relevance
-        score -= matches * 0.1;
-
-        // Partial match penalty
-        score += partialMatches * 0.05;
-
-        // Fuzzy matching for typos
-        const companyDist = levenshtein(query, company);
+        // fuzzy company matching
+        const companyDist = levenshtein(companyParts.join(" "), company);
         score += companyDist * 0.05;
 
         return { ...item, score };
       })
-      .filter(Boolean);
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 50);
 
-    // Sort by score ascending (best first)
-    let ranked = results.sort((a, b) => a.score - b.score).slice(0, 50);
-
-    // Extract year from query
-    const queryYearMatch = query.match(/\d{4}/);
-    const queryYear = queryYearMatch ? parseInt(queryYearMatch[0], 10) : null;
-
-    if (queryYear) {
-      // Strict year match if user typed a year
-      ranked = ranked.filter((item) => item.year === queryYear);
-    } else {
-      // No year in query, fallback to original grouping & sorting
-      const grouped = ranked.reduce((acc, item) => {
-        const key = item.companyName.toLowerCase();
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-      }, {});
-
-      Object.values(grouped).forEach((group) =>
-        group.sort((a, b) => b.year - a.year)
-      );
-
-      ranked = Object.keys(grouped)
-        .map((key) => grouped[key])
-        .flat()
-        .slice(0, 20);
-    }
-
-    return ranked;
+    return results;
   }, [searchQuery, allTaxData]);
 
   const handleSearch = async (query) => {

@@ -84,12 +84,15 @@ export const TabThree = () => {
 
     fetchAllTaxData();
   }, []);
-
   const suggestions = useMemo(() => {
     if (!searchQuery?.trim() || allTaxData.length === 0) return [];
 
     const query = searchQuery.toLowerCase().trim();
-    const queryParts = Array.from(new Set(query.match(/\w+/g) || []));
+
+    // ✅ Improved: capture parts like “H&M”, “Louis-Vuitton”, “P&G”, etc.
+    const queryParts = Array.from(
+      new Set(query.match(/[a-z0-9&@\-./']+/gi) || [])
+    );
 
     // Extract year from query
     const queryYearMatch = query.match(/\d{4}/);
@@ -100,7 +103,7 @@ export const TabThree = () => {
       (p) => p !== (queryYear?.toString() ?? "")
     );
 
-    // Levenshtein distance
+    // Levenshtein distance function
     const levenshtein = (a, b) => {
       const dp = Array.from({ length: a.length + 1 }, (_, i) =>
         Array(b.length + 1).fill(0)
@@ -109,10 +112,10 @@ export const TabThree = () => {
       for (let j = 0; j <= b.length; j++) dp[0][j] = j;
       for (let i = 1; i <= a.length; i++) {
         for (let j = 1; j <= b.length; j++) {
-          if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];
-          else
-            dp[i][j] =
-              1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+          dp[i][j] =
+            a[i - 1] === b[j - 1]
+              ? dp[i - 1][j - 1]
+              : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
         }
       }
       return dp[a.length][b.length];
@@ -138,12 +141,13 @@ export const TabThree = () => {
         let score = 1;
 
         // exact / startsWith boosts
-        if (company === companyParts.join(" ")) score -= 0.6;
-        else if (company.startsWith(companyParts.join(" "))) score -= 0.4;
+        const companyJoined = companyParts.join(" ");
+        if (company === companyJoined) score -= 0.6;
+        else if (company.startsWith(companyJoined)) score -= 0.4;
         if (year === queryYear?.toString()) score -= 0.5;
 
         // fuzzy company matching
-        const companyDist = levenshtein(companyParts.join(" "), company);
+        const companyDist = levenshtein(companyJoined, company);
         score += companyDist * 0.05;
 
         return { ...item, score };

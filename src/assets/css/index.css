@@ -327,6 +327,7 @@ div#mobile-inital-render {
 }
 .customGraphMobile span {
   font-size: 11px !important;
+  min-width: 50px;
 }
 .customGraphMobile::before {
   content: "";

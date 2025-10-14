@@ -343,7 +343,7 @@ export const TabNull = ({
     };
 
     query = dedupeRepeatedPhrases(query);
-    setSearchQuery(query);
+    setSearchQuery(query.replace(/\b(\w+)\s+\1\b/gi, "$1"));
 
     console.log("After cleaning:", query);
 

@@ -990,7 +990,10 @@ export const TabNull = ({
                             variant="h6"
                             sx={{ fontWeight: "bold", mb: 1 }}
                           >
-                            {row.Brand} {row["Product Name"]}{" "}
+                            {`${row.Brand} ${row["Product Name"]}`.replace(
+                              /\b(\w+)\s+\1\b/gi,
+                              "$1"
+                            )}
                           </Typography>
 
                           <Box sx={{ width: "100%", mb: 1 }}>

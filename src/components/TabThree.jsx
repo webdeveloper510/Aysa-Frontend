@@ -89,7 +89,7 @@ export const TabThree = () => {
 
     const query = searchQuery.toLowerCase().trim();
 
-    // ✅ Improved: capture parts like “H&M”, “Louis-Vuitton”, “P&G”, etc.
+    // ✅ Capture company name parts including special chars
     const queryParts = Array.from(
       new Set(query.match(/[a-z0-9&@\-./']+/gi) || [])
     );
@@ -103,7 +103,7 @@ export const TabThree = () => {
       (p) => p !== (queryYear?.toString() ?? "")
     );
 
-    // Levenshtein distance function
+    // Levenshtein distance function for fuzzy matching
     const levenshtein = (a, b) => {
       const dp = Array.from({ length: a.length + 1 }, (_, i) =>
         Array(b.length + 1).fill(0)
@@ -123,10 +123,10 @@ export const TabThree = () => {
 
     const results = allTaxData
       .filter((item) => {
-        // strict year match if year is present
+        // strict year match if query includes a year
         if (queryYear && item.year !== queryYear) return false;
 
-        // if companyParts exist, at least one must match company
+        // at least one part of company name must match
         if (companyParts.length > 0) {
           const company = item.companyName.toLowerCase();
           const matches = companyParts.some((p) => company.includes(p));
@@ -137,14 +137,14 @@ export const TabThree = () => {
       })
       .map((item) => {
         const company = item.companyName.toLowerCase();
-        const year = item.year.toString();
+        const year = item.year;
         let score = 1;
 
         // exact / startsWith boosts
         const companyJoined = companyParts.join(" ");
         if (company === companyJoined) score -= 0.6;
         else if (company.startsWith(companyJoined)) score -= 0.4;
-        if (year === queryYear?.toString()) score -= 0.5;
+        if (year === queryYear) score -= 0.5;
 
         // fuzzy company matching
         const companyDist = levenshtein(companyJoined, company);
@@ -152,7 +152,11 @@ export const TabThree = () => {
 
         return { ...item, score };
       })
-      .sort((a, b) => a.score - b.score)
+      // ✅ Sort by year descending first, then by score ascending
+      .sort((a, b) => {
+        if (b.year !== a.year) return b.year - a.year;
+        return a.score - b.score;
+      })
       .slice(0, 50);
 
     return results;

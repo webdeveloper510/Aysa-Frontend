@@ -249,14 +249,17 @@ export const TabThree = () => {
       const searchTerm = `${value.companyName} (${value.year})`;
       handleSearch(searchTerm);
     } else if (typeof value === "string") {
-      // if (suggestions.length >= 1) {
-      //   handleSearch(suggestions[0].label);
-      //   setSearchQuery(suggestions[0].label);
-      // } else {
-      const cleanValue = value.replace(/\\/g, "").trim();
-      setSearchQuery(cleanValue);
-      handleSearch(cleanValue);
-      // }
+      const isNumeric = (value) => /^\d+$/.test(value);
+      if (isNumeric(value.trim())) {
+        if (suggestions.length >= 1) {
+          handleSearch(suggestions[0].label);
+          setSearchQuery(suggestions[0].label);
+        } else handleSearch(value.trim());
+      } else {
+        const cleanValue = value.replace(/\\/g, "").trim();
+        setSearchQuery(cleanValue);
+        handleSearch(cleanValue);
+      }
     }
   };
 
@@ -315,7 +318,14 @@ export const TabThree = () => {
             }}
             inputValue={searchQuery}
             onBlur={(event) => {
-              if (searchQuery.trim()) {
+              const value = searchQuery.trim();
+              const isNumeric = (value) => /^\d+$/.test(value);
+              if (isNumeric(searchQuery)) {
+                if (suggestions.length >= 1) {
+                  handleSearch(suggestions[0].label);
+                  setSearchQuery(suggestions[0].label);
+                } else handleSearch(searchQuery.trim());
+              } else {
                 handleSearch(searchQuery.trim());
               }
             }}

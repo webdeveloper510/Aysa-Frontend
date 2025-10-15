@@ -311,13 +311,16 @@ export const TabTwo = () => {
     } else if (typeof value === "string") {
       // Clean the string to remove any extra formatting
       const cleanValue = value.replace(/\\/g, "").trim();
-      // if (suggestions.length >= 1) {
-      //   handleSearch(suggestions[0].label);
-      //   setSearchQuery(suggestions[0].label);
-      // } else {
-      setSearchQuery(cleanValue);
-      handleSearch(cleanValue);
-      // }
+      const isNumeric = (value) => /^\d+$/.test(value);
+      if (isNumeric(value)) {
+        if (suggestions.length >= 1) {
+          handleSearch(suggestions[0].label);
+          setSearchQuery(suggestions[0].label);
+        } else handleSearch(value);
+      } else {
+        setSearchQuery(cleanValue);
+        handleSearch(cleanValue);
+      }
     }
   };
 
@@ -387,8 +390,15 @@ export const TabTwo = () => {
               setSearchQuery(newInputValue);
             }}
             onBlur={(event) => {
-              if (searchQuery.trim()) {
-                handleSearch(searchQuery.trim());
+              const value = searchQuery.trim();
+              if (value) {
+                const isNumeric = (value) => /^\d+$/.test(value);
+                if (isNumeric(value)) {
+                  if (suggestions.length >= 1) {
+                    handleSearch(suggestions[0].label);
+                    setSearchQuery(suggestions[0].label);
+                  } else handleSearch(searchQuery.trim());
+                } else handleSearch(searchQuery.trim());
               }
             }}
             onChange={handleSuggestionSelect}

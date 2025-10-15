@@ -38,6 +38,19 @@ export const TabTwo = () => {
   const isDesktop = useMediaQuery("(min-width:768px)");
   const [open, setopen] = useState(null);
 
+  const formatPayRatio = (value) => {
+    if (!value) return "N/A";
+    return value
+      .toString()
+      .toLowerCase()
+      .split("x")
+      .map((part) => {
+        const num = parseFloat(part.trim());
+        return isNaN(num) ? part.trim() : num.toLocaleString("en-US");
+      })
+      .join(" ×");
+  };
+
   useEffect(() => {
     const ua = navigator.userAgent;
     if (/Mobi|Android|iPhone|iPod|iPad/i.test(ua)) {
@@ -528,10 +541,7 @@ export const TabTwo = () => {
                           {row.ceo_name} –{" "}
                           <strong>{row.ceo_total_compensation}</strong> vs
                           Worker <strong>{row.worker_salary}</strong>{" "}
-                          {`(${row["pay_ration"]
-                            .toLowerCase()
-                            .replace("x", " ×")})`}
-                          .
+                          {formatPayRatio(row["pay_ration"])}.
                         </Typography>
                       </CardContent>
                     </Grid>
@@ -555,9 +565,7 @@ export const TabTwo = () => {
                             fontSize: "20px",
                           }}
                         >
-                          {`${row["pay_ration"]
-                            .toLowerCase()
-                            .replace("x", " ×")}`}
+                          {formatPayRatio(row["pay_ration"])}
                         </Box>
                       </CardContent>
                     </Grid>
@@ -567,8 +575,7 @@ export const TabTwo = () => {
                     CEO {row.ceo_name} made an estimate of{" "}
                     {row.ceo_total_compensation} vs. the average worker making{" "}
                     {row.worker_salary}. That’s{" "}
-                    {row["pay_ration"]?.toLowerCase().replace("x", "")} times
-                    more.
+                    {formatPayRatio(row["pay_ration"])} times more.
                   </Typography>
                 </Card>
               </>
@@ -655,9 +662,7 @@ export const TabTwo = () => {
                             fontSize: "1.5rem",
                           }}
                         >
-                          {`${row["pay_ratio"]
-                            .toLowerCase()
-                            .replace("x", " ×")}`}
+                          {formatPayRatio(row["pay_ratio"])}
                         </Box>
                       </CardContent>
                     </Grid>
@@ -667,14 +672,14 @@ export const TabTwo = () => {
                   <Typography align="left" variant="h6" sx={{ color: "#000" }}>
                     {row.ceo_name} –{" "}
                     <strong>{row.ceo_total_compensation}</strong> vs Worker{" "}
-                    <strong>{row.worker_salary}</strong>{" "}
-                    {`(${row["pay_ratio"].toLowerCase().replace("x", " ×")})`}.
+                    <strong>{row.worker_salary}</strong> (
+                    {formatPayRatio(row["pay_ratio"])})
                   </Typography>
 
                   <Typography variant="h6" mt="10px" align="left">
                     CEO {row.ceo_name} made {row.ceo_total_compensation} vs. the
-                    average worker making {row.worker_salary}.That’s{" "}
-                    {row["pay_ratio"]?.toLowerCase().replace("x", "")} times
+                    average worker making {row.worker_salary}. That’s{" "}
+                    {formatPayRatio(row["pay_ratio"]).replace(" ×", "")} times
                     more.
                   </Typography>
                 </Card>

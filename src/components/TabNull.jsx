@@ -27,7 +27,7 @@ export const TabNull = ({
   const [deviceType, setDeviceType] = useState("desktop");
   const [globalData, setglobalData] = useState({});
   const [open, setopen] = useState(false);
-  const [submitted, setsubmitted] = useState(false);
+  // const [submitted, setsubmitted] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width:768px)");
 
@@ -344,12 +344,9 @@ export const TabNull = ({
 
     query = dedupeRepeatedPhrases(query);
     setSearchQuery(query.replace(/\b(\w+)\s+\1\b/gi, "$1"));
-
-    console.log("After cleaning:", query);
-
     setLoading(true);
     setError("");
-    setsubmitted(true);
+    // setsubmitted(true);
 
     try {
       const response = await fetch(
@@ -586,9 +583,13 @@ export const TabNull = ({
                 setshowComparison(false);
                 return;
               }
-              if (submitted) {
-                setsubmitted(false);
-              } else setSearchQuery(newInputValue);
+              // if (submitted) {
+              //   console.log("here1");
+              //   setsubmitted(false);
+              // } else {
+              //   console.log("here2");
+              setSearchQuery(newInputValue);
+              // }
               setStatus(0);
             }}
             onChange={handleSuggestionSelect}

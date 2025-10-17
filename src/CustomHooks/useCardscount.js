@@ -7,6 +7,7 @@ export function useCardscount() {
   const [TodaysProfitSearch, setTodaysProfitSearch] = useState(0);
   const [TodaysTaxSearch, setTodaysTaxSearch] = useState(0);
   const [TodaysCeoSearch, setTodaysCeoSearch] = useState(0);
+  const [TotalSearch, setTotalSearch] = useState(0);
 
   useEffect(() => {
     async function getData() {
@@ -41,6 +42,11 @@ export function useCardscount() {
         setTodaysProfitSearch(res?.data?.data?.profit?.search_count || 0);
         setTodaysTaxSearch(res?.data?.data?.tax?.search_count || 0);
         setTodaysCeoSearch(res?.data?.data["ceo-worker"]?.search_count || 0);
+        setTotalSearch(
+          (res?.data?.data?.profit?.search_count || 0) +
+            (res?.data?.data?.tax?.search_count || 0) +
+            (res?.data?.data["ceo-worker"]?.search_count || 0)
+        );
       } catch (err) {
         console.error(err);
       }
@@ -55,5 +61,6 @@ export function useCardscount() {
     TodaysCeoSearch,
     todaysVisitors,
     totalVisitors,
+    TotalSearch,
   };
 }

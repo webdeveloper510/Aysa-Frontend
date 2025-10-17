@@ -15,6 +15,7 @@ const DashBoard = () => {
     TodaysCeoSearch,
     todaysVisitors,
     totalVisitors,
+    TotalSearch,
   } = useCardscount();
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 p-6">
@@ -96,6 +97,15 @@ const DashBoard = () => {
             Today's Tax Avoidance Search
           </p>
           <p className="text-2xl font-bold">{TodaysTaxSearch}</p>
+        </div>
+
+        {/* Today's Total Searches */}
+        <div className="w-40 h-40 bg-gradient-to-br from-purple-400 to-violet-600 rounded-full flex flex-col items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 text-white">
+          <ShoppingCart className="w-10 h-10 mb-2 text-purple-100" />
+          <p className="text-sm font-medium text-center px-2">
+            Today's Total Searches
+          </p>
+          <p className="text-2xl font-bold">{TotalSearch}</p>
         </div>
       </div>
     </div>
